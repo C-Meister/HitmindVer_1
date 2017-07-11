@@ -25,7 +25,7 @@
 #ifdef SANGHIE				//상희 전용
 #include <mysql/mysql.h>	//DB헤더파일
 #else
-#include <mysql.h>
+#include "mysql/mysql.h"
 #endif
 
 // 라이브러리 선언문 라이브러리파일은 따로 추가안해도 됩니다.
