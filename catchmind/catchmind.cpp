@@ -114,10 +114,22 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
+
 	//변수 선언 끝
+
 	disablecursor(1);
+//	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
-	
+	uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
+	cur(120, 30);
+	printf("-------------");
+	while (1) {
+		
+		EnterCriticalSection(&cs);
+		LeaveCriticalSection(&cs);
+	//	cur(0, 0);
+	//	printf("%d %d  ", pos.x, pos.y);
+	}
 	return 0;
 
 }
@@ -147,7 +159,7 @@ void checkword(char*nowword, char*scanword) {
 } //알아서 비교해줌
 void chating(MYSQL *cons)
 {
-	POINT po;
+	char query[300];
 	int i = 0;
 	TCHAR buff;
 	char buff2 = 0;
@@ -184,6 +196,8 @@ void chating(MYSQL *cons)
 		}
 		CLS;
 		i = 0;
+		sprintf(query, "insert into catchmind.chating (name, mean) values ('서상희', '%S')", buffer);
+		mysql_query(cons, query);
 		memset(buffer, 0, sizeof(buffer));
 		cur(40, 20);
 		printf("                                                   ");
