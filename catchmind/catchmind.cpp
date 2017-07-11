@@ -67,6 +67,7 @@
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);      // 흰색
 //구조체 선언
 typedef struct {
+	char name[20];
 	char id[30];
 	char pass[50];
 }LOG;
@@ -86,6 +87,7 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);
+int sqlsignup(MYSQL *cons);
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//채팅을 입력하는 함수
@@ -104,6 +106,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);
 LOG login();
+
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -531,4 +534,25 @@ int sqllogin(MYSQL *cons) {
 			return 0;
 		}
 	}
+}
+int sqlsignup(MYSQL *cons) {
+	LOG user;
+	char query[100];
+	printf("회원가입을 합니다. 비밀번호는 암호화되어 저장이됩니다.\n");
+	user = login();
+	printf("\n이름 : ");
+	fgets(user.name, sizeof(user.name), stdin);
+	CHOP(user.name);
+	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
+	if (mysql_query(cons, query))
+	{
+		printf("\n회원가입 성공");
+		return 1;
+	}
+	else
+	{
+		printf("\n회원가입 실패");
+		return 0;
+	}
+
 }
