@@ -74,6 +74,8 @@ POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 �
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
+void Connect_Server();
+void recieve();
 //--------------------- MySQL 함수들 --------------------------------------
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
@@ -102,7 +104,12 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
+	WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
+	SOCKET connect_sock;					//서버 소켓변수
+	SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
+	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
 	//변수 선언 끝
+
 	disablecursor(1);
 //	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
@@ -299,4 +306,10 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.w = w;//매개변수w를 직사각형의 너비에 대입
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
+}
+void Connect_Server() {
+
+}
+void recieve() {
+
 }
