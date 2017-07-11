@@ -7,7 +7,7 @@
 신상호 -- 소켓 프로그래밍 server, client 구현
 장민석 -- 그래픽 라이브러리를 사용하여 게임내부 구현
 서상희 -- 전체적인 틀을 합침, mysql 구현
-※Visual Studio 2017에서 사용이 용이합니다
+※Visual Studio 2013 이상에서 사용이 가능합니다
 */
 // 헤더파일 선언문
 //기본 헤더파일
@@ -31,7 +31,7 @@
 #define CLS system("cls")		//화면 지우기
 #define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
-#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4));
+#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //기본 함수들
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
