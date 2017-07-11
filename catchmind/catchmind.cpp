@@ -27,7 +27,7 @@
 #include <mysql.h>
 #endif
 
-// 라이브러리 선언문
+// 라이브러리 선언문 라이브러리파일은 따로 추가안해도 됩니다.
 // #pragma comment 는 visual studio에서만 사용 가능 *솔루션 플렛폼을 64비트로 해주세요
 #pragma comment (lib, "libmysql.lib")	//mysql라이브러리
 #pragma comment (lib, "SDL2")			//그래픽 라이브러리 1
@@ -64,14 +64,13 @@ char **mysqlquery(MYSQL *cons, char *query);
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
-	
 	//변수 선언
 	int i, j, k, v, result;
-	MYSQL *cons = mysql_init(NULL);
-	MYSQL_RES *sql_result;
-	MYSQL_ROW sql_row;
+	MYSQL *cons = mysql_init(NULL);	//mysql 초기화
+	MYSQL_RES *sql_result;			//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;				//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];
-	char mysqlip[30] = "10.80.161.182";
+	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
 	//변수 선언 끝
 	loadmysql(cons, mysqlip);
 	return 0;
@@ -83,22 +82,22 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 {
 	CLS;
 	printf("데이터베이스 불러오기 시도중...");
-	if (cons == NULL)
+	if (cons == NULL) //cons가 초기화를 못했으면
 	{
-		fprintf(stderr, "%s\n", mysql_error(cons));
+		fprintf(stderr, "%s\n", mysql_error(cons));		//에러 프린트, printf("%s")와 같음
 		printf("채팅 서버 불러오기 실패 (초기화 오류)\n");
 		Sleep(1000);
 		exit(1);
 	}
 	else
 		printf("1");
-	if (mysql_real_connect(cons, mysqlip, "root", "tbvjaos15", NULL, 0, NULL, 0) == NULL)
+	if (mysql_real_connect(cons, mysqlip, "root", "tbvjaos15", NULL, 0, NULL, 0) == NULL) //mysql서버로 연결
 	{
 		printf("\b실패... \n서버가 존재하지 않습니다.\n");
 		fprintf(stderr, "%s\n", mysql_error(cons));
 		printf("새로운 ip를 설정해 주세요.");
 		scanf("%s", mysqlip);
-		loadmysql(cons, mysqlip);
+		loadmysql(cons, mysqlip);					//재귀함수 호출
 	}
 	else {
 		printf("\b2");
