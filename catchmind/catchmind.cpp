@@ -65,7 +65,7 @@ void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수
-void disablecursor(void);						//커서 숨기기
+void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -81,11 +81,12 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char query[400];						//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
 	//변수 선언 끝
-	disablecursor();
+	disablecursor(1);
 	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
 	while (1) {
 		pos = MouseClick();
+
 		cur(0, 0);
 		printf("%d %d  ", pos.x, pos.y);
 	}
@@ -157,9 +158,17 @@ void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
 	sprintf(buff, "mode con cols=%d lines=%d", x * 2, y);
 	system(buff);
 }
-void disablecursor(void) {
+void disablecursor(bool a) {
+	
 	CONSOLE_CURSOR_INFO ConsoleCursor;			// 콘솔커서 정보 구조체
-	ConsoleCursor.bVisible = false;				// true 보임 , false 안보임
-	ConsoleCursor.dwSize = 1;					// 커서 사이즈
+	if (a == true) {
+		ConsoleCursor.bVisible = false;				// true 보임 , false 안보임
+		ConsoleCursor.dwSize = 1;
+	}// 커서 사이즈
+	else
+	{
+		ConsoleCursor.bVisible = true;				// true 보임 , false 안보임
+		ConsoleCursor.dwSize = 10;
+	}
 	SetConsoleCursorInfo(COL, &ConsoleCursor);	// 설정
 }
