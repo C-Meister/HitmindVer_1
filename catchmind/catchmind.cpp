@@ -11,6 +11,7 @@
 */
 //전처리기
 #define _CRT_SECURE_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 // 헤더파일 선언문
 //기본 헤더파일
 #include <stdio.h>
@@ -19,6 +20,7 @@
 #include <conio.h>	
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
+#include <WinSock2.h>		//소켓프로그래밍
 
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
@@ -66,6 +68,8 @@ void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
+void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
+
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -171,4 +175,9 @@ void disablecursor(bool a) {
 		ConsoleCursor.dwSize = 10;
 	}
 	SetConsoleCursorInfo(COL, &ConsoleCursor);	// 설정
+}
+void ErrorHandling(char *Message) {
+	fputs(Message, stderr);
+	fputc('\n', stderr);
+	exit(1);	//오류가 발생했으니 그대로 프로그램 종료
 }
