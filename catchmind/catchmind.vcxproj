@@ -76,6 +76,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\상희\Desktop\프로그램\c언어그래픽\SDL - 최종 사용 결정\SDL2-2.0.5\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\상희\Desktop\프로그램\c언어그래픽\SDL - 최종 사용 결정\SDL2-2.0.5\lib;C:\Users\상희\Downloads\SDL2_image-2.0.1-20170711T000318Z-001\SDL2_image-2.0.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
