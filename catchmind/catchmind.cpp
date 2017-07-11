@@ -133,7 +133,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 //	ConsoleL(30, 30);
 #ifdef SANGHIE											//상희 테스트용
 	loadmysql(cons, mysqlip);
-	uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
+	sqllogin(cons);
+	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
 	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
 	cur(120, 30);
 	printf("-------------");
@@ -141,7 +142,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		Sleep(1000);
 		//	cur(0, 0);
 		//	printf("%d %d  ", pos.x, pos.y);
-	}
+	}*/
 	return 0;
 #else													//본 메인함수는 여기적어주세요
 	return 0;
@@ -501,12 +502,16 @@ void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 }
 int sqllogin(MYSQL *cons) {
 	LOG user = login();
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
 	while (1) {
 		user = login();
 		sprintf(query, "select * from catchmind.login where id = '%s'", user.id);
 		mysql_query(cons, query);
-		if (mysql_store_result(cons) == NULL)
+		sql_result = mysql_store_result(cons);
+		sql_row = mysql_fetch_row(sql_result);
+		if (sql_row[0][0] == 0)
 		{
 			printf("아이디가 존재하지 않습니다.");
 		}
@@ -516,6 +521,9 @@ int sqllogin(MYSQL *cons) {
 		{
 			printf("비밀번호가 틀렸습니다.");
 		}
-
+		else {
+			printf("로그인 성공");
+			return 0;
+		}
 	}
 }
