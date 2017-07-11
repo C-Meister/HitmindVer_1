@@ -74,8 +74,8 @@ POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 �
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server();
-void recieve();
+void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr,char *ServerIP); //서버 연결 해주는 함수
+void recieve();	//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
@@ -307,8 +307,19 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
-void Connect_Server() {
+void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP) {
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)	//소켓 프로그래밍 시작
+		ErrorHandling("WSAStartup() error");
+	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
+	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
+	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
+	connect_addr.sin_port = htons(5555);					 //서버 포트
+	if(connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
+		ErrorHandling("connect() error");
+	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
+	while (1) { //받아온 데이터 처리
 
+	}
 }
 void recieve() {
 
