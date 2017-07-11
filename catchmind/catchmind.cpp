@@ -87,12 +87,12 @@ void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP); //서버 연결 해주는 함수
 void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
-int sqllogin(MYSQL *cons);
-int sqlsignup(MYSQL *cons);
-void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
-char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
-void writechating(MYSQL *cons);					//채팅을 입력하는 함수
-void readchating(MYSQL *cons);					//채팅을 읽는 함수
+int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
+int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
+void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
+char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
+void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
+void readchating(MYSQL *cons);					//mysqm의 채팅을 읽는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
@@ -105,8 +105,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 // -------------------- 게임 내부 함수들 ----------------------------------
 
 //-------------------------콘솔 함수들------------------------------------
-void checkword(char*nowword, char*scanword);
-LOG login();
+void checkword(char*nowword, char*scanword);						//단어를 확인함
+LOG login();														//id 비밀번호를 형식에 맞게 입력을함 
 
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
