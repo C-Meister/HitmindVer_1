@@ -22,11 +22,11 @@
 
 //특수 헤더파일 (따로 설치) 
 #include <SDL.h>			//SDL - 그래픽 헤더파일
-#ifdef SANGHIE				//상희 전용
-#include <mysql/mysql.h>	//DB헤더파일
-#else
+			//상희 전용
+//#include <mysql/mysql.h>	//DB헤더파일
+
 #include "mysql/mysql.h"
-#endif
+
 
 // 라이브러리 선언문 라이브러리파일은 따로 추가안해도 됩니다.
 // #pragma comment 는 visual studio에서만 사용 가능 *솔루션 플렛폼을 64비트로 해주세요
