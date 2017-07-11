@@ -28,7 +28,7 @@
 #endif
 
 // 라이브러리 선언문
-// #pragma comment 는 visual studio에서만 사용 가능
+// #pragma comment 는 visual studio에서만 사용 가능 *솔루션 플렛폼을 64비트로 해주세요
 #pragma comment (lib, "libmysql.lib")	//mysql라이브러리
 #pragma comment (lib, "SDL2")			//그래픽 라이브러리 1
 #pragma comment (lib, "SDL2main")		//그래픽 라이브러리 2
