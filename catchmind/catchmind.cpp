@@ -37,7 +37,6 @@
 #define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
-
 //색깔출력 쉬운버전 
 #define COL                   GetStdHandle(STD_OUTPUT_HANDLE)        // 콘솔창의 핸들정보 받기
 #define BLACK                SetConsoleTextAttribute(COL, 0x0000);        // 검정색
@@ -47,7 +46,7 @@
 #define BLOOD               SetConsoleTextAttribute(COL, 0x0004);        // 검붉은색
 #define PURPLE               SetConsoleTextAttribute(COL, 0x0005);        // 보라색
 #define GOLD                 SetConsoleTextAttribute(COL, 0x0006);        // 금색
-#define ORIGINAL            SetConsoleTextAttribute(COL, 0x0007);        // 밝은 회색 (ORIGINAL CONSOLE COLOR)
+#define ORIGINAL            SetConsoleTextAttribute(COL, 0x0007);        // 밝은 회색 (기본 콘솔 글씨 색깔)
 #define GRAY                 SetConsoleTextAttribute(COL, 0x0008);        // 회색
 #define BLUE                  SetConsoleTextAttribute(COL, 0x0009);        // 파란색
 #define HIGH_GREEN       SetConsoleTextAttribute(COL, 0x000a);        // 연두색
@@ -58,7 +57,7 @@
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);        // 흰색
 
 //기본 함수들
-
+void ConsoleL(int x, int y);				//콘솔창의 크기를 설정하는 함수 x y의 너비가 같다
 void loadmysql(MYSQL *cons, char mysqlip[]); //MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 POINT MouseClick(void);			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
@@ -78,6 +77,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char query[400];				//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
 	//변수 선언 끝
+	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
 	pos = MouseClick();
 	printf("%d %d", pos.x, pos.y);
@@ -143,4 +143,9 @@ POINT MouseClick(void)			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
 			}
 		} 
 	}
+}
+void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
+	char buff[50];
+	sprintf(buff, "mode con cols=%d lines=%d", x * 2, y);
+	system(buff);
 }
