@@ -118,7 +118,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 //	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
-	checkword(nowword, scanword);
+    //checkword(nowword, scanword); //정답비교
 //	DWORD pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
 /*	cur(120, 30);
 	printf("-------------");
