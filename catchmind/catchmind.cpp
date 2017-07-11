@@ -73,9 +73,10 @@ typedef struct {
 }LOG;
 
 //전역 변수들 (사용 비추천)
-//이벤트
-CRITICAL_SECTION cs;
-char message[100];
+
+CRITICAL_SECTION cs;	//이벤트
+char message[100];		//소켓 프로그래밍 문자열
+char username[30];		//사용자 이름
 
 //기본 함수들
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
@@ -504,36 +505,35 @@ void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 	}
 }
 int sqllogin(MYSQL *cons) {
-	LOG user;
+	LOG user;								//사용자 정보 구조체
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
-	while (1) {
-		user = login();
-		sprintf(query, "select * from catchmind.login where id = '%s'", user.id);
-		mysql_query(cons, query);
-		sql_result = mysql_store_result(cons);
-		
-		if (mysql_fetch_row(sql_result) == NULL)
-		{
-			printf("\n아이디가 존재하지 않습니다.\n");
-			continue;
-		}
-		else
-			printf("\n아이디 OK");
-		sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass);
-		mysql_query(cons, query);
-		sql_result = mysql_store_result(cons);
-		if (mysql_fetch_row(sql_result) == NULL)
-		{
-			printf("\n비밀번호가 틀렸습니다.\n");
-			continue;
-		}
-		else {
-			printf("\n로그인 성공");
-			return 0;
-		}
+	user = login();							//login 함수를 사용
+	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
+	mysql_query(cons, query);
+	sql_result = mysql_store_result(cons);
+
+	if (mysql_fetch_row(sql_result) == NULL)									//해댱 id가 없으면 
+	{
+		printf("\n아이디가 존재하지 않습니다.\n");
+		return 0;
 	}
+	else
+		printf("\n아이디 OK");
+	sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass); 
+	mysql_query(cons, query);	//password는 DB에 암호화되어 있어서 값을 비교할때도 서로 암호화해서 비교를함
+	sql_result = mysql_store_result(cons);
+	if (mysql_fetch_row(sql_result) == NULL)
+	{
+		printf("\n비밀번호가 틀렸습니다.\n");
+		return 0;
+	}
+	else {
+		printf("\n로그인 성공");
+		return 1;
+	}
+
 }
 int sqlsignup(MYSQL *cons) {
 	LOG user;
@@ -542,9 +542,9 @@ int sqlsignup(MYSQL *cons) {
 	user = login();
 	printf("\n이름 : ");
 	fgets(user.name, sizeof(user.name), stdin);
-	CHOP(user.name);
+	CHOP(user.name);							//문자열에 스페이스바를 지워버림
 	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
-	if (mysql_query(cons, query))
+	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
 	{
 		printf("\n회원가입 성공");
 		return 1;
