@@ -12,8 +12,11 @@
 // 헤더파일 선언문
 //기본 헤더파일
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <conio.h>	
 #include <windows.h>
+
 #include <process.h>		//process 멀티쓰레드용
 
 //특수 헤더파일 (따로 설치) 
