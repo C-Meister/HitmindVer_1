@@ -109,11 +109,16 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	SOCKET connect_sock;					//서버 소켓변수
 	SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
 	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
+	char data[1000][30] = { 0, };           //단어데이터
+	char nowword[30] = { 0, };              //랜덤선택 단어
+	char scanword[30] = { 0, };             //내가 친 단어
+
 	//변수 선언 끝
 
 	disablecursor(1);
 //	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
+	checkword(nowword, scanword);
 //	DWORD pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
 /*	cur(120, 30);
 	printf("-------------");
@@ -127,6 +132,29 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 }
 
+void checkword(char*nowword, char*scanword) {
+
+	int cnt = 0;
+	int i = 0;
+	while (cnt != i - 1) { //단어가 맞을때 까지 돌림
+
+		cnt = 0;
+
+		for (i = 0; scanword[i] != 0; i++) //초기화
+			scanword[i] = 0;
+
+		fgets(scanword, sizeof(scanword), stdin); // 상희 채팅서버와 연동
+
+		for (i = 0; nowword[i] != 0; i++) //비교
+			if (nowword[i] == scanword[i])
+				cnt++;
+
+		if (scanword[i] != 0) //비교(오류방지)
+			cnt = 0;
+
+	}
+	printf("끝");
+} //알아서 비교해줌
 void chating(MYSQL *cons)
 {
 	POINT po;
