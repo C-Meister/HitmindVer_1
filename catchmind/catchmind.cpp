@@ -103,7 +103,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);
-void login();
+LOG login();
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -149,7 +149,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 }
 
-void login() {
+LOG login() {
 	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 	LOG user = { 0, 0 };
 	int i = 0;
@@ -216,6 +216,7 @@ void login() {
 			i++;
 		}
 	}
+	return user;
 }
 void checkword(char*nowword, char*scanword) {
 
@@ -499,5 +500,22 @@ void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 	}
 }
 int sqllogin(MYSQL *cons) {
-	
+	LOG user = login();
+	char query[100];
+	while (1) {
+		user = login();
+		sprintf(query, "select * from catchmind.login where id = '%s'", user.id);
+		mysql_query(cons, query);
+		if (mysql_store_result(cons) == NULL)
+		{
+			printf("아이디가 존재하지 않습니다.");
+		}
+		sprintf(query, "select * from catchmind.login where password = password('%s')", user.id);
+		mysql_query(cons, query);
+		if (mysql_store_result(cons) == NULL)
+		{
+			printf("비밀번호가 틀렸습니다.");
+		}
+
+	}
 }
