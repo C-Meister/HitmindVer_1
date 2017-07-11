@@ -16,7 +16,7 @@
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
 
-//특수 헤더파일 (따로 설치)
+//특수 헤더파일 (따로 설치) 
 #include <SDL.h>			//SDL - 그래픽 헤더파일
 #include <mysql/mysql.h>	//mysql 만약 오류가있으면 <mysql.h>로 변환
 
