@@ -38,9 +38,23 @@
 //기본 함수들
 int loadmysql(MYSQL *cons)
 {
+	char *mysqlip = "10.80.161.182";
+	printf("데이터베이스 불러오기 시도중...");
 	if (cons == NULL)
 	{
+		fprintf(stderr, "%s\n", mysql_error(cons));
 		printf("채팅 서버 불러오기 실패 (초기화 오류)\n");
+		Sleep(1000);
+		exit(1);
+	}
+	else
+		printf("1");
+	if (mysql_real_connect(cons, mysqlip, "root", "tbvjaos15", NULL, 0, NULL, 0) == NULL)
+	{
+		printf("\b실패... \n서버가 존재하지 않습니다.\n");
+		fprintf(stderr, "%s\n", mysql_error(cons));
+		d
+		
 	}
 }
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
