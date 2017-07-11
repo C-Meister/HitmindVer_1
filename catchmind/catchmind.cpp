@@ -36,7 +36,8 @@
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //기본 함수들
-void loadmysql(MYSQL *cons, char mysqlip[]);
+void loadmysql(MYSQL *cons, char mysqlip[]); //MySQL에 연결하는 함수
+char **mysqlquery(MYSQL *cons, char *query, int max);
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 {
@@ -84,4 +85,12 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 	}
 
 	return;
+}
+char **mysqlquery(MYSQL *cons, char *query, int max) {
+	MYSQL_RES *sql_result;
+	MYSQL_ROW sql_row;
+	mysql_query(cons, query);
+	sql_result = mysql_store_result(cons);
+	return mysql_fetch_row(sql_result);
+
 }
