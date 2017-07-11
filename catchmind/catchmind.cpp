@@ -36,9 +36,28 @@
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //기본 함수들
+void loadmysql(MYSQL *cons, char mysqlip[]);
+
+int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
+{
+	
+	//변수 선언
+	int i, j, k, v, result;
+	MYSQL *cons = mysql_init(NULL);
+	MYSQL_RES *sql_result;
+	MYSQL_ROW sql_row;
+	char query[400];
+	char mysqlip[30] = "10.80.161.182";
+	//끝
+	loadmysql(cons, mysqlip);
+	return 0;
+
+}
+
 
 void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 {
+	CLS;
 	printf("데이터베이스 불러오기 시도중...");
 	if (cons == NULL)
 	{
@@ -57,23 +76,12 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 		scanf("%s", mysqlip);
 		loadmysql(cons, mysqlip);
 	}
-	else
+	else {
 		printf("\b2");
-	printf("\n성공");
-	CLS;
-	return;
-}
-int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
-{
-	//변수 선언
-	int i, j, k, v, result;
-	MYSQL *cons = mysql_init(NULL);
-	MYSQL_RES *sql_result;
-	MYSQL_ROW sql_row;
-	char query[400];
-	char mysqlip[30] = "10.80.161.182";
-	//끝
-	loadmysql(cons, mysqlip);
-	return 0;
+		printf("\n성공");
+		mysql_set_character_set(cons, "euckr");
+		CLS;
+	}
 
+	return;
 }
