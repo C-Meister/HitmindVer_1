@@ -76,7 +76,7 @@ void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr,char *ServerIP); //서버 연결 해주는 함수
-void recieve(SOCKET connect_sock);	//서버에서 데이터 받아오는 쓰레드용 함수
+void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
@@ -123,18 +123,21 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	disablecursor(1);
 //	ConsoleL(30, 30);
+#ifdef SANGHIE
 	loadmysql(cons, mysqlip);
 	uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
 	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
 	cur(120, 30);
 	printf("-------------");
 	while (1) {
-		
 		Sleep(1000);
-	//	cur(0, 0);
-	//	printf("%d %d  ", pos.x, pos.y);
+		//	cur(0, 0);
+		//	printf("%d %d  ", pos.x, pos.y);
 	}
 	return 0;
+#else
+	return 0;
+#endif
 
 }
 
