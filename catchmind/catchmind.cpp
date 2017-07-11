@@ -80,8 +80,8 @@ void recieve(SOCKET connect_sock);	//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
-void writechating(MYSQL *cons);
-void readchating(MYSQL *cons);
+void writechating(MYSQL *cons);					//채팅을 입력하는 함수
+void readchating(MYSQL *cons);					//채팅을 읽는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
@@ -125,12 +125,12 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 //	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
 	uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
+	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
 	cur(120, 30);
 	printf("-------------");
 	while (1) {
 		
-		EnterCriticalSection(&cs);
-		LeaveCriticalSection(&cs);
+		Sleep(1000);
 	//	cur(0, 0);
 	//	printf("%d %d  ", pos.x, pos.y);
 	}
@@ -243,9 +243,9 @@ void writechating(MYSQL *cons)
 		{
 			if (_kbhit())
 			{
-				EnterCriticalSection(&cs);
 				
-				buff = getch();
+				
+				buff = _getch();
 				if (buff == 13)
 					break;
 				else if (buff == 8 && i != 0) {
@@ -257,14 +257,18 @@ void writechating(MYSQL *cons)
 					if (buff == buff2)
 						i++;
 					buffer[i++] = buff;
+					buffer[i + 1] = 0;
 					buff = buff2;
 				}
 				buff = 0;
-				LeaveCriticalSection(&cs);
+				
 			}
+			
+			EnterCriticalSection(&cs);
 			cur(40, 20);
-			printf("%S", buffer);
+			printf("%ls", buffer);
 			cur(0, 0);
+			LeaveCriticalSection(&cs);
 			Sleep(10);
 		}
 		CLS;
@@ -272,8 +276,6 @@ void writechating(MYSQL *cons)
 		sprintf(query, "insert into catchmind.chating (name, mean) values ('서상희', '%S')", buffer);
 		mysql_query(cons, query);
 		memset(buffer, 0, sizeof(buffer));
-		cur(40, 20);
-		printf("                                                   ");
 	}
 }
 void readchating(MYSQL *cons) {
@@ -281,18 +283,20 @@ void readchating(MYSQL *cons) {
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	while (1) {
-		mysql_query(cons, "select * from catchmind.chating");
+		
+		v = 0;
+		mysql_query(cons, "select * from catchmind.chating order by time desc limit 10");
 		sql_result = mysql_store_result(cons);
 		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 		{
-			if (sql_row[0][0] - '0' != v)
-			{
-
-				cur(10,10 + (short)v);
-				printf("%s : %s", sql_row[1], sql_row[2]);
+				EnterCriticalSection(&cs);
+				cur(10,20 -  (short)v);
+				printf("%s : %s", sql_row[2], sql_row[3]);
 				v++;
-			}
+				LeaveCriticalSection(&cs);
+			
 		}
+		Sleep(500);
 	}
 	
 }
