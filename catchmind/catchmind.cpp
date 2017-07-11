@@ -21,7 +21,7 @@
 #include <process.h>		//process 멀티쓰레드용
 
 //특수 헤더파일 (따로 설치) 
-#include <SDL.h>			//SDL - 그래픽 헤더파일
+#include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 			//상희 전용
 //#include <mysql/mysql.h>	//DB헤더파일
 
