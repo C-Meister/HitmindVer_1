@@ -45,7 +45,8 @@
 #define CLS system("cls")		//화면 지우기
 #define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
-#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
+#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))		//색깔설정 X배경 Y 글자
+#define CHOP(x) x[strlen(x) - 1] = ' '	//fgets를 쓰면 엔터도 배열에남음. 엔터를 배열에서 삭제해주는것
 //색깔출력 쉬운버전 
 #define COL                   GetStdHandle(STD_OUTPUT_HANDLE)			// 콘솔창의 핸들정보 받기
 #define BLACK                SetConsoleTextAttribute(COL, 0x0000);		// 검정색
@@ -64,6 +65,12 @@
 #define PLUM                SetConsoleTextAttribute(COL, 0x000d);       // 자주색
 #define YELLOW             SetConsoleTextAttribute(COL, 0x000e);        // 노란색
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);      // 흰색
+//구조체 선언
+typedef struct {
+	char id[30];
+	char pass[50];
+}LOG;
+
 //전역 변수들 (사용 비추천)
 //이벤트
 CRITICAL_SECTION cs;
@@ -78,6 +85,7 @@ void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr,char *ServerIP); //서버 연결 해주는 함수
 void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
+int sqllogin(MYSQL *cons);
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//채팅을 입력하는 함수
@@ -143,66 +151,65 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 void login() {
 	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
-	char id[100] = { 0, }; //아이디저장 배열
-	char pass[100];        //비밀번호저장 배열 
+	LOG user = { 0, 0 };
 	int i = 0;
 
-	/*비밀번호 암호화 구현*/
+	/*아이디 암호화 X*/
 	printf("id : ");
 
-	while (1) {
-		id[i] = _getch();
 
-		if (id[i] == 8) {
+	while (1) {
+		user.id[i] = _getch();
+
+		if (user.id[i] == 8) {
 			if (i == 0) {
-				id[0] = 0;
+				user.id[0] = 0;
 				continue;
 			}
 			printf("\b \b");
-			id[i - 1] = 0;
-			id[i--] = 0;
+			user.id[i - 1] = 0;
+			user.id[i--] = 0;
 		}
-		else if (id[i] == 13 && i > 3) {
-			id[i] = 0;
+		else if (user.id[i] == 13 && i > 3) {
+			user.id[i] = 0;
 			break;
 		}
-		else if (id[i] == 13) {
-			id[i] = 0;
+		else if (user.id[i] == 13) {
+			user.id[i] = 0;
 		}
-		else if (!((id[i] >= '0' && id[i] <= '9') || (id[i] >= 'a' && id[i] <= 'z') || (id[i] >= 'A' && id[i] <= 'Z'))) {
-			id[i] = 0;
+		else if (!((user.id[i] >= '0' && user.id[i] <= '9') || (user.id[i] >= 'a' && user.id[i] <= 'z') || (user.id[i] >= 'A' && user.id[i] <= 'Z'))) {
+			user.id[i] = 0;
 		}
 		else
-			putchar(id[i++]);
+			putchar(user.id[i++]);
 
 
 	}
-
 	/*비밀번호 암호화 구현*/
 	i = 0;
 	printf("\npassword : ");
 
 	while (1) {
-		pass[i] = _getch();
+		user.pass[i] = _getch();
 
-		if (pass[i] == 8) {
+		if (user.pass[i] == 8) {
 			if (i == 0) {
-				pass[0] = 0;
+				user.pass[0] = 0;
 				continue;
 			}
 			printf("\b \b");
-			pass[i - 1] = 0;
-			pass[i--] = 0;
+			user.pass[i - 1] = 0;
+			user.pass[i--] = 0;
 		}
-		else if (pass[i] == 13 && i > 3) {
-			pass[i] = 0;
+		else if (user.pass[i] == 13 && i > 3) {
+			user.pass[i] = 0;
 			break;
 		}
-		else if (pass[i] == 13) {
-			pass[i] = 0;
+		else if (user.pass[i] == 13) {
+			user.pass[i] = 0;
 		}
-		else if (!((pass[i] >= '0' && pass[i] <= '9') || (pass[i] >= 'a' && pass[i] <= 'z') || (pass[i] >= 'A' && pass[i] <= 'Z'))) {
-			pass[i] = 0;
+		else if (!((user.pass[i] >= '0' && user.pass[i] <= '9') || (user.pass[i] >= 'a' && user.pass[i] <= 'z') || (user.pass[i] >= 'A' && user.pass[i] <= 'Z'))) {
+			user.pass[i] = 0;
 		}
 		else {
 			printf("*");
@@ -490,4 +497,7 @@ void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 
 		}
 	}
+}
+int sqllogin(MYSQL *cons) {
+	
 }
