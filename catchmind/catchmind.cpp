@@ -33,12 +33,23 @@
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //기본 함수들
-
+int loadmysql(MYSQL *cons)
+{
+	if (cons == NULL)
+	{
+		printf("채팅 서버 불러오기 실패 (초기화 오류)\n");
+	}
+}
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 {
+	//변수 선언
+	int i, j, k, v, result;
+	MYSQL *cons = mysql_init(NULL);
+	MYSQL_RES *sql_result;
+	MYSQL_ROW sql_row;
+	char query[400];
+	//끝
 
-	cur(5, 5);
-	printf("hello앙");
 	return 0;
 
 }
