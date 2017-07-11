@@ -16,7 +16,6 @@
 #include <time.h>
 #include <conio.h>	
 #include <windows.h>
-
 #include <process.h>		//process 멀티쓰레드용
 
 //특수 헤더파일 (따로 설치) 
@@ -59,20 +58,29 @@
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);        // 흰색
 
 //기본 함수들
+
 void loadmysql(MYSQL *cons, char mysqlip[]); //MySQL에 연결하는 함수
-char **mysqlquery(MYSQL *cons, char *query);
+char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
+POINT MouseClick(void);			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
+
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
+
+
+
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	//변수 선언
 	int i, j, k, v, result;
+	POINT pos;
 	MYSQL *cons = mysql_init(NULL);	//mysql 초기화
 	MYSQL_RES *sql_result;			//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;				//mysql 결과의 데이터 하나를 저장하는 변수
-	char query[400];
+	char query[400];				//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
 	//변수 선언 끝
 	loadmysql(cons, mysqlip);
+	pos = MouseClick();
+	printf("%d %d", pos.x, pos.y);
 	return 0;
 
 }
@@ -108,11 +116,31 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 
 	return;
 }
-char **mysqlquery(MYSQL *cons, char *query) {
-	MYSQL_RES *sql_result;
-	MYSQL_ROW sql_row;
+char **onemysqlquery(MYSQL *cons, char *query) {		//mysql 명령어의 결과하나를 바로 반환해주는 함수
 	mysql_query(cons, query);
-	sql_result = mysql_store_result(cons);
-	return mysql_fetch_row(sql_result);
+	return mysql_fetch_row(mysql_store_result(cons));
 
+}
+POINT MouseClick(void)			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
+{ 
+	int x, y;
+	HANDLE       hIn, hOut;
+	DWORD        dwNOER;
+	INPUT_RECORD rec;
+
+	hIn=GetStdHandle(STD_INPUT_HANDLE);
+	hOut=GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
+
+	while( TRUE ){
+		ReadConsoleInput(hIn,&rec,1,&dwNOER);
+
+		if( rec.EventType == MOUSE_EVENT ){
+			if( rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED ){
+				x = rec.Event.MouseEvent.dwMousePosition.X;
+				y = rec.Event.MouseEvent.dwMousePosition.Y;
+				return { x, y };
+			}
+		} 
+	}
 }
