@@ -43,7 +43,7 @@
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
 //#define 정의문
 #define CLS system("cls")		//화면 지우기
-#define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동
+#define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //색깔출력 쉬운버전 
@@ -92,7 +92,10 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
+
+//-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);
+void login();
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -135,6 +138,75 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 }
 
+void login() {
+	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
+	char id[100] = { 0, }; //아이디저장 배열
+	char pass[100];        //비밀번호저장 배열 
+	int i = 0;
+
+	/*비밀번호 암호화 구현*/
+	printf("id : ");
+
+	while (1) {
+		id[i] = _getch();
+
+		if (id[i] == 8) {
+			if (i == 0) {
+				id[0] = 0;
+				continue;
+			}
+			printf("\b \b");
+			id[i - 1] = 0;
+			id[i--] = 0;
+		}
+		else if (id[i] == 13 && i > 3) {
+			id[i] = 0;
+			break;
+		}
+		else if (id[i] == 13) {
+			id[i] = 0;
+		}
+		else if (!((id[i] >= '0' && id[i] <= '9') || (id[i] >= 'a' && id[i] <= 'z') || (id[i] >= 'A' && id[i] <= 'Z'))) {
+			id[i] = 0;
+		}
+		else
+			putchar(id[i++]);
+
+
+	}
+
+	/*비밀번호 암호화 구현*/
+	i = 0;
+	printf("\npassword : ");
+
+	while (1) {
+		pass[i] = _getch();
+
+		if (pass[i] == 8) {
+			if (i == 0) {
+				pass[0] = 0;
+				continue;
+			}
+			printf("\b \b");
+			pass[i - 1] = 0;
+			pass[i--] = 0;
+		}
+		else if (pass[i] == 13 && i > 3) {
+			pass[i] = 0;
+			break;
+		}
+		else if (pass[i] == 13) {
+			pass[i] = 0;
+		}
+		else if (!((pass[i] >= '0' && pass[i] <= '9') || (pass[i] >= 'a' && pass[i] <= 'z') || (pass[i] >= 'A' && pass[i] <= 'Z'))) {
+			pass[i] = 0;
+		}
+		else {
+			printf("*");
+			i++;
+		}
+	}
+}
 void checkword(char*nowword, char*scanword) {
 
 	int cnt = 0;
@@ -216,7 +288,7 @@ void readchating(MYSQL *cons) {
 			if (sql_row[0][0] - '0' != v)
 			{
 
-				cur(10, 10 + v);
+				cur(10,10 + (short)v);
 				printf("%s : %s", sql_row[1], sql_row[2]);
 				v++;
 			}
