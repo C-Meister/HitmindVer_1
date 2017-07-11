@@ -44,7 +44,7 @@
 //#define 정의문
 #define CLS system("cls")		//화면 지우기
 #define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동
-#define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
+#define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //색깔출력 쉬운버전 
 #define COL                   GetStdHandle(STD_OUTPUT_HANDLE)			// 콘솔창의 핸들정보 받기
@@ -65,12 +65,12 @@
 #define YELLOW             SetConsoleTextAttribute(COL, 0x000e);        // 노란색
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);      // 흰색
 //전역 변수들 (사용 비추천)
+//이벤트
 CRITICAL_SECTION cs;
 char message[100];
 
 //기본 함수들
-void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같다
-
+void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
@@ -81,6 +81,7 @@ void recieve(SOCKET connect_sock);	//서버에서 데이터 받아오는 쓰레드용 함수
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
 void chating(MYSQL *cons);
+
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -89,7 +90,8 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
-
+// -------------------- 게임 내부 함수들 ----------------------------------
+void checkword(char*nowword, char*scanword);
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -118,16 +120,16 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 //	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
-    //checkword(nowword, scanword); //정답비교
-//	DWORD pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
-/*	cur(120, 30);
+	DWORD pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
+	cur(120, 30);
 	printf("-------------");
 	while (1) {
-		pos = MouseClick();
-
-		cur(0, 0);
-		printf("%d %d  ", pos.x, pos.y);
-	}*/
+		
+		EnterCriticalSection(&cs);
+		LeaveCriticalSection(&cs);
+	//	cur(0, 0);
+	//	printf("%d %d  ", pos.x, pos.y);
+	}
 	return 0;
 
 }
@@ -158,14 +160,45 @@ void checkword(char*nowword, char*scanword) {
 void chating(MYSQL *cons)
 {
 	POINT po;
-	char buffer[100];
-	while (1)
-	{
-		po = MouseClick();
-		if (po.x > 120 && po.x < 140 && po.y < 30 && po.y > 28) {
-			cur(120, 31);
-			fgets(buffer, sizeof(buffer), stdin);
+	int i = 0;
+	TCHAR buff;
+	char buff2 = 0;
+	TCHAR buffer[100] = { 0, };
+	while (1) {
+
+		while (1)
+		{
+			if (_kbhit())
+			{
+				EnterCriticalSection(&cs);
+				
+				buff = getch();
+				if (buff == 13)
+					break;
+				else if (buff == 8 && i != 0) {
+					CLS;
+					buffer[i--] = 0;
+				}
+				else
+				{
+					if (buff == buff2)
+						i++;
+					buffer[i++] = buff;
+					buff = buff2;
+				}
+				buff = 0;
+				LeaveCriticalSection(&cs);
+			}
+			cur(40, 20);
+			printf("%S", buffer);
+			cur(0, 0);
+			Sleep(10);
 		}
+		CLS;
+		i = 0;
+		memset(buffer, 0, sizeof(buffer));
+		cur(40, 20);
+		printf("                                                   ");
 	}
 }
 void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
