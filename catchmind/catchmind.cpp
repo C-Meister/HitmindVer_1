@@ -36,9 +36,9 @@
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { X, Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))
 //기본 함수들
-int loadmysql(MYSQL *cons)
+
+void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 {
-	char *mysqlip = "10.80.161.182";
 	printf("데이터베이스 불러오기 시도중...");
 	if (cons == NULL)
 	{
@@ -53,9 +53,15 @@ int loadmysql(MYSQL *cons)
 	{
 		printf("\b실패... \n서버가 존재하지 않습니다.\n");
 		fprintf(stderr, "%s\n", mysql_error(cons));
-		
-		
+		printf("새로운 ip를 설정해 주세요.");
+		scanf("%s", mysqlip);
+		loadmysql(cons, mysqlip);
 	}
+	else
+		printf("\b2");
+	printf("\n성공");
+	CLS;
+	return;
 }
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 {
