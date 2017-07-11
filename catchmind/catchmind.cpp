@@ -21,7 +21,7 @@
 
 //특수 헤더파일 (따로 설치) 
 #include <SDL.h>			//SDL - 그래픽 헤더파일
-#include <mysql/mysql.h>	//mysql 만약 오류가있으면 <mysql.h>로 변환
+#include <mysql.h>	//mysql 만약 오류가있으면 <mysql.h>로 변환
 
 
 // 라이브러리 선언문
