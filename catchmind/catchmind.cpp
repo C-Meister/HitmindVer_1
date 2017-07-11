@@ -53,7 +53,7 @@ int loadmysql(MYSQL *cons)
 	{
 		printf("\b실패... \n서버가 존재하지 않습니다.\n");
 		fprintf(stderr, "%s\n", mysql_error(cons));
-		d
+		
 		
 	}
 }
