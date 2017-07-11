@@ -60,9 +60,9 @@
 
 //기본 함수들
 void loadmysql(MYSQL *cons, char mysqlip[]); //MySQL에 연결하는 함수
-char **mysqlquery(MYSQL *cons, char *query, int max);
-
-int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
+char **mysqlquery(MYSQL *cons, char *query);
+//함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
+int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	
 	//변수 선언
@@ -72,7 +72,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_ROW sql_row;
 	char query[400];
 	char mysqlip[30] = "10.80.161.182";
-	//끝
+	//변수 선언 끝
 	loadmysql(cons, mysqlip);
 	return 0;
 
@@ -109,7 +109,7 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 
 	return;
 }
-char **mysqlquery(MYSQL *cons, char *query, int max) {
+char **mysqlquery(MYSQL *cons, char *query) {
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	mysql_query(cons, query);
