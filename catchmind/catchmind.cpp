@@ -71,8 +71,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	char query[400];
+	char mysqlip[30] = "10.80.161.182";
 	//끝
-
+	loadmysql(cons, mysqlip);
 	return 0;
 
 }
