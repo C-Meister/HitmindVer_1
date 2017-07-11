@@ -82,7 +82,7 @@ POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 �
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr,char *ServerIP); //서버 연결 해주는 함수
+void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP); //서버 연결 해주는 함수
 void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);
@@ -130,7 +130,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언 끝
 
 	disablecursor(1);
-//	ConsoleL(30, 30);
+	//	ConsoleL(30, 30);
 #ifdef SANGHIE											//상희 테스트용
 	loadmysql(cons, mysqlip);
 	sqllogin(cons);
@@ -255,8 +255,8 @@ void writechating(MYSQL *cons)
 		{
 			if (_kbhit())
 			{
-				
-				
+
+
 				buff = _getch();
 				if (buff == 13)
 					break;
@@ -273,9 +273,9 @@ void writechating(MYSQL *cons)
 					buff = buff2;
 				}
 				buff = 0;
-				
+
 			}
-			
+
 			EnterCriticalSection(&cs);
 			cur(40, 20);
 			printf("%ls", buffer);
@@ -295,22 +295,22 @@ void readchating(MYSQL *cons) {
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	while (1) {
-		
+
 		v = 0;
 		mysql_query(cons, "select * from catchmind.chating order by time desc limit 10");
 		sql_result = mysql_store_result(cons);
 		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 		{
-				EnterCriticalSection(&cs);
-				cur(10,20 -  (short)v);
-				printf("%s : %s", sql_row[2], sql_row[3]);
-				v++;
-				LeaveCriticalSection(&cs);
-			
+			EnterCriticalSection(&cs);
+			cur(10, 20 - (short)v);
+			printf("%s : %s", sql_row[2], sql_row[3]);
+			v++;
+			LeaveCriticalSection(&cs);
+
 		}
 		Sleep(500);
 	}
-	
+
 }
 void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 {
@@ -348,26 +348,26 @@ char **onemysqlquery(MYSQL *cons, char *query) {		//mysql 명령어의 결과하나를 바
 
 }
 POINT MouseClick(void)			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
-{ 
+{
 	int x, y;
 	HANDLE       hIn, hOut;
 	DWORD        dwNOER;
 	INPUT_RECORD rec;
 
-	hIn=GetStdHandle(STD_INPUT_HANDLE);
-	hOut=GetStdHandle(STD_OUTPUT_HANDLE);
+	hIn = GetStdHandle(STD_INPUT_HANDLE);
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
 
-	while( TRUE ){
-		ReadConsoleInput(hIn,&rec,1,&dwNOER);
+	while (TRUE) {
+		ReadConsoleInput(hIn, &rec, 1, &dwNOER);
 
-		if( rec.EventType == MOUSE_EVENT ){
-			if( rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED ){
+		if (rec.EventType == MOUSE_EVENT) {
+			if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) {
 				x = rec.Event.MouseEvent.dwMousePosition.X;
 				y = rec.Event.MouseEvent.dwMousePosition.Y;
 				return { x, y };
 			}
-		} 
+		}
 	}
 }
 void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
@@ -376,7 +376,7 @@ void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
 	system(buff);
 }
 void disablecursor(bool a) {
-	
+
 	CONSOLE_CURSOR_INFO ConsoleCursor;			// 콘솔커서 정보 구조체
 	if (a == true) {
 		ConsoleCursor.bVisible = false;				// true 보임 , false 안보임
@@ -486,7 +486,7 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
 	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
 	connect_addr.sin_port = htons(5555);					 //서버 포트
-	if(connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
+	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
 		ErrorHandling("connect() error");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, &connect_sock, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	while (1) { //받아온 데이터 처리
@@ -495,13 +495,13 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 }
 void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 	while (1) {
-		if (recv(connect_sock, message, 1023, 0)>0) { //서버에서 데이터를 받아와 message변수에 저장
+		if (recv(connect_sock, message, 1023, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 
 		}
 	}
 }
 int sqllogin(MYSQL *cons) {
-	LOG user = login();
+	LOG user;
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
@@ -510,19 +510,24 @@ int sqllogin(MYSQL *cons) {
 		sprintf(query, "select * from catchmind.login where id = '%s'", user.id);
 		mysql_query(cons, query);
 		sql_result = mysql_store_result(cons);
-		sql_row = mysql_fetch_row(sql_result);
-		if (sql_row[0][0] == 0)
+		
+		if (mysql_fetch_row(sql_result) == NULL)
 		{
-			printf("아이디가 존재하지 않습니다.");
+			printf("\n아이디가 존재하지 않습니다.\n");
+			continue;
 		}
-		sprintf(query, "select * from catchmind.login where password = password('%s')", user.id);
+		else
+			printf("\n아이디 OK");
+		sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass);
 		mysql_query(cons, query);
-		if (mysql_store_result(cons) == NULL)
+		sql_result = mysql_store_result(cons);
+		if (mysql_fetch_row(sql_result) == NULL)
 		{
-			printf("비밀번호가 틀렸습니다.");
+			printf("\n비밀번호가 틀렸습니다.\n");
+			continue;
 		}
 		else {
-			printf("로그인 성공");
+			printf("\n로그인 성공");
 			return 0;
 		}
 	}
