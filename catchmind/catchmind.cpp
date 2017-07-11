@@ -64,17 +64,20 @@
 #define PLUM                SetConsoleTextAttribute(COL, 0x000d);       // 자주색
 #define YELLOW             SetConsoleTextAttribute(COL, 0x000e);        // 노란색
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);      // 흰색
+//전역 변수들 (사용 비추천)
+CRITICAL_SECTION cs;
 
 //기본 함수들
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같다
 
-POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수
+POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 //--------------------- MySQL 함수들 --------------------------------------
 void loadmysql(MYSQL *cons, char mysqlip[]);	//MySQL에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql 명령어의 결과하나를 바로 반환해주는 함수
+void chating(MYSQL *cons);
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -91,6 +94,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	//변수 선언
+	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
 	POINT pos;
 	MYSQL *cons = mysql_init(NULL);			//mysql 초기화
@@ -100,19 +104,34 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
 	//변수 선언 끝
 	disablecursor(1);
-	ConsoleL(30, 30);
+//	ConsoleL(30, 30);
 	loadmysql(cons, mysqlip);
+//	DWORD pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)chating, cons, 0, NULL);
+/*	cur(120, 30);
+	printf("-------------");
 	while (1) {
 		pos = MouseClick();
 
 		cur(0, 0);
 		printf("%d %d  ", pos.x, pos.y);
-	}
+	}*/
 	return 0;
 
 }
 
-
+void chating(MYSQL *cons)
+{
+	POINT po;
+	char buffer[100];
+	while (1)
+	{
+		po = MouseClick();
+		if (po.x > 120 && po.x < 140 && po.y < 30 && po.y > 28) {
+			cur(120, 31);
+			fgets(buffer, sizeof(buffer), stdin);
+		}
+	}
+}
 void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 {
 	CLS;
