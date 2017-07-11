@@ -123,7 +123,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	disablecursor(1);
 //	ConsoleL(30, 30);
-#ifdef SANGHIE
+#ifdef SANGHIE											//상희 테스트용
 	loadmysql(cons, mysqlip);
 	uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
 	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
@@ -135,7 +135,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		//	printf("%d %d  ", pos.x, pos.y);
 	}
 	return 0;
-#else
+#else													//본 메인함수는 여기적어주세요
 	return 0;
 #endif
 
