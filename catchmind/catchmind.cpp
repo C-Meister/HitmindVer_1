@@ -99,14 +99,15 @@ void usermain(void);
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(char *ServerIP); //서버 연결 해주는 함수
-void recieve();				//서버에서 데이터 받아오는 쓰레드용 함수
+void recieve(void);				//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);
-void Clnt_1();
-void Clnt_2();
-void Clnt_3();
-void Clnt_4();
-void makeroom();
-IN_ADDR GetDefaultMyIP();
+void waitroom(void);
+void Clnt_1(void);
+void Clnt_2(void);
+void Clnt_3(void);
+void Clnt_4(void);
+void makeroom(void);
+IN_ADDR GetDefaultMyIP(void);
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
 int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
@@ -123,12 +124,12 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
-void mainatitleimage();				//게임 메인타이틀 출력
-void maintitle();					//게임 메인타이틀 출력및 선택
-void banglist();					//게임 선택창 출력
-int bangchose();					//게임 선택창 출력및 선택
-void logintema();					//로그인 디자인
-void jointema();					//회원가입 디자인
+void mainatitleimage(void);				//게임 메인타이틀 출력
+void maintitle(void);					//게임 메인타이틀 출력및 선택
+void banglist(void);					//게임 선택창 출력
+int bangchose(void);					//게임 선택창 출력및 선택
+void logintema(void);					//로그인 디자인
+void jointema(void);					//회원가입 디자인
 LOG login(int m);
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
@@ -178,7 +179,160 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	return 0;
 
 }
+void waitroom(void)
+{
+	while (1) { //받아온 데이터 처리
 
+		gotoxy(0, 3);
+		WHITE
+			printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ PLAYER 1 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ STATUS ] : ");
+		if (status[0] == 0) {
+			GRAY
+				gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
+			printf("DISCONNECTED");
+			WHITE
+		}
+		else if (status[0] == 1) {
+			HIGH_GREEN
+				gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
+			printf("JOIN           ");
+			WHITE
+		}
+		if (status[0] == 2) {
+			SKY_BLUE
+				gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
+			printf("READY");
+			WHITE
+		}
+		gotoxy(100, 7);
+		printf("■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ PLAYER 2 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ STATUS ] : ");
+		if (status[1] == 0) {
+			GRAY
+				gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
+			printf("DISCONNECTED");
+			WHITE
+		}
+		else if (status[1] == 1) {
+			HIGH_GREEN
+				gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
+			printf("JOIN");
+			WHITE
+		}
+		if (status[1] == 2) {
+			SKY_BLUE
+				gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
+			printf("READY");
+			WHITE
+		}
+		gotoxy(100, 16);
+		printf("■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ PLAYER 3 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ STATUS ] : ");
+		if (status[2] == 0) {
+			GRAY
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
+			printf("DISCONNECTED");
+			WHITE
+		}
+		else if (status[2] == 1) {
+			HIGH_GREEN
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
+			printf("JOIN");
+			WHITE
+		}
+		if (status[2] == 2) {
+			SKY_BLUE
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
+			printf("READY");
+			WHITE
+		}
+		gotoxy(100, 25);
+		printf("■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■   [ PLAYER 4 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n"); //92
+		printf("      ■   [ STATUS ] : ");
+		if (status[3] == 0) {
+			GRAY
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
+			printf("DISCONNECTED");
+			WHITE
+		}
+		else if (status[3] == 1) {
+			HIGH_GREEN
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
+			printf("JOIN");
+			WHITE
+		}
+		if (status[3] == 2) {
+			SKY_BLUE
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
+			printf("READY");
+			WHITE
+		}
+		gotoxy(100, 34);
+		printf("■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■                                                                                            ■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■                ■                                                        ■                ■\n");
+		printf("      ■                ■                                                        ■                ■\n");
+		printf("      ■                ■                                                        ■                ■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		Sleep(100);
+	}
+}
 void usermain(void) {
 #ifdef SANGHO
 #endif
@@ -616,159 +770,9 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL,0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	system("cls");
 	send(connect_sock, "player connect", 20, 0);
-	while (1) { //받아온 데이터 처리
-		
-		gotoxy(0, 3);
-		WHITE
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 1 ]                                                                             ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
-		if (status[0] == 0) {
-			GRAY
-			gotoxy(24, 7);
-			printf("                   ");
-			gotoxy(24, 7);
-			printf("DISCONNECTED");
-			WHITE
-		}
-		else if (status[0] == 1) {
-			HIGH_GREEN
-			gotoxy(24, 7);
-			printf("                   ");
-			gotoxy(24, 7);
-				printf("JOIN           ");
-			WHITE
-		}
-		if (status[0] == 2) {
-			SKY_BLUE
-			gotoxy(24, 7);
-			printf("                   ");
-			gotoxy(24, 7);
-				printf("READY");
-			WHITE
-		}
-		gotoxy(100, 7);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 2 ]                                                                             ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
-		if (status[1] == 0) {
-			GRAY
-			gotoxy(24, 16);
-			printf("                   ");
-			gotoxy(24, 16);
-				printf("DISCONNECTED");
-			WHITE
-		}
-		else if (status[1] == 1) {
-			HIGH_GREEN
-				gotoxy(24, 16);
-			printf("                   ");
-			gotoxy(24, 16);
-				printf("JOIN");
-			WHITE
-		}
-		if (status[1] == 2) {
-			SKY_BLUE
-				gotoxy(24, 16);
-			printf("                   ");
-			gotoxy(24, 16);
-				printf("READY");
-			WHITE
-		}
-		gotoxy(100, 16);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 3 ]                                                                             ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
-		if (status[2] == 0) {
-			GRAY
-				gotoxy(24, 25);
-			printf("                   ");
-			gotoxy(24, 25);
-				printf("DISCONNECTED");
-			WHITE
-		}
-		else if (status[2] == 1) {
-			HIGH_GREEN
-				gotoxy(24, 25);
-			printf("                   ");
-			gotoxy(24, 25);
-				printf("JOIN");
-			WHITE
-		}
-		if (status[2] == 2) {
-			SKY_BLUE
-				gotoxy(24, 25);
-			printf("                   ");
-			gotoxy(24, 25);
-				printf("READY");
-			WHITE
-		}
-		gotoxy(100, 25);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 4 ]                                                                             ■\n");
-		printf("      ■                                                                                            ■\n"); //92
-		printf("      ■   [ STATUS ] : ");
-		if (status[3] == 0) {
-			GRAY
-				gotoxy(24, 34);
-			printf("                   ");
-			gotoxy(24, 34);
-				printf("DISCONNECTED");
-			WHITE
-		}
-		else if (status[3] == 1) {
-			HIGH_GREEN
-				gotoxy(24, 34);
-			printf("                   ");
-			gotoxy(24, 34);
-				printf("JOIN");
-			WHITE
-		}
-		if (status[3] == 2) {
-			SKY_BLUE
-				gotoxy(24, 34);
-			printf("                   ");
-			gotoxy(24, 34);
-				printf("READY");
-			WHITE
-		}
-		gotoxy(100, 34);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                ■                                                        ■                ■\n");
-		printf("      ■                ■                                                        ■                ■\n");
-		printf("      ■                ■                                                        ■                ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		Sleep(100);
-	}
+	waitroom();
 }
-void recieve() { //서버에서 데이터 받아오는 쓰레드용 함수
+void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char mess[50] = { 0, };
 	Sleep(1000);
 	while (1) {
@@ -880,7 +884,7 @@ int sqlsignup(MYSQL *cons) {
 	}
 
 }
-void mainatitleimage() {
+void mainatitleimage(void) {
 	gotoxy(6, 3);
 	printf("■■■■■  ■  ■      ■■■    ■    ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");
 	gotoxy(6, 4);
@@ -910,7 +914,7 @@ void mainatitleimage() {
 	gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
-void maintitle() { //게임 메인타이틀 출력
+void maintitle(void) { //게임 메인타이틀 출력
 	ConsoleL(100, 60);
 	disablecursor(true);
 	int xx = 0, yy = 0;
@@ -956,7 +960,7 @@ void click(int *xx, int *yy) {
 	}
 
 }
-void banglist() {																				//마우스에서 2를 나눈값을 받는다
+void banglist(void) {																				//마우스에서 2를 나눈값을 받는다
 #ifdef SANGHIE
 	printf("                ┌──────────────┬──────────────┐\n"); //방만들기 9 ~ 22 , 2
 	printf("                │          방만들기          │          빠른시작          │\n"); //빠른시작 24 ~ 37 , 2
@@ -997,7 +1001,7 @@ void banglist() {																				//마우스에서 2를 나눈값을 받는다
 #endif
 	
 }
-int bangchose() {
+int bangchose(void) {
 
 	int xx = 0, yy = 0;
 	banglist();
@@ -1013,7 +1017,7 @@ int bangchose() {
 	}
 
 }
-void numberbaseball() {
+void numberbaseball(void) {
 
 	srand((unsigned int)time(NULL));
 
@@ -1206,7 +1210,7 @@ void aicheck(int(*aiall)[10][10], int(*aire)[100], int t) {
 		}
 	}
 }
-void logintema() {
+void logintema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            캐치마인드 서버에 로그인          ■\n");
@@ -1221,7 +1225,7 @@ void logintema() {
 	printf("■              ■              ■              ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
-void jointema() {
+void jointema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■  회원가입 : 닉네임은 공백 특수문자 안됩니다  ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
@@ -1255,7 +1259,7 @@ void sendall(char *message) {
 		Sleep(300);
 	}
 }
-void Clnt_1() {
+void Clnt_1(void) {
 	char message[100];
 	printf("hello\n");
 	while (1) {
@@ -1269,7 +1273,7 @@ void Clnt_1() {
 		}
 	}
 }
-void Clnt_2() {
+void Clnt_2(void) {
 	char message[100];
 	printf("hello\n");
 	while (1) {
@@ -1284,7 +1288,7 @@ void Clnt_2() {
 		}
 	}
 }
-void Clnt_3() {
+void Clnt_3(void) {
 	char message[100];
 	printf("hello\n");
 	while (1) {
@@ -1299,7 +1303,7 @@ void Clnt_3() {
 		}
 	}
 }
-void Clnt_4() {
+void Clnt_4(void) {
 	char message[100];
 	printf("hello\n");
 	while (1) {
@@ -1314,7 +1318,7 @@ void Clnt_4() {
 		}
 	}
 }
-void makeroom() {
+void makeroom(void) {
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
 		ErrorHandling("WSAStartup() error");
 	int i = 0;
