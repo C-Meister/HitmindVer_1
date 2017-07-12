@@ -188,6 +188,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			//ConsoleL(26, 15);마우스가 콘솔창을 벗어나면 입력이 안되므로 잠시 보류				//콘솔크기를 로그인창에 맞게  
+			disablecursor(0);
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 			ConsoleL(50, 20);
