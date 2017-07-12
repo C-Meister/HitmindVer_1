@@ -74,11 +74,6 @@ typedef struct {
 
 //전역 변수들 (사용 비추천)
 
-INPUT_RECORD rec;
-DWORD dwNOER;
-HANDLE COUT = 0;    // 콘솔 출력 장치
-HANDLE CIN = 0;        // 콘솔 입력 장치
-
 CRITICAL_SECTION cs;	//이벤트
 char message[100];		//소켓 프로그래밍 문자열
 char username[30];		//사용자 이름
@@ -805,11 +800,18 @@ void maintitle() { //게임 메인타이틀 출력
 	CLS;
 }
 void click(int *xx, int *yy) {
-	DWORD mode;
-	CIN = GetStdHandle(STD_INPUT_HANDLE); //마우스 재활성화
-	GetConsoleMode(CIN, &mode);
-	SetConsoleMode(CIN, mode | ENABLE_MOUSE_INPUT);
+
+	HANDLE       hIn, hOut;
+	DWORD        dwNOER;
+	INPUT_RECORD rec;
+
+	hIn = GetStdHandle(STD_INPUT_HANDLE);
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
+
 	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
+
 	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
 
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
@@ -846,6 +848,7 @@ void banglist() {																				//마우스에서 2를 나눈값을 받는다
 	printf("                ┃                            ┃                            ┃\n");
 	printf("                ┗━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛\n");
 #else
+	printf("\n"); //좌표값때문에 한칸 밀어냄
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
 	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n");
