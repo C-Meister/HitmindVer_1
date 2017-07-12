@@ -131,8 +131,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 void maintitle(void);							//게임 메인타이틀 출력및 선택
-void banglist(MYSQL *cons);						//게임 선택창 출력
-int bangchose(MYSQL *cons);						//게임 선택창 출력및 선택
+void banglist(MYSQL *cons);						//게임 방 출력
+int bangchose(MYSQL *cons);						//게임 방 출력및 선택
 void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
@@ -179,7 +179,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	}*/
 	loadmysql(cons, mysqlip);
 //	sqlmakeroom(cons);
-	banglist(cons);
+	bangchose(cons);
 	return 0;
 
 }
@@ -239,7 +239,7 @@ void sqlmakeroom(MYSQL *cons) {
 		}
 	}
 	char query[100];
-	sprintf(query, "insert into catchmind.room values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
+	sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
 	mysql_query(cons, query);
 
 }
@@ -1173,6 +1173,7 @@ int bangchose(MYSQL *cons) {
 	}
 
 }
+
 void numberbaseball(void) {
 
 	srand((unsigned int)time(NULL));
