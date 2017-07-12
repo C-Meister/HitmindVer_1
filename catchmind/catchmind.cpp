@@ -228,7 +228,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			}
 			break;
 		}
-		recieve();
+
 	}return 0;
 }
 
@@ -294,15 +294,19 @@ void sqlmakeroom(MYSQL *cons) {
 	CLS;
 	printf("방 제작중....");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
-	if (count == 1)
-	{
-		CLS;
-		Connect_Server(myip);
-		return;
+	while (1) {
+		if (count == 1)
+		{
+			CLS;
+			Connect_Server(myip);
+			return;
+		}
+		Sleep(1000);
 	}
 }
 void waitroom(void)
 {
+	ConsoleL(100, 50);
 	while (1) { //받아온 데이터 처리
 
 		gotoxy(0, 3);
@@ -935,7 +939,7 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
 		ErrorHandling("connect() error");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
-	system("cls");
+	CLS;
 	send(connect_sock, "player connect", 20, 0);
 	waitroom();
 }
@@ -1194,13 +1198,13 @@ void banglist(MYSQL *cons) {
 	sql_result = mysql_store_result(cons);
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
-		
+
 		if (i % 2 == 0)
 			cur(25, 6 + (i * 2));
 		else
 			cur(55, 6 + ((i / 2) * 4));
 		printf("%s", sql_row[0]);
-		
+
 		/*for (short j = 0; sql_row[1][j] != 0; j++) {
 			if (i % 2 == 0 && j < 10)
 				cur(25 + j, 7 + (i * 2));
@@ -1267,7 +1271,7 @@ int chooseroom(int roomnum) {
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
 	CLS;
-	
+
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■              캐치마인드 방 접속              ■\n");
@@ -1276,7 +1280,7 @@ int chooseroom(int roomnum) {
 	printf("■  방 제목   □                              □■\n");			// x = 17 y = 5
 	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
 	printf("■  Password  □                              □■\n");
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n"); 
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	cur(17, 5);
 	printf("%s", connectroom[roomnum].roomname);
 	cur(17, 7);
@@ -1565,10 +1569,10 @@ void sendall(char *message) {
 }
 void Clnt_1(void) {
 	char message[100];
-	printf("hello\n");
+//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[0], message, 20, 0) > 0) {
-			printf("Client 1 -> Server : %s\n", message);
+		//	printf("Client 1 -> Server : %s\n", message);
 			if (strcmp(message, "player connect") == 0) {
 				memset(&message, 0, sizeof(message));
 				strcpy(message, "player 1 connect");
@@ -1579,11 +1583,11 @@ void Clnt_1(void) {
 }
 void Clnt_2(void) {
 	char message[100];
-	printf("hello\n");
+//	printf("hello\n");
 	while (1) {
 
 		if (recv(Sconnect_sock[1], message, 20, 0) > 0) {
-			printf("Client 2 -> Server : %s\n", message);
+			//printf("Client 2 -> Server : %s\n", message);
 			if (strcmp(message, "player connect") == 0) {
 				memset(&message, 0, sizeof(message));
 				strcpy(message, "player 2 connect");
@@ -1594,11 +1598,11 @@ void Clnt_2(void) {
 }
 void Clnt_3(void) {
 	char message[100];
-	printf("hello\n");
+//	printf("hello\n");
 	while (1) {
 
 		if (recv(Sconnect_sock[2], message, 20, 0) > 0) {
-			printf("Client 3 -> Server : %s\n", message);
+	//		printf("Client 3 -> Server : %s\n", message);
 			if (strcmp(message, "player connect") == 0) {
 				memset(&message, 0, sizeof(message));
 				strcpy(message, "player 3 connect");
@@ -1609,11 +1613,11 @@ void Clnt_3(void) {
 }
 void Clnt_4(void) {
 	char message[100];
-	printf("hello\n");
+//	printf("hello\n");
 	while (1) {
 
 		if (recv(Sconnect_sock[3], message, 20, 0) > 0) {
-			printf("Client 4 -> Server : %s\n", message);
+	//		printf("Client 4 -> Server : %s\n", message);
 			if (strcmp(message, "player connect") == 0) {
 				memset(&message, 0, sizeof(message));
 				strcpy(message, "player 4 connect");
