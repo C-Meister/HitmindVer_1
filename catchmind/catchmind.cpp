@@ -163,19 +163,8 @@ void usermain(void) {
 #ifdef SOOHAN
 #endif
 #ifdef SANGHIE
-	setcolor(0, 15);
-	loadmysql(cons, mysqlip);
-	sqllogin(cons);
-	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
-	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
-	cur(120, 30);
-	printf("-------------");
-	while (1) {
-	Sleep(1000);
-	//	cur(0, 0);
-	//	printf("%d %d  ", pos.x, pos.y);
-	}*/
-	return 0;
+	
+	
 #endif
 #ifdef MINSUK
 #endif
