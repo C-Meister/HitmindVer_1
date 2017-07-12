@@ -1357,13 +1357,14 @@ void makeroom(void) {
 			case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
 			case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
 			case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
-			default: printf("Client 접속 거부 : 인원 초과\n"); break;
+			default: cur(10, 40); printf("Client 접속 거부 : 인원 초과\n"); break;
 			}
 			i++;
 		}
 		printf("클라이언트 %d 접속!\n", i);
 	}
 }
+
 IN_ADDR GetDefaultMyIP()
 {
 	char localhostname[MAX_PATH];
