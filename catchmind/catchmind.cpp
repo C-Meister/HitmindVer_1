@@ -120,6 +120,8 @@ void mainatitleimage();				//게임 메인타이틀 출력
 void maintitle();					//게임 메인타이틀 출력및 선택
 void banglist();					//게임 선택창 출력
 int bangchose();					//게임 선택창 출력및 선택
+void logintema();					
+void jointema();
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 																	//id 비밀번호를 형식에 맞게 입력을함 
