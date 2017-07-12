@@ -75,6 +75,7 @@ typedef struct {
 	LONG x;
 	LONG y;
 }MOUSEPOINT;
+
 typedef struct tagPOINT __RPC_FAR *PPOINT;
 typedef struct tagPOINT __RPC_FAR *LPPOINT;
 
@@ -121,8 +122,10 @@ void banglist();					//게임 선택창 출력
 int bangchose();					//게임 선택창 출력및 선택
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
-LOG login();                                    //id 비밀번호를 형식에 맞게 입력을함 
-void click(int *xx, int *yy);
+LOG login(int m);                                    //id 비밀번호를 형식에 맞게 입력을함 
+void click(int *xx, int *yy);  //마우스
+void logintema(); //로그인 배경
+void jointema();  //회원가입 배경
 //--------------------------미니게임 숫자야구 함수들----------------------
 void createainumber(int *ainum);
 void scanfirst(int *usnum);
@@ -819,7 +822,7 @@ int sqllogin(MYSQL *cons) {
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
-	user = login();							//login 함수를 사용
+	user = login(1);							//login 함수를 사용
 	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
 	mysql_query(cons, query);
 	sql_result = mysql_store_result(cons);
@@ -849,7 +852,7 @@ int sqlsignup(MYSQL *cons) {
 	LOG user;
 	char query[100];
 	printf("회원가입을 합니다. 비밀번호는 암호화되어 저장이됩니다.\n");
-	user = login();
+	user = login(2);
 	printf("\n이름 : ");
 	fgets(user.name, sizeof(user.name), stdin);
 	CHOP(user.name);							//문자열에 스페이스바를 지워버림
