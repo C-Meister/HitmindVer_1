@@ -86,8 +86,8 @@ char message[100];		//소켓 프로그래밍 문자열
 int status[4];			//소켓용
 char username[30];		//사용자 이름
 WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
-SOCKET connect_sock,Sconnect_sock[4],listen_sock;	//서버 소켓변수
-SOCKADDR_IN connect_addr,listen_addr;			//서버 주소정보 저장하는 변수
+SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
+SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 
 //기본 함수들
@@ -347,8 +347,8 @@ void usermain(void) {
 #ifdef SOOHAN
 #endif
 #ifdef SANGHIE
-	
-	
+
+
 #endif
 #ifdef MINSUK
 #endif
@@ -413,7 +413,7 @@ restart:
 					system("start https://blog.naver.com/dgsw102");
 					system("start https://blog.naver.com/soohan530");
 				}
-				else if(n<1)
+				else if (n < 1)
 					n++;
 				else if (9 <= xx && xx <= 15) {
 					for (i = 0; i <= 15; i++) {
@@ -470,7 +470,7 @@ restart:
 				system("start https://blog.naver.com/dgsw102");
 				system("start https://blog.naver.com/soohan530");
 			}
-			else if (n<1)
+			else if (n < 1)
 				n++;
 			else if (9 <= xx && xx <= 15) {
 				for (i = 0; i <= 15; i++) {
@@ -822,7 +822,7 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	connect_addr.sin_port = htons(5555);					 //서버 포트
 	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
 		ErrorHandling("connect() error");
-	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL,0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
+	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	system("cls");
 	send(connect_sock, "player connect", 20, 0);
 	waitroom();
@@ -831,7 +831,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
 	Sleep(1000);
 	while (1) {
-		
+
 		if (recv(connect_sock, message, 20, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strcmp(message, "player 1 connect") == 0) {
 				status[0] = 1;
@@ -892,9 +892,9 @@ int sqllogin(MYSQL *cons) {
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	LOG user;								//사용자 정보 구조체
 	while (1) {
-		
+
 		int check = 0;
-		
+
 		user = login(1);							//login 함수를 사용
 		if (user.id[0] == NULL)
 		{
@@ -903,8 +903,8 @@ int sqllogin(MYSQL *cons) {
 			gotoxy(2, 3);
 			if (check == 1)
 				printf("               (회원가입 성공)           ");
-			else if(check == -1)
-				printf("            (아이디가 중복됩니다)           ");
+			else if (check == -1)
+				printf("             (아이디가 중복됩니다)              ");
 			else
 				printf("               (회원가입 실패)          ");
 		}
@@ -916,7 +916,7 @@ int sqllogin(MYSQL *cons) {
 			{
 				gotoxy(2, 3);
 				printf("           아이디가 존재하지 않습니다     ");
-				
+
 			}
 			else {
 
@@ -932,48 +932,43 @@ int sqllogin(MYSQL *cons) {
 					printf("              비밀번호가 틀렸습니다        ");
 				}
 				else {
-					return 1;
+					return 1; //로그인 성공
 				}
 			}
 		}
-				
-		
+
+
 	}
-	
+
 
 }
 int sqlsignup(MYSQL *cons) {
 	LOG user;
 	char query[100];
+	char query2[100];
 	user = login(2);
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
-	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
-	
+
+
 	if (user.name[0] == 0)
 		return 0;
 
-	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
-	mysql_query(cons, query);
+	sprintf(query2, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
+	mysql_query(cons, query2);
 	sql_result = mysql_store_result(cons);
-	sql_row = mysql_fetch_row(sql_result);
-
-	if (sql_row[0][1] != NULL)									//해댱 id가 있으면 
+	if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
-		return -1;
-
+		if (sql_row[0][1] != NULL)
+			return -1;
 	}
-	
+
+	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
+
 	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
-	{
-		printf("\n회원가입 성공");
-		return 1;
-	}
+		return 1; //성공
 	else
-	{
-		printf("\n회원가입 실패");
-		return 0;
-	}
+		return 0; //실패
 
 }
 void mainatitleimage(void) {
@@ -1013,7 +1008,7 @@ void maintitle(void) { //게임 메인타이틀 출력
 	mainatitleimage();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
-		
+
 		click(&xx, &yy);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25)
@@ -1029,7 +1024,7 @@ void click(int *xx, int *yy) {
 	DWORD        dwNOER;
 	INPUT_RECORD rec;
 
-	
+
 	hIn = GetStdHandle(STD_INPUT_HANDLE);
 	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
@@ -1037,8 +1032,8 @@ void click(int *xx, int *yy) {
 
 	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
 
-	
-	
+
+
 	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
 
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
@@ -1095,7 +1090,7 @@ void banglist(void) {																				//마우스에서 2를 나눈값을 받는다
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 #endif
-	
+
 }
 int bangchose(void) {
 
@@ -1103,7 +1098,7 @@ int bangchose(void) {
 	banglist();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
-		
+
 		click(&xx, &yy);
 
 		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
