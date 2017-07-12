@@ -93,7 +93,7 @@ WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
 SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
-
+ROOM connectroom[6];
 //기본 함수들
 
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
@@ -170,27 +170,37 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	mysql_query(cons, "use catchmind");
 	//변수 선언 끝
 	disablecursor(1);
-	//	ConsoleL(30, 30);
-/*	maintitle();
-	bangnum = bangchose();
-	if (bangnum == 1) {
-		memset(&wsaData, 0, sizeof(wsaData));
-		memset(&connect_sock, 0, sizeof(connect_sock));
-		memset(&connect_addr, 0, sizeof(connect_addr));
-		Connect_Server(ServerIP);
-	}*/
+
+	/*	maintitle();
+		bangnum = bangchose();
+		if (bangnum == 1) {
+			memset(&wsaData, 0, sizeof(wsaData));
+			memset(&connect_sock, 0, sizeof(connect_sock));
+			memset(&connect_addr, 0, sizeof(connect_addr));
+			Connect_Server(ServerIP);
+		}*/
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 
 	mainchoose = maintitle();				//main 화면
+						//
 	while (1) {
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
+			ConsoleL(26, 15);				//콘솔크기를 로그인창에 맞게
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
-
+			ConsoleL(50, 20);
 			bangchoose = bangchose(cons);	//방을 고름	
-			if (bangchoose == 0)			//방이 0번째를 고르면 방만들기로 이동
+			if (bangchoose == 0)			//방만들기를 클릭하면 방만들기로 이동
 				sqlmakeroom(cons);
+			else if (bangchoose == 1)		//방 빠른 접속 -추후추가
+			{
+
+			}
+			else                            //방 선택 접속
+			{
+				
+			}
 			return 0;
 		}
 	}
@@ -731,7 +741,7 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 	{
 		printf("\b실패... \n서버가 존재하지 않습니다.\n");
 		fprintf(stderr, "%s\n", mysql_error(cons));
-		printf("새로운 ip를 설정해 주세요.");
+		printf("새로운 ip를 설정해 주세요.\n->");
 		scanf("%s", mysqlip);
 		loadmysql(cons, mysqlip);					//재귀함수 호출
 	}
@@ -1142,7 +1152,7 @@ void banglist(MYSQL *cons) {
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 
-	mysql_query(cons, "select ip, name from catchmind.room");
+	mysql_query(cons, "select * from catchmind.room");
 	sql_result = mysql_store_result(cons);
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
@@ -1169,14 +1179,14 @@ void banglist(MYSQL *cons) {
 		printf("%-7s", sql_row[1]);
 		i++;
 	}
-	
+
 	i = 0;
 
 }
 int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0;
-	
+
 	while (1) {
 		banglist(cons);
 		gotoxy(0, 0);
@@ -1184,7 +1194,7 @@ int bangchose(MYSQL *cons) {
 
 		click(&xx, &yy);
 
-	
+
 		if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 			return 0;
 		if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
@@ -1192,7 +1202,7 @@ int bangchose(MYSQL *cons) {
 		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
 			return 2;
 		Sleep(50);
-		
+
 	}
 
 }
