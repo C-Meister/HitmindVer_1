@@ -76,8 +76,8 @@ typedef struct {
 	LONG y;
 }MOUSEPOINT;
 
-typedef struct tagPOINT __RPC_FAR *PPOINT;
-typedef struct tagPOINT __RPC_FAR *LPPOINT;
+typedef struct tagPOINT *PPOINT;
+typedef struct tagPOINT *LPPOINT;
 
 //전역 변수들 (사용 비추천)
 
@@ -122,10 +122,8 @@ void banglist();					//게임 선택창 출력
 int bangchose();					//게임 선택창 출력및 선택
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
-LOG login(int m);                                    //id 비밀번호를 형식에 맞게 입력을함 
-void click(int *xx, int *yy);  //마우스
-void logintema(); //로그인 배경
-void jointema();  //회원가입 배경
+																	//id 비밀번호를 형식에 맞게 입력을함 
+void click(int *xx, int *yy);					//클릭함수 두번째, xx값과 yy값을 변환함
 //--------------------------미니게임 숫자야구 함수들----------------------
 void createainumber(int *ainum);
 void scanfirst(int *usnum);
@@ -134,7 +132,6 @@ void aiscan(int(*aire)[100], int *usnum, int(*aiall)[10][10], int t);
 void aicheck(int(*aiall)[10][10], int(*aire)[100], int t);
 void numberbaseball();
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
-
 
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
@@ -147,7 +144,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
-	char mysqlip[30] = "10.80.162.181";		//mysql ip 상희ip입니다	지금 윈도우7버전
+	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다	지금 윈도우7버전
 	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
@@ -195,7 +192,7 @@ restart:
 	int i = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0;
-	MOUSEPOINT a;
+	POINT a;
 
 	/*닉네임 생성*/
 	if (m == 2) {
