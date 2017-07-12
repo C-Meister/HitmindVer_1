@@ -106,7 +106,7 @@ void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
 void readchating(MYSQL *cons);					//mysqm의 채팅을 읽는 함수
-
+LOG login(int m);
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -120,8 +120,8 @@ void mainatitleimage();				//게임 메인타이틀 출력
 void maintitle();					//게임 메인타이틀 출력및 선택
 void banglist();					//게임 선택창 출력
 int bangchose();					//게임 선택창 출력및 선택
-void logintema();					
-void jointema();
+void logintema();					//로그인 디자인
+void jointema();					//회원가입 디자인
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 																	//id 비밀번호를 형식에 맞게 입력을함 
@@ -211,7 +211,7 @@ restart:
 	}
 	gotoxy(16, 5);
 	while (1) {
-		if (kbhit()) {
+		if (_kbhit()) {
 
 			user.id[i] = _getch();
 			if (user.id[i] == 8) {
@@ -270,7 +270,7 @@ restart:
 	gotoxy(16, 7);
 	while (1) {
 
-		if (kbhit()) {
+		if (_kbhit()) {
 			user.pass[i] = _getch();
 			if (user.pass[i] == 8) {
 				if (i == 0) {
