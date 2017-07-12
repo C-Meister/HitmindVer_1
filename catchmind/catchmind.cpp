@@ -244,6 +244,7 @@ void sqlmakeroom(MYSQL *cons) {
 	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
 	char * myip = inet_ntoa(addr);
 	ROOM myroom = { 0, 0, 0 };
+	disablecursor(1);
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            캐치마인드 방 만들기              ■\n");
@@ -292,6 +293,7 @@ void sqlmakeroom(MYSQL *cons) {
 	char query[100];
 	sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
 	mysql_query(cons, query);
+	disablecursor(1);
 	CLS;
 	printf("방 제작중....");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
