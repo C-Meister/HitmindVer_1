@@ -561,6 +561,7 @@ int sqlsignup(MYSQL *cons) {
 }
 void maintitle() { //게임 메인타이틀 출력
 	ConsoleL(100, 60);
+	disablecursor(true);
 	gotoxy(6, 3);
 	printf("■■■■■  ■  ■      ■■■    ■    ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");
 	gotoxy(6, 4);
