@@ -102,24 +102,24 @@ void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 void usermain(void);
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server(char *ServerIP); //서버 연결 해주는 함수
-void recieve(void);				//서버에서 데이터 받아오는 쓰레드용 함수
-void sendall(char *message);
-void waitroom(void);
-void Clnt_1(void);
-void Clnt_2(void);
-void Clnt_3(void);
-void Clnt_4(void);
-void makeroom(void);
-void sqlmakeroom(MYSQL *cons);
-IN_ADDR GetDefaultMyIP(void);
+void Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
+void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
+void sendall(char *message);					//하나를받으면 전부전송
+void waitroom(void);							//네트워크 대기방
+void Clnt_1(void);								//서버 - 클라이언트 1통신
+void Clnt_2(void);								//서버 - 클라이언트 2통신
+void Clnt_3(void);								//서버 - 클라이언트 3통신
+void Clnt_4(void);								//서버 - 클라이언트 4통신
+void makeroom(void);							//방만들기(네트워크)
+IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
 int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
 void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
-void readchating(MYSQL *cons);					//mysqm의 채팅을 읽는 함수
+void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
+void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -129,16 +129,15 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
-void mainatitleimage(void);				//게임 메인타이틀 출력
-void maintitle(void);					//게임 메인타이틀 출력및 선택
-void banglist(MYSQL *cons);					//게임 선택창 출력
-int bangchose(MYSQL *cons);					//게임 선택창 출력및 선택
-void logintema(void);					//로그인 디자인
-void jointema(void);					//회원가입 디자인
-LOG login(int m);
+void mainatitleimage(void);						//게임 메인타이틀 출력
+void maintitle(void);							//게임 메인타이틀 출력및 선택
+void banglist(MYSQL *cons);						//게임 선택창 출력
+int bangchose(MYSQL *cons);						//게임 선택창 출력및 선택
+void logintema(void);							//로그인 디자인
+void jointema(void);							//회원가입 디자인
+LOG login(int m);								//기본적인 로그인 입력
 //-------------------------콘솔 함수들------------------------------------
-void checkword(char*nowword, char*scanword);						//단어를 확인함
-																	//id 비밀번호를 형식에 맞게 입력을함 
+void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy);					//클릭함수 두번째, xx값과 yy값을 변환함
 //--------------------------미니게임 숫자야구 함수들----------------------
 void createainumber(int *ainum);
