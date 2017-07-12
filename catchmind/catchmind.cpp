@@ -84,6 +84,7 @@ char message[100];		//소켓 프로그래밍 문자열
 char username[30];		//사용자 이름
 
 //기본 함수들
+
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
@@ -153,8 +154,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//	ConsoleL(30, 30);
 	//loadmysql(cons, mysqlip);
 	memset(&connect_addr, 0, sizeof(connect_addr));
-	memset(&connect_sock, 0, sizeof(connect_addr));
-	memset(&wsaData, 0, sizeof(connect_addr));
+	memset(&connect_sock, 0, sizeof(connect_sock));
+	memset(&wsaData, 0, sizeof(wsaData));
 	maintitle();
 	bangnum = bangchose();
 	if (bangnum == 1) {
@@ -166,6 +167,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 
 }
+
 void usermain(void) {
 #ifdef SANGHO
 #endif
@@ -188,6 +190,7 @@ void usermain(void) {
 #endif
 #ifdef MINSUK
 #endif
+	exit(1);
 }
 LOG login() {
 	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
