@@ -71,6 +71,12 @@ typedef struct {
 	char id[30];
 	char pass[50];
 }LOG;
+typedef struct {
+	LONG x;
+	LONG y;
+}MOUSEPOINT;
+typedef struct tagPOINT __RPC_FAR *PPOINT;
+typedef struct tagPOINT __RPC_FAR *LPPOINT;
 
 //전역 변수들 (사용 비추천)
 
@@ -173,73 +179,155 @@ void usermain(void) {
 #endif
 	exit(1);
 }
-LOG login() {
-	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
+LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
+				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
+
+restart:
+	gotoxy(0, 0);
+	if (m == 1)
+		logintema();
+	else if (m == 2)
+		jointema();
 	LOG user = { 0, 0 };
 	int i = 0;
+	int cnt = 0;
+	int xx = 0, yy = 0;
+	MOUSEPOINT a;
 
-	/*아이디 암호화 X*/
-	printf("id : ");
-
-
+	/*닉네임 생성*/
+	if (m == 2) {
+		gotoxy(16, 3);
+		scanf("%s", user.name);
+		for (i = 0; user.name[i] != 0; i++) {
+			if (user.name[i] == 0) {
+				cnt++;
+				break;
+			}
+		}
+		if (cnt == 1 || i > 16)
+			goto restart;
+	}
+	gotoxy(16, 5);
 	while (1) {
-		user.id[i] = _getch();
+		if (kbhit()) {
 
-		if (user.id[i] == 8) {
-			if (i == 0) {
-				user.id[0] = 0;
+			user.id[i] = _getch();
+			if (user.id[i] == 8) {
+				if (i == 0) {
+					user.id[0] = 0;
+					continue;
+				}
+				printf("\b \b");
+				user.id[i - 1] = 0;
+				user.id[i--] = 0;
+			}
+			else if ((user.id[i] == 9 || user.id[i] == 13) && i > 3) {
+				user.id[i] = 0;
+				break;
+			}
+			else if (user.id[i] == 13) {
+				user.id[i] = 0;
+			}
+			else if (i >= 15) {
 				continue;
 			}
-			printf("\b \b");
-			user.id[i - 1] = 0;
-			user.id[i--] = 0;
+			else if (!((user.id[i] >= '0' && user.id[i] <= '9') || (user.id[i] >= 'a' && user.id[i] <= 'z') || (user.id[i] >= 'A' && user.id[i] <= 'Z'))) {
+				user.id[i] = 0;
+			}
+			else
+				putchar(user.id[i++]);
 		}
-		else if (user.id[i] == 13 && i > 3) {
-			user.id[i] = 0;
-			break;
-		}
-		else if (user.id[i] == 13) {
-			user.id[i] = 0;
-		}
-		else if (!((user.id[i] >= '0' && user.id[i] <= '9') || (user.id[i] >= 'a' && user.id[i] <= 'z') || (user.id[i] >= 'A' && user.id[i] <= 'Z'))) {
-			user.id[i] = 0;
-		}
-		else
-			putchar(user.id[i++]);
 
+		GetCursorPos(&a);
+		SetCursorPos(a.x, a.y);
+		click(&xx, &yy);
+		//gotoxy(20,20);
+		//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
 
+		if (9 <= yy && yy <= 11) {
+			if (1 <= xx && xx <= 7) {
+				system("start https://blog.naver.com/dgsw102");
+				system("start https://blog.naver.com/soohan530");
+			}
+			else if (9 <= xx && xx <= 15) {
+				for (i = 0; i <= 15; i++) {
+					user.id[i] = 0;
+					user.pass[i] = 0;
+				}
+				break; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+			}
+			else if (17 <= xx && xx <= 23) {
+				goto restart;
+			}
+		}
+		Sleep(20);
 	}
-	/*비밀번호 암호화 구현*/
 	i = 0;
-	printf("\npassword : ");
 
+	/*비밀번호 암호화 구현*/
+	gotoxy(16, 7);
 	while (1) {
-		user.pass[i] = _getch();
 
-		if (user.pass[i] == 8) {
-			if (i == 0) {
-				user.pass[0] = 0;
+		if (kbhit()) {
+			user.pass[i] = _getch();
+			if (user.pass[i] == 8) {
+				if (i == 0) {
+					user.pass[0] = 0;
+					continue;
+				}
+				printf("\b \b");
+				user.pass[i - 1] = 0;
+				user.pass[i--] = 0;
+			}
+			else if (user.pass[i] == 13 && i > 3) {
+				user.pass[i] = 0;
+				break;
+			}
+			else if (user.pass[i] == 13) {
+				user.pass[i] = 0;
+			}
+			else if (i >= 15) {
 				continue;
 			}
-			printf("\b \b");
-			user.pass[i - 1] = 0;
-			user.pass[i--] = 0;
+			else if (!((user.pass[i] >= '0' && user.pass[i] <= '9') || (user.pass[i] >= 'a' && user.pass[i] <= 'z') || (user.pass[i] >= 'A' && user.pass[i] <= 'Z'))) {
+				user.pass[i] = 0;
+			}
+			else {
+				printf("*");
+				i++;
+			}
 		}
-		else if (user.pass[i] == 13 && i > 3) {
-			user.pass[i] = 0;
+		GetCursorPos(&a);
+		SetCursorPos(a.x, a.y);
+		click(&xx, &yy);
+
+		if (9 <= yy && yy <= 11) {
+			if (1 <= xx && xx <= 7) {
+				system("start https://blog.naver.com/dgsw102");
+				system("start https://blog.naver.com/soohan530");
+			}
+			else if (9 <= xx && xx <= 15) {
+				for (i = 0; i <= 15; i++) {
+					user.id[i] = 0;
+					user.pass[i] = 0;
+				}
+				break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+			}
+			else if (17 <= xx && xx <= 23) {
+				goto restart;
+			}
+		}
+		else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
 			break;
 		}
-		else if (user.pass[i] == 13) {
-			user.pass[i] = 0;
+		else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+			break;
 		}
-		else if (!((user.pass[i] >= '0' && user.pass[i] <= '9') || (user.pass[i] >= 'a' && user.pass[i] <= 'z') || (user.pass[i] >= 'A' && user.pass[i] <= 'Z'))) {
-			user.pass[i] = 0;
-		}
-		else {
-			printf("*");
-			i++;
-		}
+
+
+		Sleep(20);
 	}
+	fflush(stdin);
 	return user;
 }
 void checkword(char*nowword, char*scanword) {
@@ -1103,4 +1191,34 @@ void aicheck(int(*aiall)[10][10], int(*aire)[100], int t) {
 			}
 		}
 	}
+}
+void logintema() {
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■                                              ■\n");
+	printf("■            캐치마인드 서버에 로그인          ■\n");
+	printf("■                                              ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■     ID     □                    □          ■\n");
+	printf("■□□□□□□□□□□□□□□□□□□   login  ■\n");
+	printf("■  Password  □                    □          ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■              ■              ■              ■\n");
+	printf("■ 개발자사이트 ■   회원가입   ■    초기화    ■\n");
+	printf("■              ■              ■              ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+}
+void jointema() {
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■  회원가입 : 닉네임은 공백 특수문자 안됩니다  ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■    닉네임  □                    □          ■\n");
+	printf("■□□□□□□□□□□□□□□□□□□          ■\n");
+	printf("■     ID     □                    □ 회원가입 ■\n");
+	printf("■□□□□□□□□□□□□□□□□□□          ■\n");
+	printf("■  Password  □                    □          ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■              ■              ■              ■\n");
+	printf("■ 개발자사이트 ■    나가기    ■    초기화    ■\n");
+	printf("■              ■              ■              ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
