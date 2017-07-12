@@ -188,7 +188,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			//ConsoleL(26, 15);마우스가 콘솔창을 벗어나면 입력이 안되므로 잠시 보류				//콘솔크기를 로그인창에 맞게  
-			disablecursor(0);
+			disablecursor(0);               //커서 보이게
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 			ConsoleL(50, 20);
@@ -1202,13 +1202,23 @@ int bangchose(MYSQL *cons) {
 
 		click(&xx, &yy);
 
-
 		if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 			return 0;
-		if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
+		else if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
 			return 1;
-		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
+		else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
 			return 2;
+		else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//방 2
+			return 3;
+		else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//방 3
+			return 4;
+		else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//방 4
+			return 5;
+		else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//방 5
+			return 6;
+		else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//방 6
+			return 7;
+
 		Sleep(50);
 
 	}
