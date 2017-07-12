@@ -148,7 +148,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 #else
 #ifdef SANGHIE											//상희 테스트용
 	loadmysql(cons, mysqlip);
-	sqllogin(cons);
+	bangchose();
 	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
 	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
 	cur(120, 30);
@@ -603,7 +603,7 @@ void maintitle() { //게임 메인타이틀 출력
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }// x13~31 y20~26		x33~51 y20~26		x53~71 y20~26
 void click(int *xx, int *yy) {
-	int mode;
+	unsigned long mode;
 	CIN = GetStdHandle(STD_INPUT_HANDLE); //마우스 재활성화
 	GetConsoleMode(CIN, &mode);
 	SetConsoleMode(CIN, mode | ENABLE_MOUSE_INPUT);
