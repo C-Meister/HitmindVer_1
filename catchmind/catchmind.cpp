@@ -385,12 +385,9 @@ restart:
 					user.name[i - 1] = 0;
 					user.name[i--] = 0;
 				}
-				else if ((user.name[i] == 9 || user.name[i] == 13) && i > 3) {
+				else if ((user.name[i] == 9 || user.name[i] == 13)) {
 					user.name[i] = 0;
 					break;
-				}
-				else if (user.name[i] == 13) {
-					user.name[i] = 0;
 				}
 				else if (i >= 15) {
 					continue;
