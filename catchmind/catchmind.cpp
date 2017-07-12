@@ -171,6 +171,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	return 0;
 #else			//본 메인함수는 여기적어주세요
 	//loadmysql(cons, mysqlip);
+	memset(&connect_addr, 0, sizeof(connect_addr));
+	memset(&connect_sock, 0, sizeof(connect_addr));
+	memset(&wsaData, 0, sizeof(connect_addr));
 	maintitle();
 	bangnum = bangchose();
 	if (bangnum == 1) {
