@@ -892,9 +892,6 @@ void numberbaseball() {
 	}
 
 
-
-	return 0;
-
 }
 void createainumber(int *ainum) {
 
