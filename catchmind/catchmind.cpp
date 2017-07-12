@@ -86,8 +86,9 @@ char message[100];		//소켓 프로그래밍 문자열
 int status[4];			//소켓용
 char username[30];		//사용자 이름
 WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
-SOCKET connect_sock;					//서버 소켓변수
-SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
+SOCKET connect_sock,Sconnect_sock[4],listen_sock;	//서버 소켓변수
+SOCKADDR_IN connect_addr,listen_addr;			//서버 주소정보 저장하는 변수
+int sockaddr_in_size;
 
 //기본 함수들
 
@@ -99,6 +100,13 @@ void usermain(void);
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(char *ServerIP); //서버 연결 해주는 함수
 void recieve();				//서버에서 데이터 받아오는 쓰레드용 함수
+void sendall(char *message);
+void Clnt_1();
+void Clnt_2();
+void Clnt_3();
+void Clnt_4();
+void makeroom();
+IN_ADDR GetDefaultMyIP();
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
 int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
@@ -1227,4 +1235,149 @@ void jointema() {
 	printf("■ 개발자사이트 ■    나가기    ■    초기화    ■\n");
 	printf("■              ■              ■              ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+}
+void sendall(char *message) {
+	while (1) {
+		send(Sconnect_sock[0], message, 20, 0);
+		printf("Client 1 <- Server : %s\n", message);
+		if (Sconnect_sock[1] != 0) {
+			send(Sconnect_sock[1], message, 20, 0);
+			printf("Client 2 <- Server : %s\n", message);
+		}
+		if (Sconnect_sock[2] != 0) {
+			send(Sconnect_sock[2], message, 20, 0);
+			printf("Client 3 <- Server : %s\n", message);
+		}
+		if (Sconnect_sock[3] != 0) {
+			send(Sconnect_sock[3], message, 20, 0);
+			printf("Client 4 <- Server : %s\n", message);
+		}
+		Sleep(300);
+	}
+}
+void Clnt_1() {
+	char message[100];
+	printf("hello\n");
+	while (1) {
+		if (recv(Sconnect_sock[0], message, 20, 0) > 0) {
+			printf("Client 1 -> Server : %s\n", message);
+			if (strcmp(message, "player connect") == 0) {
+				memset(&message, 0, sizeof(message));
+				strcpy(message, "player 1 connect");
+			}
+			sendall(message);
+		}
+	}
+}
+void Clnt_2() {
+	char message[100];
+	printf("hello\n");
+	while (1) {
+
+		if (recv(Sconnect_sock[1], message, 20, 0) > 0) {
+			printf("Client 2 -> Server : %s\n", message);
+			if (strcmp(message, "player connect") == 0) {
+				memset(&message, 0, sizeof(message));
+				strcpy(message, "player 2 connect");
+			}
+			sendall(message);
+		}
+	}
+}
+void Clnt_3() {
+	char message[100];
+	printf("hello\n");
+	while (1) {
+
+		if (recv(Sconnect_sock[2], message, 20, 0) > 0) {
+			printf("Client 3 -> Server : %s\n", message);
+			if (strcmp(message, "player connect") == 0) {
+				memset(&message, 0, sizeof(message));
+				strcpy(message, "player 3 connect");
+			}
+			sendall(message);
+		}
+	}
+}
+void Clnt_4() {
+	char message[100];
+	printf("hello\n");
+	while (1) {
+
+		if (recv(Sconnect_sock[3], message, 20, 0) > 0) {
+			printf("Client 4 -> Server : %s\n", message);
+			if (strcmp(message, "player connect") == 0) {
+				memset(&message, 0, sizeof(message));
+				strcpy(message, "player 4 connect");
+			}
+			sendall(message);
+		}
+	}
+}
+void makeroom() {
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+		ErrorHandling("WSAStartup() error");
+	int i = 0;
+	char message[100];
+	listen_sock = socket(PF_INET, SOCK_STREAM, 0); // 소켓 생성 후 소켓에 대한 정보를 listen_sock변수에 대입					
+
+	if (listen_sock == INVALID_SOCKET)
+		ErrorHandling("socket() error");
+
+	printf("소켓 생성 완료!\n");
+
+	memset(&listen_addr, 0, sizeof(listen_addr)); // 서버의 주소 초기화
+
+	listen_addr.sin_family = AF_INET;
+
+	listen_addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // 서버의 주소를 내 주소로 (아마도)
+
+	listen_addr.sin_port = htons(5555); // 서버 포트 
+
+	printf("주소 지정 완료!\n");
+
+	if (bind(listen_sock, (SOCKADDR*)&listen_addr, sizeof(listen_addr)) == SOCKET_ERROR) // 지금까지 설정한 주소를 listen_sock에 bind()로 지정
+		ErrorHandling("bind() error");
+
+	printf("bind() 완료!\n");
+	if (listen(listen_sock, 5) == SOCKET_ERROR)	// 클라이언트가 접속할때 까지 기다림
+		ErrorHandling("listen() error");
+	printf("listen() 완료!\n");
+	sockaddr_in_size = sizeof(connect_addr);
+
+	while (1) {
+		Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+		if (Sconnect_sock[i] != 0) {
+			switch (i) {
+			case 0:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
+			case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
+			case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
+			case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
+			default: printf("Client 접속 거부 : 인원 초과\n"); break;
+			}
+			i++;
+		}
+		printf("클라이언트 %d 접속!\n", i);
+	}
+}
+IN_ADDR GetDefaultMyIP()
+{
+	char localhostname[MAX_PATH];
+	IN_ADDR addr = { 0, };
+
+	if (gethostname(localhostname, MAX_PATH) == SOCKET_ERROR)//호스트 이름 얻어오기
+	{
+		return addr;
+	}
+	HOSTENT *ptr = gethostbyname(localhostname);//호스트 엔트리 얻어오기
+	while (ptr && ptr->h_name)
+	{
+		if (ptr->h_addrtype == PF_INET)//IPv4 주소 타입일 때
+		{
+			memcpy(&addr, ptr->h_addr_list[0], ptr->h_length);//메모리 복사
+			break;//반복문 탈출
+		}
+		ptr++;
+	}
+	return addr;
 }
