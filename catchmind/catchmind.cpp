@@ -179,17 +179,17 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		memset(&connect_addr, 0, sizeof(connect_addr));
 		Connect_Server(ServerIP);
 	}*/
-	loadmysql(cons, mysqlip);		//mysql 서버 불러오기
+	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 
-	mainchoose = maintitle();		//main 화면
+	mainchoose = maintitle();				//main 화면
 	while (1) {
 		CLS;
-		if (mainchoose == 1) {		//main에서 첫번째를 고르면
-			if (sqllogin(cons) != 1)
+		if (mainchoose == 1) {				//main에서 첫번째를 고르면
+			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 
-			bangchoose = bangchose(cons);
-			if (bangchoose == 0)
+			bangchoose = bangchose(cons);	//방을 고름	
+			if (bangchoose == 0)			//방이 0번째를 고르면 방만들기로 이동
 				sqlmakeroom(cons);
 			return 0;
 		}
@@ -1151,7 +1151,7 @@ void banglist(MYSQL *cons) {
 		else
 			cur(55, 6 + ((i / 2) * 4));
 		printf("%s", sql_row[0]);
-		for (short j = 0; sql_row[1][j] != 0; j++) {
+		/*for (short j = 0; sql_row[1][j] != 0; j++) {
 			if (i % 2 == 0 && j < 10)
 				cur(25 + j, 7 + (i * 2));
 			else if (i % 2 == 0)
@@ -1161,7 +1161,12 @@ void banglist(MYSQL *cons) {
 			else
 				cur(55 + j - 10, 8 + (i / 2) * 4);
 			printf("%c", sql_row[1][j]);
-		}
+		}*/
+		if (i % 2 == 0)
+			cur(25, 7 + (i * 2));
+		else
+			cur(55, 7 + ((i / 2) * 4));
+		printf("%-7s", sql_row[1]);
 		i++;
 	}
 	
