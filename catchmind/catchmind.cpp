@@ -194,6 +194,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			disablecursor(0);               //커서 보이게
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
+			disablecursor(1);
 			while (1) {						//방 반복문
 				ConsoleL(50, 20);
 				bangchoose = bangchose(cons);	//방을 고름	
