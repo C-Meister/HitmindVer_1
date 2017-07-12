@@ -130,7 +130,7 @@ SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, in
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
-void maintitle(void);							//게임 메인타이틀 출력및 선택
+int maintitle(void);							//게임 메인타이틀 출력및 선택
 void banglist(MYSQL *cons);						//게임 방 출력
 int bangchose(MYSQL *cons);						//게임 방 출력및 선택
 void logintema(void);							//로그인 디자인
@@ -154,6 +154,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
+	char mainchoose = 0;
+	char bangchoose;
 	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
 	MYSQL *cons = mysql_init(NULL);			//mysql 초기화
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
@@ -177,17 +179,28 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		memset(&connect_addr, 0, sizeof(connect_addr));
 		Connect_Server(ServerIP);
 	}*/
-	loadmysql(cons, mysqlip);
-//	sqlmakeroom(cons);
-	bangchose(cons);
-	return 0;
+	loadmysql(cons, mysqlip);		//mysql 서버 불러오기
 
+	mainchoose = maintitle();		//main 화면
+	while (1) {
+		CLS;
+		if (mainchoose == 1) {		//main에서 첫번째를 고르면
+			if (sqllogin(cons) != 1)
+				continue;
+
+			bangchoose = bangchose(cons);
+			if (bangchoose == 0)
+				sqlmakeroom(cons);
+			return 0;
+		}
+	}
 }
 
 
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void sqlmakeroom(MYSQL *cons) {
+	CLS;
 	int i = 0;
 	IN_ADDR addr;
 	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
@@ -1047,7 +1060,7 @@ void mainatitleimage(void) {
 	gotoxy(12, 22);
 	printf("■              ■                      ■              ■                      ■              ■");
 	gotoxy(12, 23);
-	printf("■              ■                      ■              ■                      ■              ■");
+	printf("■  게임 시작   ■                      ■              ■                      ■              ■");
 	gotoxy(12, 24);
 	printf("■              ■                      ■              ■                      ■              ■");
 	gotoxy(12, 25);
@@ -1055,7 +1068,7 @@ void mainatitleimage(void) {
 	gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
-void maintitle(void) { //게임 메인타이틀 출력
+int maintitle(void) { //게임 메인타이틀 출력
 	ConsoleL(100, 60);
 	disablecursor(true);
 	int xx = 0, yy = 0;
@@ -1066,7 +1079,7 @@ void maintitle(void) { //게임 메인타이틀 출력
 		click(&xx, &yy);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25)
-			break;
+			return 1;
 
 		gotoxy(0, 0);
 	}
@@ -1166,8 +1179,13 @@ int bangchose(MYSQL *cons) {
 
 		click(&xx, &yy);
 
-		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
+	
+		if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
+			return 0;
+		if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
 			return 1;
+		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
+			return 2;
 		Sleep(50);
 		
 	}
