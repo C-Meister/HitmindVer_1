@@ -78,7 +78,7 @@ typedef struct {
 typedef struct {
 	char roomname[30];
 	char password[30];
-	char * ip;
+	char ip[20];
 }ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
@@ -133,6 +133,7 @@ void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
 void banglist(MYSQL *cons);						//게임 방 출력
 int bangchose(MYSQL *cons);						//게임 방 출력및 선택
+int chooseroom(int roomnum);
 void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
@@ -195,11 +196,11 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				sqlmakeroom(cons);
 			else if (bangchoose == 1)		//방 빠른 접속 -추후추가
 			{
-
+				
 			}
 			else                            //방 선택 접속
 			{
-				
+				chooseroom(bangchoose);
 			}
 			return 0;
 		}
@@ -1152,15 +1153,17 @@ void banglist(MYSQL *cons) {
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 
-	mysql_query(cons, "select * from catchmind.room");
+	mysql_query(cons, "select ip, name, password from catchmind.room");
 	sql_result = mysql_store_result(cons);
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
+		
 		if (i % 2 == 0)
 			cur(25, 6 + (i * 2));
 		else
 			cur(55, 6 + ((i / 2) * 4));
 		printf("%s", sql_row[0]);
+		
 		/*for (short j = 0; sql_row[1][j] != 0; j++) {
 			if (i % 2 == 0 && j < 10)
 				cur(25 + j, 7 + (i * 2));
@@ -1177,7 +1180,11 @@ void banglist(MYSQL *cons) {
 		else
 			cur(55, 7 + ((i / 2) * 4));
 		printf("%-7s", sql_row[1]);
+		strcpy(connectroom[i].ip, sql_row[0]);
+		strcpy(connectroom[i].roomname, sql_row[1]);
+		strcpy(connectroom[i].password, sql_row[2]);
 		i++;
+
 	}
 
 	i = 0;
@@ -1206,7 +1213,58 @@ int bangchose(MYSQL *cons) {
 	}
 
 }
+int chooseroom(int roomnum) {
+	roomnum -= 2;
+	char roompassword[30] = { 0, };
+	int i = 0;
+	if (connectroom[roomnum].ip[0] == 0)
+		return -1;
+	CLS;
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■                                              ■\n");
+	printf("■              캐치마인드 방 접속              ■\n");
+	printf("■          접속 ip :  %s            ■\n", connectroom[roomnum].ip);
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■  방 제목   □                              □■\n");			// x = 17 y = 5
+	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
+	printf("■  Password  □                              □■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n"); 
+	cur(17, 5);
+	printf("%s", connectroom[roomnum].roomname);
+	cur(17, 7);
+	while (1) {
 
+		if (_kbhit()) {
+			roompassword[i] = _getch();
+			if (roompassword[i] == 8) {
+				if (i == 0) {
+					roompassword[0] = 0;
+					continue;
+				}
+				printf("\b \b");
+				roompassword[i - 1] = 0;
+				roompassword[i--] = 0;
+			}
+			else if (roompassword[i] == 13 && i > 3) {
+				roompassword[i] = 0;
+				break;
+			}
+			else if (roompassword[i] == 13) {
+				roompassword[i] = 0;
+			}
+			else if (i >= 15) {
+				continue;
+			}
+			else if (!((roompassword[i] >= '0' && roompassword[i] <= '9') || (roompassword[i] >= 'a' && roompassword[i] <= 'z') || (roompassword[i] >= 'A' && roompassword[i] <= 'Z'))) {
+				roompassword[i] = 0;
+			}
+			else {
+				printf("*");
+				i++;
+			}
+		}
+	}
+}
 void numberbaseball(void) {
 
 	srand((unsigned int)time(NULL));
