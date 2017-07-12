@@ -110,10 +110,10 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
-void mainatitleimage();
-void maintitle(); //게임 메인타이틀 출력
-void banglist();
-int bangchose();
+void mainatitleimage();				//게임 메인타이틀 출력
+void maintitle();					//게임 메인타이틀 출력및 선택
+void banglist();					//게임 선택창 출력
+int bangchose();					//게임 선택창 출력및 선택
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 LOG login();                                    //id 비밀번호를 형식에 맞게 입력을함 
@@ -153,6 +153,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 	//	ConsoleL(30, 30);
 	maintitle();
+	bangchose();
 	return 0;
 
 }
