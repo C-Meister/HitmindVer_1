@@ -108,13 +108,15 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
+void mainatitleimage();
 void maintitle(); //게임 메인타이틀 출력
+void banglist();
+void bangchose();
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 LOG login();                                    //id 비밀번호를 형식에 맞게 입력을함 
-void click(int *xx, int *yy);					//이 클릭 쓰지말고 MouseClick잇음
-void banglist();
-void bangchose();
+void click(int *xx, int *yy);
+
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -160,9 +162,10 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	}*/
 	return 0;
 #else			//본 메인함수는 여기적어주세요
+	loadmysql(cons, mysqlip);
 	maintitle();
-//	loadmysql(cons, mysqlip);
-//	sqllogin(cons);
+	loadmysql(cons, mysqlip);
+	sqllogin(cons);
 	return 0;
 #endif
 #endif
@@ -570,9 +573,7 @@ int sqlsignup(MYSQL *cons) {
 	}
 
 }
-void maintitle() { //게임 메인타이틀 출력
-	ConsoleL(100, 60);
-	disablecursor(true);
+void mainatitleimage() {
 	gotoxy(6, 3);
 	printf("■■■■■  ■  ■      ■■■    ■    ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");
 	gotoxy(6, 4);
@@ -601,9 +602,25 @@ void maintitle() { //게임 메인타이틀 출력
 	printf("■              ■                      ■              ■                      ■              ■");
 	gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
-}// x13~31 y20~26		x33~51 y20~26		x53~71 y20~26
+}
+void maintitle() { //게임 메인타이틀 출력
+	ConsoleL(100, 60);
+	disablecursor(true);
+	int xx = 0, yy = 0;
+	while (1) {
+		printf("%3d %3d\n", xx, yy);
+		mainatitleimage();
+		click(&xx, &yy);
+
+		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25)
+			break;
+
+		gotoxy(0, 0);
+	}
+	CLS;
+}
 void click(int *xx, int *yy) {
-	unsigned long mode;
+	int mode;
 	CIN = GetStdHandle(STD_INPUT_HANDLE); //마우스 재활성화
 	GetConsoleMode(CIN, &mode);
 	SetConsoleMode(CIN, mode | ENABLE_MOUSE_INPUT);
