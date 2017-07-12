@@ -129,7 +129,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
-	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다
+	char mysqlip[30] = "10.80.162.92";		//mysql ip 상희ip입니다	지금 윈도우7버전
 	WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
 	SOCKET connect_sock;					//서버 소켓변수
 	SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
@@ -143,7 +143,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 	//	ConsoleL(30, 30);
 #ifdef SANGHO
-
+	
 
 #else
 #ifdef SANGHIE											//상희 테스트용
@@ -160,10 +160,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	}*/
 	return 0;
 #else			//본 메인함수는 여기적어주세요
-	loadmysql(cons, mysqlip);
 	maintitle();
-	loadmysql(cons, mysqlip);
-	sqllogin(cons);
+//	loadmysql(cons, mysqlip);
+//	sqllogin(cons);
 	return 0;
 #endif
 #endif
@@ -587,7 +586,7 @@ void maintitle() { //게임 메인타이틀 출력
 	gotoxy(6, 8);
 	printf("  ■        ■  ■    ■      ■  ■    ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■");
 	gotoxy(6, 9);
-	printf("  ■        ■  ■    ■      ■  ■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
+	printf("■          ■  ■    ■      ■  ■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
 	gotoxy(12, 20);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 	gotoxy(12, 21);
