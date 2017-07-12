@@ -76,7 +76,11 @@ typedef struct {
 
 CRITICAL_SECTION cs;	//이벤트
 char message[100];		//소켓 프로그래밍 문자열
+int status[4];			//소켓용
 char username[30];		//사용자 이름
+WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
+SOCKET connect_sock;					//서버 소켓변수
+SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
 
 //기본 함수들
 
@@ -86,8 +90,8 @@ void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 void usermain(void);
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP); //서버 연결 해주는 함수
-void recieve(SOCKET connect_sock);				//서버에서 데이터 받아오는 쓰레드용 함수
+void Connect_Server(char *ServerIP); //서버 연결 해주는 함수
+void recieve();				//서버에서 데이터 받아오는 쓰레드용 함수
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
 int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
@@ -134,10 +138,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
-	char mysqlip[30] = "10.80.162.92";		//mysql ip 상희ip입니다	지금 윈도우7버전
-	WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
-	SOCKET connect_sock;					//서버 소켓변수
-	SOCKADDR_IN connect_addr;				//서버 주소정보 저장하는 변수
+	char mysqlip[30] = "10.80.162.181";		//mysql ip 상희ip입니다	지금 윈도우7버전
 	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
@@ -148,7 +149,13 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 	//	ConsoleL(30, 30);
 	maintitle();
-	bangchose();
+	bangnum = bangchose();
+	if (bangnum == 1) {
+		memset(&wsaData, 0, sizeof(wsaData));
+		memset(&connect_sock, 0, sizeof(connect_sock));
+		memset(&connect_addr, 0, sizeof(connect_addr));
+		Connect_Server(ServerIP);
+	}
 	return 0;
 
 }
@@ -406,9 +413,10 @@ void disablecursor(bool a) {
 	SetConsoleCursorInfo(COL, &ConsoleCursor);	// 설정
 }
 void ErrorHandling(char *Message) {
+	system("cls");
 	fputs(Message, stderr);
 	fputc('\n', stderr);
-	return;
+	exit(1);
 }
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
 	std::cout << msg << " Error: " << SDL_GetError() << std::endl;
@@ -495,8 +503,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
-void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP) { //서버 연결 해주는 함수
-	int status[4] = { 0, };
+void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)	//소켓 프로그래밍 시작
 		ErrorHandling("WSAStartup() error");
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
@@ -505,46 +512,11 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 	connect_addr.sin_port = htons(5555);					 //서버 포트
 	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
 		ErrorHandling("connect() error");
-	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, &connect_sock, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
+	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL,0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	system("cls");
-	send(connect_sock, "player connect",1023,0);
+	send(connect_sock, "player connect", 20, 0);
 	while (1) { //받아온 데이터 처리
-		if (strcmp(message, "player 1 connect") == 0) {
-			status[0] = 1;
-		}
-		if (strcmp(message, "player 2 connect") == 0) {
-			status[1] = 1;
-		}
-		if (strcmp(message, "player 3 connect") == 0) {
-			status[2] = 1;
-		}
-		if (strcmp(message, "player 4 connect") == 0) {
-			status[3] = 1;
-		}
-		if (strcmp(message, "player 1 ready") == 0) {
-			status[0] = 2;
-		}
-		if (strcmp(message, "player 2 ready") == 0) {
-			status[1] = 2;
-		}
-		if (strcmp(message, "player 3 ready") == 0) {
-			status[2] = 2;
-		}
-		if (strcmp(message, "player 4 ready") == 0) {
-			status[3] = 2;
-		}
-		if (strcmp(message, "player 1 not ready") == 0) {
-			status[0] = 1;
-		}
-		if (strcmp(message, "player 2 not ready") == 0) {
-			status[1] = 1;
-		}
-		if (strcmp(message, "player 3 not ready") == 0) {
-			status[2] = 1;
-		}
-		if (strcmp(message, "player 4 not ready") == 0) {
-			status[3] = 1;
-		}
+		
 		gotoxy(0, 3);
 		WHITE
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
@@ -565,7 +537,7 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 			gotoxy(24, 7);
 			printf("                   ");
 			gotoxy(24, 7);
-				printf("JOIN");
+				printf("JOIN           ");
 			WHITE
 		}
 		if (status[0] == 2) {
@@ -692,11 +664,65 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 		printf("      ■                ■                                                        ■                ■\n");
 		printf("      ■                ■                                                        ■                ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		Sleep(100);
 	}
 }
-void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
+void recieve() { //서버에서 데이터 받아오는 쓰레드용 함수
+	char mess[50] = { 0, };
+	Sleep(1000);
 	while (1) {
-		recv(connect_sock, message, 1023, 0); //서버에서 데이터를 받아와 message변수에 저장
+		
+		if (recv(connect_sock, message, 20, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+			if (strcmp(message, "player 1 connect") == 0) {
+				status[0] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 2 connect") == 0) {
+				status[1] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 3 connect") == 0) {
+				status[2] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 4 connect") == 0) {
+				status[3] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 1 ready") == 0) {
+				status[0] = 2;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 2 ready") == 0) {
+				status[1] = 2;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 3 ready") == 0) {
+				status[2] = 2;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 4 ready") == 0) {
+				status[3] = 2;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 1 not ready") == 0) {
+				status[0] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 2 not ready") == 0) {
+				status[1] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 3 not ready") == 0) {
+				status[2] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strcmp(message, "player 4 not ready") == 0) {
+				status[3] = 1;
+				ZeroMemory(message, sizeof(message));
+			}
+			Sleep(100);
+		}
 
 	}
 }
