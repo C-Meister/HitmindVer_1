@@ -110,7 +110,7 @@ void Clnt_1(void);								//서버 - 클라이언트 1통신
 void Clnt_2(void);								//서버 - 클라이언트 2통신
 void Clnt_3(void);								//서버 - 클라이언트 3통신
 void Clnt_4(void);								//서버 - 클라이언트 4통신
-void makeroom(void);							//방만들기(네트워크)
+void makeroom(int *count);							//방만들기(네트워크)
 IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
@@ -157,6 +157,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int i, j, k, v, result;
 	char mainchoose = 0;
 	char bangchoose;
+	char chooseroomcount;
 	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
 	MYSQL *cons = mysql_init(NULL);			//mysql 초기화
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
@@ -184,24 +185,41 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	mainchoose = maintitle();				//main 화면
 						//
-	while (1) {
+	while (1) {								//로그인 반복문
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			//ConsoleL(26, 15);마우스가 콘솔창을 벗어나면 입력이 안되므로 잠시 보류				//콘솔크기를 로그인창에 맞게  
 			disablecursor(0);               //커서 보이게
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
-			ConsoleL(50, 20);
-			bangchoose = bangchose(cons);	//방을 고름	
-			if (bangchoose == 0)			//방만들기를 클릭하면 방만들기로 이동
-				sqlmakeroom(cons);
-			else if (bangchoose == 1)		//방 빠른 접속 -추후추가
-			{
-				
-			}
-			else                            //방 선택 접속
-			{
-				chooseroom(bangchoose);
+			while (1) {						//방 반복문
+				ConsoleL(50, 20);
+				bangchoose = bangchose(cons);	//방을 고름	
+				if (bangchoose == 0)			//방만들기를 클릭하면 방만들기로 이동
+					sqlmakeroom(cons);
+				else if (bangchoose == 1)		//방 빠른 접속 -추후추가
+				{
+
+				}
+				else                            //방 선택 접속
+				{
+					chooseroomcount = chooseroom(bangchoose);
+					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
+					{
+						continue;
+					}
+					if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
+					{
+						cur(10, 1);
+						printf("(비밀번호가 틀렸습니다)");
+						getchar();
+						continue;
+					}
+					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
+					{
+						
+					}
+				}
 			}
 			return 0;
 		}
@@ -213,6 +231,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void sqlmakeroom(MYSQL *cons) {
 	CLS;
+	int count = 0;
 	int i = 0;
 	IN_ADDR addr;
 	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
@@ -266,7 +285,14 @@ void sqlmakeroom(MYSQL *cons) {
 	char query[100];
 	sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
 	mysql_query(cons, query);
-
+	CLS;
+	printf("방 제작중....");
+	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
+	if (count == 1)
+	{
+		CLS;
+		
+	}
 }
 void waitroom(void)
 {
@@ -1005,12 +1031,15 @@ int sqllogin(MYSQL *cons) {
 
 
 
-				if (mysql_fetch_row(sql_result) == NULL)
+				if ((sql_row = mysql_fetch_row(sql_result)) == NULL)
 				{
 					gotoxy(2, 3);
 					printf("              비밀번호가 틀렸습니다        ");
 				}
 				else {
+					strcpy(username, sql_row[1]);
+					sprintf(query, "title %s님 캐치마인드에 오신것을 환영합니다!", username);
+					system(query);
 					return 1; //로그인 성공
 				}
 			}
@@ -1231,6 +1260,7 @@ int chooseroom(int roomnum) {
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
 	CLS;
+	
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■              캐치마인드 방 접속              ■\n");
@@ -1275,6 +1305,12 @@ int chooseroom(int roomnum) {
 			}
 		}
 	}
+	if (!(strcmp(connectroom[roomnum].password, roompassword)))
+	{
+		return 1;
+	}
+	else
+		return 0;
 }
 void numberbaseball(void) {
 
@@ -1579,7 +1615,7 @@ void Clnt_4(void) {
 		}
 	}
 }
-void makeroom(void) {
+void makeroom(int *count) {
 	int i = 0;
 	char message[100];
 	IN_ADDR serverip = GetDefaultMyIP();
@@ -1599,6 +1635,7 @@ void makeroom(void) {
 		ErrorHandling("listen() error");
 	printf("listen() 완료!\n");
 	sockaddr_in_size = sizeof(connect_addr);
+	*count = 1;
 	while (1) {
 		Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
 		if (Sconnect_sock[i] != 0) {
