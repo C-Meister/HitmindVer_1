@@ -349,7 +349,9 @@ void usermain(void) {
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 
+	int n = 0;
 restart:
+	POINT a;
 	gotoxy(0, 0);
 	if (m == 1)
 		logintema();
@@ -359,21 +361,66 @@ restart:
 	int i = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0;
-	POINT a;
 	/*닉네임 생성*/
+	gotoxy(16, 3);
 	if (m == 2) {
-		gotoxy(16, 3);
-		scanf("%s", user.name);
-		
-		for (i = 0; user.name[i] != 0; i++) {
-			if (user.name[i] == 0) {
-				cnt++;
-				break;
+		while (1) {
+			if (_kbhit()) {
+
+				user.name[i] = _getch();
+				if (user.name[i] == 8) {
+					if (i == 0) {
+						user.name[0] = 0;
+						continue;
+					}
+					printf("\b \b");
+					user.name[i - 1] = 0;
+					user.name[i--] = 0;
+				}
+				else if ((user.name[i] == 9 || user.name[i] == 13) && i > 3) {
+					user.name[i] = 0;
+					break;
+				}
+				else if (user.name[i] == 13) {
+					user.name[i] = 0;
+				}
+				else if (i >= 15) {
+					continue;
+				}
+				else if (!((user.name[i] >= '0' && user.name[i] <= '9') || (user.name[i] >= 'a' && user.name[i] <= 'z') || (user.name[i] >= 'A' && user.name[i] <= 'Z'))) {
+					user.name[i] = 0;
+				}
+				else
+					putchar(user.name[i++]);
 			}
+
+			GetCursorPos(&a);
+			SetCursorPos(a.x, a.y);
+			click(&xx, &yy);
+			//gotoxy(20,20);
+			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
+
+			if (9 <= yy && yy <= 11) {
+				if (1 <= xx && xx <= 7) {
+					system("start https://blog.naver.com/dgsw102");
+					system("start https://blog.naver.com/soohan530");
+				}
+				else if(n<10)
+					n++;
+				else if (9 <= xx && xx <= 15) {
+					for (i = 0; i <= 15; i++) {
+						user.name[i] = 0;
+					}
+					return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+				}
+				else if (17 <= xx && xx <= 23) {
+					goto restart;
+				}
+			}
+			Sleep(20);
 		}
-		if (cnt == 1 || i > 16)
-			goto restart;
 	}
+	i = 0;
 	gotoxy(16, 5);
 	while (1) {
 		if (_kbhit()) {
@@ -404,7 +451,6 @@ restart:
 			else
 				putchar(user.id[i++]);
 		}
-
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
@@ -420,8 +466,9 @@ restart:
 				for (i = 0; i <= 15; i++) {
 					user.id[i] = 0;
 					user.pass[i] = 0;
+					user.name[i] = 0;
 				}
-				break; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+				return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
 			}
 			else if (17 <= xx && xx <= 23) {
 				goto restart;
@@ -477,6 +524,7 @@ restart:
 				for (i = 0; i <= 15; i++) {
 					user.id[i] = 0;
 					user.pass[i] = 0;
+					user.name[i] = 0;
 				}
 				break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
 			}
@@ -494,7 +542,6 @@ restart:
 
 		Sleep(20);
 	}
-	fflush(stdin);
 	return user;
 }
 void checkword(char*nowword, char*scanword) {
@@ -839,6 +886,7 @@ int sqllogin(MYSQL *cons) {
 	user = login(1);							//login 함수를 사용
 	if (user.id[0] == NULL)
 	{
+		fflush(stdin);
 		sqlsignup(cons);
 	}
 	CLS;
@@ -937,6 +985,7 @@ void click(int *xx, int *yy) {
 	DWORD        dwNOER;
 	INPUT_RECORD rec;
 
+	
 	hIn = GetStdHandle(STD_INPUT_HANDLE);
 	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
@@ -944,6 +993,8 @@ void click(int *xx, int *yy) {
 
 	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
 
+	
+	
 	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
 
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
