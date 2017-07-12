@@ -405,7 +405,7 @@ restart:
 					system("start https://blog.naver.com/dgsw102");
 					system("start https://blog.naver.com/soohan530");
 				}
-				else if(n<10)
+				else if(n<1)
 					n++;
 				else if (9 <= xx && xx <= 15) {
 					for (i = 0; i <= 15; i++) {
@@ -462,6 +462,8 @@ restart:
 				system("start https://blog.naver.com/dgsw102");
 				system("start https://blog.naver.com/soohan530");
 			}
+			else if (n<1)
+				n++;
 			else if (9 <= xx && xx <= 15) {
 				for (i = 0; i <= 15; i++) {
 					user.id[i] = 0;
@@ -879,21 +881,28 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	}
 }
 int sqllogin(MYSQL *cons) {
-	LOG user;								//사용자 정보 구조체
-	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
-	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
-	user = login(1);							//login 함수를 사용
-	if (user.id[0] == NULL)
-	{
-		fflush(stdin);
-		sqlsignup(cons);
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+		MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
+		LOG user;								//사용자 정보 구조체
+	while (1) {
+		
+		int check = 0;
+		
+		user = login(1);							//login 함수를 사용
+		if (user.id[0] == NULL)
+		{
+			fflush(stdin);
+			check = sqlsignup(cons);
+		}
+
+		if (check == 1)
+			break;
+		
 	}
-	CLS;
 	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
 	mysql_query(cons, query);
 	sql_result = mysql_store_result(cons);
-
 	if (mysql_fetch_row(sql_result) == NULL)									//해댱 id가 없으면 
 	{
 		printf("\n아이디가 존재하지 않습니다.\n");
@@ -904,6 +913,9 @@ int sqllogin(MYSQL *cons) {
 	sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass); 
 	mysql_query(cons, query);	//password는 DB에 암호화되어 있어서 값을 비교할때도 서로 암호화해서 비교를함
 	sql_result = mysql_store_result(cons);
+
+
+
 	if (mysql_fetch_row(sql_result) == NULL)
 	{
 		printf("\n비밀번호가 틀렸습니다.\n");
@@ -920,6 +932,10 @@ int sqlsignup(MYSQL *cons) {
 	char query[100];
 	user = login(2);
 	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
+	
+	if (user.name[0] == 0)
+		return 0;
+
 	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
 	{
 		printf("\n회원가입 성공");
@@ -1003,6 +1019,7 @@ void click(int *xx, int *yy) {
 
 			*xx = mouse_x / 2;
 			*yy = mouse_y;
+			Sleep(100);
 		}
 		else {
 			*xx = 0;
