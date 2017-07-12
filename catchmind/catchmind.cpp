@@ -87,6 +87,7 @@ char username[30];		//사용자 이름
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
+void usermain(void);
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
 void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_addr, char *ServerIP); //서버 연결 해주는 함수
@@ -132,7 +133,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
-	POINT pos;
+	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
 	MYSQL *cons = mysql_init(NULL);			//mysql 초기화
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
@@ -148,28 +149,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int bangnum = 0;						//고른 방의 번호
 
 	//변수 선언 끝
-
 	disablecursor(1);
 	//	ConsoleL(30, 30);
-#ifdef SANGHO
-	
-
-#else
-#ifdef SANGHIE			//상희 테스트용
-	setcolor(0,15);
-	loadmysql(cons, mysqlip);
-	bangchose();
-	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
-	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
-	cur(120, 30);
-	printf("-------------");
-	while (1) {
-		Sleep(1000);
-		//	cur(0, 0);
-		//	printf("%d %d  ", pos.x, pos.y);
-	}*/
-	return 0;
-#else			//본 메인함수는 여기적어주세요
 	//loadmysql(cons, mysqlip);
 	memset(&connect_addr, 0, sizeof(connect_addr));
 	memset(&connect_sock, 0, sizeof(connect_addr));
@@ -182,10 +163,32 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	loadmysql(cons, mysqlip);
 	sqllogin(cons);
 	return 0;
+
+
+}
+void usermain(void) {
+#ifdef SANGHO
 #endif
+#ifdef SOOHAN
+#endif
+#ifdef SANGHIE
+	setcolor(0, 15);
+	loadmysql(cons, mysqlip);
+	bangchose();
+	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
+	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
+	cur(120, 30);
+	printf("-------------");
+	while (1) {
+	Sleep(1000);
+	//	cur(0, 0);
+	//	printf("%d %d  ", pos.x, pos.y);
+	}*/
+	return 0;
+#endif
+#ifdef MINSUK
 #endif
 }
-
 LOG login() {
 	//오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 	LOG user = { 0, 0 };
@@ -574,16 +577,25 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 		printf("      ■   [ STATUS ] : ");
 		if (status[0] == 0) {
 			GRAY
-				printf("DISCONNECTED");
+			gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
+			printf("DISCONNECTED");
 			WHITE
 		}
 		else if (status[0] == 1) {
 			HIGH_GREEN
+			gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
 				printf("JOIN");
 			WHITE
 		}
 		if (status[0] == 2) {
 			SKY_BLUE
+			gotoxy(24, 7);
+			printf("                   ");
+			gotoxy(24, 7);
 				printf("READY");
 			WHITE
 		}
@@ -600,16 +612,25 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 		printf("      ■   [ STATUS ] : ");
 		if (status[1] == 0) {
 			GRAY
+			gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
 				printf("DISCONNECTED");
 			WHITE
 		}
 		else if (status[1] == 1) {
 			HIGH_GREEN
+				gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
 				printf("JOIN");
 			WHITE
 		}
 		if (status[1] == 2) {
 			SKY_BLUE
+				gotoxy(24, 16);
+			printf("                   ");
+			gotoxy(24, 16);
 				printf("READY");
 			WHITE
 		}
@@ -626,16 +647,25 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 		printf("      ■   [ STATUS ] : ");
 		if (status[2] == 0) {
 			GRAY
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
 				printf("DISCONNECTED");
 			WHITE
 		}
 		else if (status[2] == 1) {
 			HIGH_GREEN
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
 				printf("JOIN");
 			WHITE
 		}
 		if (status[2] == 2) {
 			SKY_BLUE
+				gotoxy(24, 25);
+			printf("                   ");
+			gotoxy(24, 25);
 				printf("READY");
 			WHITE
 		}
@@ -652,16 +682,25 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 		printf("      ■   [ STATUS ] : ");
 		if (status[3] == 0) {
 			GRAY
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
 				printf("DISCONNECTED");
 			WHITE
 		}
 		else if (status[3] == 1) {
 			HIGH_GREEN
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
 				printf("JOIN");
 			WHITE
 		}
 		if (status[3] == 2) {
 			SKY_BLUE
+				gotoxy(24, 34);
+			printf("                   ");
+			gotoxy(24, 34);
 				printf("READY");
 			WHITE
 		}
@@ -680,9 +719,8 @@ void Connect_Server(WSADATA wsaData, SOCKET connect_sock, SOCKADDR_IN connect_ad
 }
 void recieve(SOCKET connect_sock) { //서버에서 데이터 받아오는 쓰레드용 함수
 	while (1) {
-		if (recv(connect_sock, message, 1023, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+		recv(connect_sock, message, 1023, 0); //서버에서 데이터를 받아와 message변수에 저장
 
-		}
 	}
 }
 int sqllogin(MYSQL *cons) {
