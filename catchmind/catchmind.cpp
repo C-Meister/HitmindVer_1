@@ -112,7 +112,7 @@ void maintitle(); //게임 메인타이틀 출력
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 LOG login();                                    //id 비밀번호를 형식에 맞게 입력을함 
-void click(int *xx, int *yy);
+void click(int *xx, int *yy);					//이 클릭 쓰지말고 MouseClick잇음
 void banglist();
 void bangchose();
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
