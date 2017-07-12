@@ -152,8 +152,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언 끝
 	disablecursor(1);
 	//	ConsoleL(30, 30);
-	bangchose();
-
+	maintitle();
 	return 0;
 
 }
@@ -791,9 +790,10 @@ void maintitle() { //게임 메인타이틀 출력
 	ConsoleL(100, 60);
 	disablecursor(true);
 	int xx = 0, yy = 0;
+	mainatitleimage();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
-		mainatitleimage();
+		
 		click(&xx, &yy);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25)
