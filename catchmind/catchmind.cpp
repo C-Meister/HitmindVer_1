@@ -152,19 +152,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언 끝
 	disablecursor(1);
 	//	ConsoleL(30, 30);
-	//loadmysql(cons, mysqlip);
-	memset(&connect_addr, 0, sizeof(connect_addr));
-	memset(&connect_sock, 0, sizeof(connect_sock));
-	memset(&wsaData, 0, sizeof(wsaData));
-	maintitle();
-	bangnum = bangchose();
-	if (bangnum == 1) {
-		Connect_Server(wsaData, connect_sock, connect_addr, ServerIP);
-	}
-	loadmysql(cons, mysqlip);
-	sqllogin(cons);
-	return 0;
 
+	
 
 }
 
@@ -176,7 +165,7 @@ void usermain(void) {
 #ifdef SANGHIE
 	setcolor(0, 15);
 	loadmysql(cons, mysqlip);
-	bangchose();
+	sqllogin(cons);
 	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
 	uintptr_t ac = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)readchating, cons, 0, NULL);
 	cur(120, 30);
