@@ -45,7 +45,7 @@
 #define CLS system("cls")		//화면 지우기
 #define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동
 #define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
-#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))		//색깔설정 X배경 Y 글자
+#define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))		//색깔설정 X글자 Y 배경
 #define CHOP(x) x[strlen(x) - 1] = ' '	//fgets를 쓰면 엔터도 배열에남음. 엔터를 배열에서 삭제해주는것
 //색깔출력 쉬운버전 
 #define COL                   GetStdHandle(STD_OUTPUT_HANDLE)			// 콘솔창의 핸들정보 받기
@@ -148,7 +148,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	
 
 #else
-#ifdef SANGHIE											//상희 테스트용
+#ifdef SANGHIE			//상희 테스트용
+	setcolor(0,15);
 	loadmysql(cons, mysqlip);
 	bangchose();
 	/*uintptr_t pc = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)writechating, cons, 0, NULL);
@@ -643,6 +644,25 @@ void click(int *xx, int *yy) {
 
 }
 void banglist() {																				//마우스에서 2를 나눈값을 받는다
+#ifdef SANGHIE
+	printf("                ┌──────────────┬──────────────┐\n"); //방만들기 9 ~ 22 , 2
+	printf("                │          방만들기          │          빠른시작          │\n"); //빠른시작 24 ~ 37 , 2
+	printf("                ┟━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━┪\n");
+	printf("                ┃                          방목록                          ┃\n"); //방목록 9 ~ 37, 4
+	printf("                ┣━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┫\n");
+	printf("                ┃                            ┃                            ┃\n"); //방1 9 ~ 22 , 6 ~ 8 
+	printf("                ┃           1번방            ┃                            ┃\n"); //방2 24 ~ 37 , 6 ~ 8
+	printf("                ┃                            ┃                            ┃\n");
+	printf("                ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫\n");
+	printf("                ┃                            ┃                            ┃\n"); //방3 9 ~ 22 , 10 ~ 12  
+	printf("                ┃                            ┃                            ┃\n"); //방4 24 ~ 37 ,10 ~ 12 
+	printf("                ┃                            ┃                            ┃\n");
+	printf("                ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫\n");
+	printf("                ┃                            ┃                            ┃\n"); //방5 9 ~ 22 , 14 ~ 16
+	printf("                ┃                            ┃                            ┃\n"); //방6 24 ~ 37 , 14 ~ 16
+	printf("                ┃                            ┃                            ┃\n");
+	printf("                ┗━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛\n");
+#else
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
 	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n");
@@ -660,6 +680,8 @@ void banglist() {																				//마우스에서 2를 나눈값을 받는다
 	printf("                ■                            ■                            ■\n"); //방6 24 ~ 37 , 14 ~ 16
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+#endif
+	
 }
 void bangchose() {
 
