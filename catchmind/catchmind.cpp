@@ -172,7 +172,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	mysql_query(cons, "use catchmind");
 	//변수 선언 끝
 	disablecursor(1);
-
+	memset(&wsaData, 0, sizeof(wsaData));
+	memset(&connect_sock, 0, sizeof(connect_sock));
+	memset(&connect_addr, 0, sizeof(connect_addr));
 	/*	maintitle();
 		bangnum = bangchose();
 		if (bangnum == 1) {
@@ -219,13 +221,15 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					}
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
-						
+						Connect_Server(connectroom[bangchoose - 2].ip);
+						break;
 					}
 				}
 			}
-			return 0;
+			break;
 		}
-	}
+		recieve();
+	}return 0;
 }
 
 
