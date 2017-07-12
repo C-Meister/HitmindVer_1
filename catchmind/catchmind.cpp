@@ -162,6 +162,13 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
 
+#ifdef SANGHO
+	disablecursor(1);
+	ConsoleL(30, 30);
+	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)	//소켓 프로그래밍 시작
+		ErrorHandling("WSAStartup() error");
+	makeroom();
+#endif
 	//변수 선언 끝
 	disablecursor(0);
 	//	ConsoleL(30, 30);
@@ -335,6 +342,7 @@ void waitroom(void)
 }
 void usermain(void) {
 #ifdef SANGHO
+	makeroom();
 #endif
 #ifdef SOOHAN
 #endif
@@ -808,8 +816,6 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
 void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)	//소켓 프로그래밍 시작
-		ErrorHandling("WSAStartup() error");
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
 	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
@@ -822,7 +828,7 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	waitroom();
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
-	char mess[50] = { 0, };
+	char message[50] = { 0, };
 	Sleep(1000);
 	while (1) {
 		
@@ -1387,36 +1393,25 @@ void Clnt_4(void) {
 	}
 }
 void makeroom(void) {
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
-		ErrorHandling("WSAStartup() error");
 	int i = 0;
 	char message[100];
+	IN_ADDR serverip = GetDefaultMyIP();
 	listen_sock = socket(PF_INET, SOCK_STREAM, 0); // 소켓 생성 후 소켓에 대한 정보를 listen_sock변수에 대입					
-
 	if (listen_sock == INVALID_SOCKET)
 		ErrorHandling("socket() error");
-
 	printf("소켓 생성 완료!\n");
-
 	memset(&listen_addr, 0, sizeof(listen_addr)); // 서버의 주소 초기화
-
 	listen_addr.sin_family = AF_INET;
-
 	listen_addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // 서버의 주소를 내 주소로 (아마도)
-
 	listen_addr.sin_port = htons(5555); // 서버 포트 
-
 	printf("주소 지정 완료!\n");
-
 	if (bind(listen_sock, (SOCKADDR*)&listen_addr, sizeof(listen_addr)) == SOCKET_ERROR) // 지금까지 설정한 주소를 listen_sock에 bind()로 지정
 		ErrorHandling("bind() error");
-
 	printf("bind() 완료!\n");
 	if (listen(listen_sock, 5) == SOCKET_ERROR)	// 클라이언트가 접속할때 까지 기다림
 		ErrorHandling("listen() error");
 	printf("listen() 완료!\n");
 	sockaddr_in_size = sizeof(connect_addr);
-
 	while (1) {
 		Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
 		if (Sconnect_sock[i] != 0) {
@@ -1425,14 +1420,12 @@ void makeroom(void) {
 			case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
 			case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
 			case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
-			default: cur(10, 40); printf("Client 접속 거부 : 인원 초과\n"); break;
+			default: break;
 			}
 			i++;
 		}
-		printf("클라이언트 %d 접속!\n", i);
 	}
 }
-
 IN_ADDR GetDefaultMyIP()
 {
 	char localhostname[MAX_PATH];
