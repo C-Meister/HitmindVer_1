@@ -168,7 +168,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int bangnum = 0;						//고른 방의 번호
 	mysql_query(cons, "use catchmind");
 	//변수 선언 끝
-	disablecursor(0);
+	disablecursor(1);
 	//	ConsoleL(30, 30);
 /*	maintitle();
 	bangnum = bangchose();
@@ -179,8 +179,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		Connect_Server(ServerIP);
 	}*/
 	loadmysql(cons, mysqlip);
-	sqlmakeroom(cons);
-	banglist(cons);
+	bangchose(cons);
 	return 0;
 
 }
@@ -1158,6 +1157,7 @@ int bangchose(MYSQL *cons) {
 	
 	while (1) {
 		banglist(cons);
+		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
 
 		click(&xx, &yy);
@@ -1165,7 +1165,7 @@ int bangchose(MYSQL *cons) {
 		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
 			return 1;
 		Sleep(50);
-		gotoxy(0, 0);
+		
 	}
 
 }
