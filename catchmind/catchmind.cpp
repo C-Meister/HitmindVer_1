@@ -133,7 +133,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	//변수 선언 끝
 
-	disablecursor(1);     
+	disablecursor(1);
 	//	ConsoleL(30, 30);
 #ifdef SANGHO
 
@@ -155,6 +155,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 #else			//본 메인함수는 여기적어주세요
 	loadmysql(cons, mysqlip);
 	maintitle();
+	loadmysql(cons, mysqlip);
 	sqllogin(cons);
 	return 0;
 #endif
