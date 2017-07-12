@@ -646,10 +646,10 @@ void banglist() {																				//마우스에서 2를 나눈값을 받는다
 void bangchose() {
 
 	int xx = 0, yy = 0;
-
+	banglist();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
-		banglist();
+		
 		click(&xx, &yy);
 
 		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
