@@ -74,6 +74,11 @@ typedef struct {
 
 //전역 변수들 (사용 비추천)
 
+INPUT_RECORD rec;
+DWORD dwNOER;
+HANDLE COUT = 0;    // 콘솔 출력 장치
+HANDLE CIN = 0;        // 콘솔 입력 장치
+
 CRITICAL_SECTION cs;	//이벤트
 char message[100];		//소켓 프로그래밍 문자열
 char username[30];		//사용자 이름
@@ -106,8 +111,10 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 void maintitle(); //게임 메인타이틀 출력
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
-LOG login();														//id 비밀번호를 형식에 맞게 입력을함 
-
+LOG login();                                    //id 비밀번호를 형식에 맞게 입력을함 
+void click(int *xx, int *yy);
+void banglist();
+void bangchose();
 //함수 선언 끝  될수 있으면 모든것을 함수로 만들어주시길 바랍니다.
 
 
@@ -596,3 +603,60 @@ void maintitle() { //게임 메인타이틀 출력
 	gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }// x13~31 y20~26		x33~51 y20~26		x53~71 y20~26
+void click(int *xx, int *yy) {
+	int mode;
+	CIN = GetStdHandle(STD_INPUT_HANDLE); //마우스 재활성화
+	GetConsoleMode(CIN, &mode);
+	SetConsoleMode(CIN, mode | ENABLE_MOUSE_INPUT);
+	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
+	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
+
+		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
+			int mouse_x = rec.Event.MouseEvent.dwMousePosition.X; // X값 받아옴
+			int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y; // Y값 받아옴
+
+			*xx = mouse_x / 2;
+			*yy = mouse_y;
+		}
+		else {
+			*xx = 0;
+			*yy = 0;
+		}
+	}
+
+}
+void banglist() {																				//마우스에서 2를 나눈값을 받는다
+	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
+	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
+	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n");
+	printf("                □                          방목록                          □\n"); //방목록 9 ~ 37, 4
+	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("                ■                            ■                            ■\n"); //방1 9 ~ 22 , 6 ~ 8 
+	printf("                ■           1번방            ■                            ■\n"); //방2 24 ~ 37 , 6 ~ 8
+	printf("                ■                            ■                            ■\n");
+	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("                ■                            ■                            ■\n"); //방3 9 ~ 22 , 10 ~ 12  
+	printf("                ■                            ■                            ■\n"); //방4 24 ~ 37 ,10 ~ 12 
+	printf("                ■                            ■                            ■\n");
+	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("                ■                            ■                            ■\n"); //방5 9 ~ 22 , 14 ~ 16
+	printf("                ■                            ■                            ■\n"); //방6 24 ~ 37 , 14 ~ 16
+	printf("                ■                            ■                            ■\n");
+	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+}
+void bangchose() {
+
+	int xx = 0, yy = 0;
+
+	while (1) {
+		printf("%3d %3d\n", xx, yy);
+		banglist();
+		click(&xx, &yy);
+
+		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
+			break;
+
+		gotoxy(0, 0);
+	}
+
+}
