@@ -889,8 +889,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 int sqllogin(MYSQL *cons) {
 	char query[100];
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
-		MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
-		LOG user;								//사용자 정보 구조체
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
+	LOG user;								//사용자 정보 구조체
 	while (1) {
 		
 		int check = 0;
@@ -900,48 +900,70 @@ int sqllogin(MYSQL *cons) {
 		{
 			fflush(stdin);
 			check = sqlsignup(cons);
+			gotoxy(2, 3);
+			if (check == 1)
+				printf("               (회원가입 성공)           ");
+			else if(check == -1)
+				printf("            (아이디가 중복됩니다)           ");
+			else
+				printf("               (회원가입 실패)          ");
 		}
+		else {
+			sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
+			mysql_query(cons, query);
+			sql_result = mysql_store_result(cons);
+			if (mysql_fetch_row(sql_result) == NULL)									//해댱 id가 없으면 
+			{
+				gotoxy(2, 3);
+				printf("           아이디가 존재하지 않습니다     ");
+				
+			}
+			else {
 
-		if (check == 1)
-			break;
+				sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass);
+				mysql_query(cons, query);	//password는 DB에 암호화되어 있어서 값을 비교할때도 서로 암호화해서 비교를함
+				sql_result = mysql_store_result(cons);
+
+
+
+				if (mysql_fetch_row(sql_result) == NULL)
+				{
+					gotoxy(2, 3);
+					printf("              비밀번호가 틀렸습니다        ");
+				}
+				else {
+					return 1;
+				}
+			}
+		}
+				
 		
 	}
-	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
-	mysql_query(cons, query);
-	sql_result = mysql_store_result(cons);
-	if (mysql_fetch_row(sql_result) == NULL)									//해댱 id가 없으면 
-	{
-		printf("\n아이디가 존재하지 않습니다.\n");
-		return 0;
-	}
-	else
-		printf("\n아이디 OK");
-	sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass); 
-	mysql_query(cons, query);	//password는 DB에 암호화되어 있어서 값을 비교할때도 서로 암호화해서 비교를함
-	sql_result = mysql_store_result(cons);
-
-
-
-	if (mysql_fetch_row(sql_result) == NULL)
-	{
-		printf("\n비밀번호가 틀렸습니다.\n");
-		return 0;
-	}
-	else {
-		printf("\n로그인 성공");
-		return 1;
-	}
+	
 
 }
 int sqlsignup(MYSQL *cons) {
 	LOG user;
 	char query[100];
 	user = login(2);
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
 	
 	if (user.name[0] == 0)
 		return 0;
 
+	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
+	mysql_query(cons, query);
+	sql_result = mysql_store_result(cons);
+	sql_row = mysql_fetch_row(sql_result);
+
+	if (sql_row[0][1] != NULL)									//해댱 id가 있으면 
+	{
+		return -1;
+
+	}
+	
 	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
 	{
 		printf("\n회원가입 성공");
@@ -1288,7 +1310,7 @@ void logintema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            캐치마인드 서버에 로그인          ■\n");
-	printf("■                                              ■\n");
+	printf("■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■     ID     □                    □          ■\n");
 	printf("■□□□□□□□□□□□□□□□□□□   login  ■\n");
@@ -1298,6 +1320,8 @@ void logintema(void) {
 	printf("■ 개발자사이트 ■   회원가입   ■    초기화    ■\n");
 	printf("■              ■              ■              ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	gotoxy(48, 3);
+	printf("■");
 }
 void jointema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
