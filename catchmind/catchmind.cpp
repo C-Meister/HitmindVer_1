@@ -106,7 +106,6 @@ void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
 void readchating(MYSQL *cons);					//mysqm의 채팅을 읽는 함수
-LOG login(int m);
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -122,6 +121,7 @@ void banglist();					//게임 선택창 출력
 int bangchose();					//게임 선택창 출력및 선택
 void logintema();					//로그인 디자인
 void jointema();					//회원가입 디자인
+LOG login(int m);
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 																	//id 비밀번호를 형식에 맞게 입력을함 
@@ -154,16 +154,19 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int bangnum = 0;						//고른 방의 번호
 
 	//변수 선언 끝
-	disablecursor(1);
+	disablecursor(0);
 	//	ConsoleL(30, 30);
-	maintitle();
+/*	maintitle();
 	bangnum = bangchose();
 	if (bangnum == 1) {
 		memset(&wsaData, 0, sizeof(wsaData));
 		memset(&connect_sock, 0, sizeof(connect_sock));
 		memset(&connect_addr, 0, sizeof(connect_addr));
 		Connect_Server(ServerIP);
-	}
+	}*/
+	loadmysql(cons, mysqlip);
+	sqllogin(cons);
+
 	return 0;
 
 }
@@ -195,11 +198,11 @@ restart:
 	int cnt = 0;
 	int xx = 0, yy = 0;
 	POINT a;
-
 	/*닉네임 생성*/
 	if (m == 2) {
 		gotoxy(16, 3);
 		scanf("%s", user.name);
+		
 		for (i = 0; user.name[i] != 0; i++) {
 			if (user.name[i] == 0) {
 				cnt++;
@@ -822,6 +825,11 @@ int sqllogin(MYSQL *cons) {
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[100];
 	user = login(1);							//login 함수를 사용
+	if (user.id[0] == NULL)
+	{
+		sqlsignup(cons);
+	}
+	CLS;
 	sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
 	mysql_query(cons, query);
 	sql_result = mysql_store_result(cons);
@@ -850,11 +858,7 @@ int sqllogin(MYSQL *cons) {
 int sqlsignup(MYSQL *cons) {
 	LOG user;
 	char query[100];
-	printf("회원가입을 합니다. 비밀번호는 암호화되어 저장이됩니다.\n");
 	user = login(2);
-	printf("\n이름 : ");
-	fgets(user.name, sizeof(user.name), stdin);
-	CHOP(user.name);							//문자열에 스페이스바를 지워버림
 	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
 	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
 	{
