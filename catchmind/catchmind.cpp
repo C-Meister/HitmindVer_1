@@ -179,7 +179,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		Connect_Server(ServerIP);
 	}*/
 	loadmysql(cons, mysqlip);
-	bangchose(cons);
+//	sqlmakeroom(cons);
+	banglist(cons);
 	return 0;
 
 }
