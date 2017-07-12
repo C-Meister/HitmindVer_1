@@ -179,7 +179,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		Connect_Server(ServerIP);
 	}*/
 	loadmysql(cons, mysqlip);
-//	sqlmakeroom(cons);
+	sqlmakeroom(cons);
 	banglist(cons);
 	return 0;
 
@@ -189,7 +189,7 @@ void sqlmakeroom(MYSQL *cons) {
 	IN_ADDR addr;
 	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
 	char * myip = inet_ntoa(addr);
-	ROOM myroom = { 0, 0, 0};
+	ROOM myroom = { 0, 0, 0 };
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            캐치마인드 방 만들기              ■\n");
@@ -1101,8 +1101,8 @@ void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 		}
 	}
 
-}			
-void banglist(MYSQL *cons) {	
+}
+void banglist(MYSQL *cons) {
 	CLS;
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
@@ -1125,45 +1125,46 @@ void banglist(MYSQL *cons) {
 	printf("                ■                            ■                            ■\n"); //방6 24 ~ 37 , 14 ~ 16
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	while (1) {
-		mysql_query(cons, "select ip, name from catchmind.room");
-		sql_result = mysql_store_result(cons);
-		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
-		{
-			if (i % 2 == 0)
-				cur(25, 6 + (i * 2));
+
+	mysql_query(cons, "select ip, name from catchmind.room");
+	sql_result = mysql_store_result(cons);
+	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+	{
+		if (i % 2 == 0)
+			cur(25, 6 + (i * 2));
+		else
+			cur(55, 6 + ((i / 2) * 4));
+		printf("%s", sql_row[0]);
+		for (short j = 0; sql_row[1][j] != 0; j++) {
+			if (i % 2 == 0 && j < 10)
+				cur(25 + j, 7 + (i * 2));
+			else if (i % 2 == 0)
+				cur(25 + j - 10, 8 + (i * 2));
+			else if (j < 10)
+				cur(55 + j, 7 + (i / 2) * 4);
 			else
-				cur(55, 6 + ((i / 2) * 4));
-			printf("%s", sql_row[0]);
-			for (short j = 0; sql_row[1][j] != 0; j++) {
-				if (i % 2 == 0 && j < 10)
-					cur(25 + j, 7 + (i * 2));
-				else if (i % 2 == 0)
-					cur(25 + j - 10, 8 + (i * 2));
-				else if (j < 10)
-					cur(55 + j, 7 + (i / 2) * 4);
-				else
-					cur(55 + j - 10, 8 + (i / 2 ) * 4);
-				printf("%c", sql_row[1][j]);
-			}
-			i++;
+				cur(55 + j - 10, 8 + (i / 2) * 4);
+			printf("%c", sql_row[1][j]);
 		}
-		Sleep(500);
-		i = 0;
+		i++;
 	}
+	
+	i = 0;
+
 }
 int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0;
-	banglist(cons);
+	
 	while (1) {
+		banglist(cons);
 		printf("%3d %3d\n", xx, yy);
 
 		click(&xx, &yy);
 
 		if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)
 			return 1;
-
+		Sleep(50);
 		gotoxy(0, 0);
 	}
 
