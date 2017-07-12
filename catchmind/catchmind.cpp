@@ -195,8 +195,10 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			while (1) {						//방 반복문
 				ConsoleL(50, 20);
 				bangchoose = bangchose(cons);	//방을 고름	
-				if (bangchoose == 0)			//방만들기를 클릭하면 방만들기로 이동
+				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
 					sqlmakeroom(cons);
+					break;
+				}
 				else if (bangchoose == 1)		//방 빠른 접속 -추후추가
 				{
 
@@ -291,7 +293,8 @@ void sqlmakeroom(MYSQL *cons) {
 	if (count == 1)
 	{
 		CLS;
-		
+		Connect_Server(myip);
+		return;
 	}
 }
 void waitroom(void)
