@@ -75,7 +75,11 @@ typedef struct {
 	LONG x;
 	LONG y;
 }MOUSEPOINT;
-
+typedef struct {
+	char roomname[30];
+	char password[30];
+	char * ip;
+}ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
 
@@ -107,6 +111,7 @@ void Clnt_2(void);
 void Clnt_3(void);
 void Clnt_4(void);
 void makeroom(void);
+void sqlmakeroom(MYSQL *cons);
 IN_ADDR GetDefaultMyIP(void);
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
@@ -126,8 +131,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);				//게임 메인타이틀 출력
 void maintitle(void);					//게임 메인타이틀 출력및 선택
-void banglist(void);					//게임 선택창 출력
-int bangchose(void);					//게임 선택창 출력및 선택
+void banglist(MYSQL *cons);					//게임 선택창 출력
+int bangchose(MYSQL *cons);					//게임 선택창 출력및 선택
 void logintema(void);					//로그인 디자인
 void jointema(void);					//회원가입 디자인
 LOG login(int m);
@@ -161,14 +166,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
-
-#ifdef SANGHO
-	disablecursor(1);
-	ConsoleL(30, 30);
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)	//소켓 프로그래밍 시작
-		ErrorHandling("WSAStartup() error");
-	makeroom();
-#endif
+	mysql_query(cons, "use catchmind");
 	//변수 선언 끝
 	disablecursor(0);
 	//	ConsoleL(30, 30);
@@ -181,9 +179,65 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		Connect_Server(ServerIP);
 	}*/
 	loadmysql(cons, mysqlip);
-	sqllogin(cons);
-
+//	sqlmakeroom(cons);
+	banglist(cons);
 	return 0;
+
+}
+void sqlmakeroom(MYSQL *cons) {
+	int i = 0;
+	IN_ADDR addr;
+	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
+	char * myip = inet_ntoa(addr);
+	ROOM myroom = { 0, 0, 0};
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■                                              ■\n");
+	printf("■            캐치마인드 방 만들기              ■\n");
+	printf("■          내 ip :  %s              ■\n", myip);
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■    제목    □                              □■\n");
+	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
+	printf("■  Password  □                              □■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	cur(16, 5);
+	scanf("%[^\n]s", myroom.roomname);
+	getchar();
+	cur(16, 7);
+	while (1) {
+
+		if (_kbhit()) {
+			myroom.password[i] = _getch();
+			if (myroom.password[i] == 8) {
+				if (i == 0) {
+					myroom.password[0] = 0;
+					continue;
+				}
+				printf("\b \b");
+				myroom.password[i - 1] = 0;
+				myroom.password[i--] = 0;
+			}
+			else if (myroom.password[i] == 13 && i > 3) {
+				myroom.password[i] = 0;
+				break;
+			}
+			else if (myroom.password[i] == 13) {
+				myroom.password[i] = 0;
+			}
+			else if (i >= 15) {
+				continue;
+			}
+			else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
+				myroom.password[i] = 0;
+			}
+			else {
+				printf("*");
+				i++;
+			}
+		}
+	}
+	char query[100];
+	sprintf(query, "insert into catchmind.room values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
+	mysql_query(cons, query);
 
 }
 void waitroom(void)
@@ -1015,7 +1069,7 @@ void maintitle(void) { //게임 메인타이틀 출력
 	}
 	CLS;
 }
-void click(int *xx, int *yy) {
+void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 
 	HANDLE       hIn, hOut;
 	DWORD        dwNOER;
@@ -1047,27 +1101,12 @@ void click(int *xx, int *yy) {
 		}
 	}
 
-}
-void banglist(void) {																				//마우스에서 2를 나눈값을 받는다
-#ifdef SANGHIE
-	printf("                ┌──────────────┬──────────────┐\n"); //방만들기 9 ~ 22 , 2
-	printf("                │          방만들기          │          빠른시작          │\n"); //빠른시작 24 ~ 37 , 2
-	printf("                ┢━━━━━━━━━━━━━━┷━━━━━━━━━━━━━━┪\n");
-	printf("                ┃                          방목록                          ┃\n"); //방목록 9 ~ 37, 4
-	printf("                ┣━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┫\n");
-	printf("                ┃                            ┃                            ┃\n"); //방1 9 ~ 22 , 6 ~ 8 
-	printf("                ┃           1번방            ┃                            ┃\n"); //방2 24 ~ 37 , 6 ~ 8
-	printf("                ┃                            ┃                            ┃\n");
-	printf("                ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫\n");
-	printf("                ┃                            ┃                            ┃\n"); //방3 9 ~ 22 , 10 ~ 12  
-	printf("                ┃                            ┃                            ┃\n"); //방4 24 ~ 37 ,10 ~ 12 
-	printf("                ┃                            ┃                            ┃\n");
-	printf("                ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫\n");
-	printf("                ┃                            ┃                            ┃\n"); //방5 9 ~ 22 , 14 ~ 16
-	printf("                ┃                            ┃                            ┃\n"); //방6 24 ~ 37 , 14 ~ 16
-	printf("                ┃                            ┃                            ┃\n");
-	printf("                ┗━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛\n");
-#else
+}			
+void banglist(MYSQL *cons) {	
+	CLS;
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
+	short i = 0;
 	printf("\n"); //좌표값때문에 한칸 밀어냄
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
 	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
@@ -1075,7 +1114,7 @@ void banglist(void) {																				//마우스에서 2를 나눈값을 받는다
 	printf("                □                          방목록                          □\n"); //방목록 9 ~ 37, 4
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("                ■                            ■                            ■\n"); //방1 9 ~ 22 , 6 ~ 8 
-	printf("                ■           1번방            ■                            ■\n"); //방2 24 ~ 37 , 6 ~ 8
+	printf("                ■                            ■                            ■\n"); //방2 24 ~ 37 , 6 ~ 8
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("                ■                            ■                            ■\n"); //방3 9 ~ 22 , 10 ~ 12  
@@ -1086,13 +1125,37 @@ void banglist(void) {																				//마우스에서 2를 나눈값을 받는다
 	printf("                ■                            ■                            ■\n"); //방6 24 ~ 37 , 14 ~ 16
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-#endif
-
+	while (1) {
+		mysql_query(cons, "select ip, name from catchmind.room");
+		sql_result = mysql_store_result(cons);
+		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+		{
+			if (i % 2 == 0)
+				cur(25, 6 + (i * 2));
+			else
+				cur(55, 6 + ((i / 2) * 4));
+			printf("%s", sql_row[0]);
+			for (short j = 0; sql_row[1][j] != 0; j++) {
+				if (i % 2 == 0 && j < 10)
+					cur(25 + j, 7 + (i * 2));
+				else if (i % 2 == 0)
+					cur(25 + j - 10, 8 + (i * 2));
+				else if (j < 10)
+					cur(55 + j, 7 + (i / 2) * 4);
+				else
+					cur(55 + j - 10, 8 + (i / 2 ) * 4);
+				printf("%c", sql_row[1][j]);
+			}
+			i++;
+		}
+		Sleep(500);
+		i = 0;
+	}
 }
-int bangchose(void) {
+int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0;
-	banglist();
+	banglist(cons);
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
 
@@ -1444,6 +1507,7 @@ void makeroom(void) {
 }
 IN_ADDR GetDefaultMyIP()
 {
+
 	char localhostname[MAX_PATH];
 	IN_ADDR addr = { 0, };
 
