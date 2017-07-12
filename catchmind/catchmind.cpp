@@ -183,6 +183,10 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	return 0;
 
 }
+
+
+
+//함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void sqlmakeroom(MYSQL *cons) {
 	int i = 0;
 	IN_ADDR addr;
