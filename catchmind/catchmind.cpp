@@ -153,7 +153,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	disablecursor(1);
 	//	ConsoleL(30, 30);
 
-	
+	return 0;
 
 }
 
