@@ -103,7 +103,7 @@ SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
 // -------------------- 게임 내부 함수들 ----------------------------------
-
+void maintitle(); //게임 메인타이틀 출력
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);						//단어를 확인함
 LOG login();														//id 비밀번호를 형식에 맞게 입력을함 
@@ -148,10 +148,13 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		//	printf("%d %d  ", pos.x, pos.y);
 	}*/
 	return 0;
-#else													//본 메인함수는 여기적어주세요
+#else			//본 메인함수는 여기적어주세요
+	maintitle();
+	loadmysql(cons, mysqlip);
+	sqllogin(cons);
 	return 0;
 #endif
-
+	
 }
 
 LOG login() {
@@ -555,4 +558,35 @@ int sqlsignup(MYSQL *cons) {
 		return 0;
 	}
 
+}
+void maintitle() { //게임 메인타이틀 출력
+	ConsoleL(100, 60);
+	gotoxy(6, 3);
+	printf("■■■■■  ■  ■      ■■■    ■    ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");
+	gotoxy(6, 4);
+	printf("        ■  ■  ■                ■    ■      ■  ■      ■      ■  ■      ■                                                 ■      ■");
+	gotoxy(6, 5);
+	printf("  ■■■■  ■  ■    ■■■■■  ■    ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■");
+	gotoxy(6, 6);
+	printf("      ■    ■■■        ■      ■    ■      ■  ■■      ■■■    ■      ■■■■■      ■      ■       ■■■  ■      ■");
+	gotoxy(6, 7);
+	printf("    ■      ■  ■      ■  ■    ■    ■      ■  ■                                          ■  ■  ■   ■    ■    ■■    ■");
+	gotoxy(6, 8);
+	printf("  ■        ■  ■    ■      ■  ■    ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■");
+	gotoxy(6, 9);
+	printf("  ■        ■  ■    ■      ■  ■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
+	gotoxy(12, 20);
+	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
+	gotoxy(12, 21);
+	printf("■              ■                      ■              ■                      ■              ■");
+	gotoxy(12, 22);
+	printf("■              ■                      ■              ■                      ■              ■");
+	gotoxy(12, 23);
+	printf("■              ■                      ■              ■                      ■              ■");
+	gotoxy(12, 24);
+	printf("■              ■                      ■              ■                      ■              ■");
+	gotoxy(12, 25);
+	printf("■              ■                      ■              ■                      ■              ■");
+	gotoxy(12, 26);
+	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
