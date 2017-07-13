@@ -86,7 +86,7 @@ typedef struct tagPOINT *LPPOINT;
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
-char message[100];		//소켓 프로그래밍 문자열
+//char message[100];		//소켓 프로그래밍 문자열
 char status[4];			//소켓용
 char username[30];		//사용자 이름
 char friendname[4][30] = {"Player 1", "Player 2", "Player 3", "Player 4"};
@@ -96,6 +96,7 @@ SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 ROOM connectroom[6];
 char signalmode;
+char querys[10][100];
 bool lead = false;
 
 
@@ -331,8 +332,9 @@ void waitroom(void)
 {
 	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
+	
+
 	while (1) { //받아온 데이터 처리
-		
 		gotoxy(0, 3);
 		WHITE
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
@@ -497,6 +499,8 @@ void waitroom(void)
 			cur(0, 0);
 			printf("아%d  ", xx);
 			send(connect_sock, "player ready", 40, 0);
+			xx = 0;
+			yy = 0;
 		}
 		Sleep(100);
 		
@@ -518,7 +522,7 @@ void usermain(void) {
 }
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
-
+	ConsoleL(30, 30);
 	int n = 0;
 restart:
 	POINT a;
@@ -561,8 +565,8 @@ restart:
 					putchar(user.name[i++]);
 			}
 
-			GetCursorPos(&a);
-			SetCursorPos(a.x, a.y);
+		//	GetCursorPos(&a);
+		//	SetCursorPos(a.x, a.y+1);
 			click(&xx, &yy);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
@@ -985,6 +989,8 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	CLS;
 	sprintf(query, "player   connect %s" , username);
 	send(connect_sock, query, 30, 0);
+	Sleep(200);
+	
 	waitroom();
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
@@ -1596,7 +1602,7 @@ void jointema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
 void sendall(char *message) {
-	while (1) {
+
 		send(Sconnect_sock[0], message, 40, 0);
 	//	printf("Client 1 <- Server : %s\n", message);
 		if (Sconnect_sock[1] != 0) {
@@ -1611,37 +1617,48 @@ void sendall(char *message) {
 			send(Sconnect_sock[3], message, 40, 0);
 	//		printf("Client 4 <- Server : %s\n", message);
 		}
-		Sleep(300);
-	}
+		
 }
 void Clnt_1(void) {
+	if (Sconnect_sock[1] != 0)
+		send(Sconnect_sock[1], querys[1], 40, 0);
+	if (Sconnect_sock[2] != 0)
+		send(Sconnect_sock[1], querys[2], 40, 0);
+	if (Sconnect_sock[3] != 0)
+		send(Sconnect_sock[1], querys[3], 40, 0);
 	char message[100];
-//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
-		//	printf("Client 1 -> Server : %s\n", message);
+			cur(0, 0);
+			printf("Client 1 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
-
 				message[7] = '1';
+				strcpy(querys[0], message);
 			}
-			else if (strcmp(message, "player ready") == 0) {
-				ZeroMemory(message, sizeof(message));
+			if (strcmp(message, "player ready") == 0) {
+			//	ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 1 ready");
 			}
-			sendall(message);
+			
 		}
+		sendall(message);
 	}
 }
 void Clnt_2(void) {
 	char message[100];
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[1], querys[0], 40, 0);
+	if (Sconnect_sock[2] != 0)
+		send(Sconnect_sock[1], querys[2], 40, 0);
+	if (Sconnect_sock[3] != 0)
+		send(Sconnect_sock[1], querys[3], 40, 0);
 //	printf("hello\n");
 	while (1) {
-
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
 			//printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
-
 				message[7] = '2';
+				strcpy(querys[1], message);
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1652,6 +1669,12 @@ void Clnt_2(void) {
 	}
 }
 void Clnt_3(void) {
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[1], querys[0], 40, 0);
+	if (Sconnect_sock[1] != 0)
+		send(Sconnect_sock[1], querys[1], 40, 0);
+	if (Sconnect_sock[3] != 0)
+		send(Sconnect_sock[1], querys[3], 40, 0);
 	char message[100];
 //	printf("hello\n");
 	while (1) {
@@ -1661,6 +1684,7 @@ void Clnt_3(void) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '3';
+				strcpy(querys[2], message);
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1671,15 +1695,22 @@ void Clnt_3(void) {
 	}
 }
 void Clnt_4(void) {
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[1], querys[0], 40, 0);
+	if (Sconnect_sock[1] != 0)
+		send(Sconnect_sock[1], querys[1], 40, 0);
+	if (Sconnect_sock[2] != 0)
+		send(Sconnect_sock[1], querys[2], 40, 0);
 	char message[100];
 //	printf("hello\n");
 	while (1) {
 
-		if (recv(Sconnect_sock[3], message, 20, 0) > 0) {
+		if (recv(Sconnect_sock[3], message, 40, 0) > 0) {
 	//		printf("Client 4 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '4';
+				strcpy(querys[3], message);
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
