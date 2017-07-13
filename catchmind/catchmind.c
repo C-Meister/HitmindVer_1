@@ -354,6 +354,7 @@ void sqlmakeroom(MYSQL *cons) {
 }
 int waitroom(void)
 {
+	disablecursor(1);
 	int xx = 0, yy = 0;
 	int togl = -1;
 	ConsoleL(100, 50);
