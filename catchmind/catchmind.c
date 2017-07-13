@@ -1633,7 +1633,7 @@ void Clnt_1(void) {
 			printf("Client 1 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '1';
-				strcpy(querys[0], message);
+				
 			}
 			if (strcmp(message, "player ready") == 0) {
 			//	ZeroMemory(message, sizeof(message));
@@ -1641,6 +1641,7 @@ void Clnt_1(void) {
 			}
 			
 		}
+		strcpy(querys[0], message);
 		sendall(message);
 	}
 }
@@ -1658,12 +1659,13 @@ void Clnt_2(void) {
 			//printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
-				strcpy(querys[1], message);
+				
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 2 ready");
 			}
+			strcpy(querys[1], message);
 			sendall(message);
 		}
 	}
@@ -1690,6 +1692,7 @@ void Clnt_3(void) {
 				ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 3 ready");
 			}
+			strcpy(querys[1], message);
 			sendall(message);
 		}
 	}
@@ -1716,6 +1719,7 @@ void Clnt_4(void) {
 				ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 4 ready");
 			}
+			strcpy(querys[1], message);
 			sendall(message);
 		}
 	}
