@@ -1842,13 +1842,14 @@ void makeroom(int *count) {
 	*count = 1;
 	while (1) {
 		if (Sconnect_sock[SOCKETCOUNT] == 0)
-			Sconnect_sock[SOCKETCOUNT++] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-		else
+			Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+		else {
 			SOCKETCOUNT++;
-		if (SOCKETCOUNT == 4)
-			SOCKETCOUNT = 0;
-
-		if (Sconnect_sock[SOCKETCOUNT] == 1) {
+			if (SOCKETCOUNT == 4)
+				SOCKETCOUNT = 0;
+			continue;
+		}
+		if (Sconnect_sock[SOCKETCOUNT] != 0) {
 			switch (SOCKETCOUNT) {
 			case 0:threads[1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
 			case 1:threads[2] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
