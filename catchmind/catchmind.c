@@ -1863,7 +1863,6 @@ void makeroom(int *count) {
 	}
 
 }
-
 IN_ADDR GetDefaultMyIP()
 {
 
