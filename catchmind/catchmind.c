@@ -513,6 +513,7 @@ void waitroom(void)
 		printf("      бс                бс                                                        бс                бс\n");		// 4, 40		//11, 40		//42, 40		49, 40
 		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
 			printf("      бс     ready      бс                       Start!                           бс     exit       бс\n");
+			
 
 		}
 		else
@@ -523,6 +524,11 @@ void waitroom(void)
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
+		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
+			if (xx > 13 && xx < 41 && yy < 43 && yy > 39)
+				send(connect_sock, "game start", 40, 0);
+				return 1;
+		}
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			if (mode == 0) {
 				mode = 1;
@@ -1698,6 +1704,7 @@ void Clnt_1(void)
 				SOCKETCOUNT = 0;
 				Sconnect_sock[0] = 0;
 			}
+
 		}
 		strcpy(querys[0], message);
 		sendall(message);
