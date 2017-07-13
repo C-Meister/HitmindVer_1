@@ -274,33 +274,33 @@ void sqlmakeroom(MYSQL *cons) {
 		cur(16, 7);
 		while (1) {
 
-			if (_kbhit()) {
-				myroom.password[i] = _getch();
-				if (myroom.password[i] == 8) {
-					if (i == 0) {
-						myroom.password[0] = 0;
-						continue;
-					}
-					printf("\b \b");
-					myroom.password[i - 1] = 0;
-					myroom.password[i--] = 0;
-				}
-				else if (myroom.password[i] == 13) {
-					myroom.password[i] = 0;
-					break;
-				}
-				else if (i >= 15) {
+
+			myroom.password[i] = _getch();
+			if (myroom.password[i] == 8) {
+				if (i == 0) {
+					myroom.password[0] = 0;
 					continue;
 				}
-				else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
-					myroom.password[i] = 0;
-				}
-				else {
-					printf("*");
-					i++;
-				}
+				printf("\b \b");
+				myroom.password[i - 1] = 0;
+				myroom.password[i--] = 0;
+			}
+			else if (myroom.password[i] == 13) {
+				myroom.password[i] = 0;
+				break;
+			}
+			else if (i >= 15) {
+				continue;
+			}
+			else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
+				myroom.password[i] = 0;
+			}
+			else {
+				printf("*");
+				i++;
 			}
 		}
+
 		char query[100];
 		sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
 		if (!(mysql_query(cons, query)))
@@ -531,6 +531,7 @@ LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 	ConsoleL(30, 30);
 	int n = 0;
 restart:
+
 	POINT a;
 	gotoxy(0, 0);
 	if (m == 1)
