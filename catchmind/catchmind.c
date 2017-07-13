@@ -825,7 +825,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
-void SDL_MAIN(void);
+int SDL_MAIN(void);
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
@@ -852,6 +852,7 @@ void numberbaseball();
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
+	SDL_MAIN();
 	//변수 선언
 	int i, j, k, v, result;
 	signalall();
@@ -1235,7 +1236,8 @@ int waitroom(void)
 		if (status[0] == 10)
 		{
 			cur(0, 0);
-			return 1;
+			printf("게임 시작");
+			status[0] = 2;
 		}
 		POINT a;
 		GetCursorPos(&a);
@@ -2740,7 +2742,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
-void SDL_MAIN(void)
+int SDL_MAIN(void)
 {
 	SDL_Window * Window;//SDL 윈도우 선언
 	SDL_Renderer * Renderer;// SDL 렌더러 선언
