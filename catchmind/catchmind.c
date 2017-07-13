@@ -593,22 +593,37 @@ restart:
 	else if (m == 2)
 		jointema();
 	LOG user = { 0, 0, 0 };
-	int i = 0;
+	int i = 0, j = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0;
+	TCHAR buff;
+	char buff2 = 0;
+	TCHAR buffer[100] = { 0, };
 	/*닉네임 생성*/
-	
+	gotoxy(16, 3);
 	if (m == 2) {
 		while (1) {
 			if (_kbhit()) {
-
-				user.name[i++] = _getch();
-
+				buff = _getch();
+				if (buff == 13)
+					break;
+				else if (buff == 8 && i != 0) {
+					buffer[i--] = 0;
+				}
+				else
+				{
+					if (buff == buff2)
+						i++;
+					buffer[i++] = buff;
+					buffer[i + 1] = 0;
+					buff = buff2;
+				}
+				buff = 0;
+				
 				gotoxy(16, 3);
-				printf("                    ");
+				printf("            ");
 				gotoxy(16, 3);
-				//printf("%s", user.name);
-
+				printf("%ls", buffer);
 			}
 			else {
 				GetCursorPos(&a);
