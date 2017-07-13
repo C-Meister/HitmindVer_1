@@ -21,13 +21,12 @@
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
 #include <iostream>
+#include <signal.h>
 //#include <WinSock2.h>		//소켓프로그래밍
 
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
-			//상희 전용
-//#include <mysql/mysql.h>	//DB헤더파일
 
 #include "mysql/mysql.h"
 
@@ -89,13 +88,15 @@ CRITICAL_SECTION cs;	//이벤트
 char message[100];		//소켓 프로그래밍 문자열
 int status[4];			//소켓용
 char username[30];		//사용자 이름
+char friendname[4][30] = {"Player 1", "Player 2", "Player 3", "Player 4"};
 WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
 SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 ROOM connectroom[6];
 //기본 함수들
-
+void exitsignal(void);
+void signalall(void);
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
@@ -237,89 +238,100 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void sqlmakeroom(MYSQL *cons) {
-	CLS;
-	int count = 0;
-	int i = 0;
-	IN_ADDR addr;
-	addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
-	char * myip = inet_ntoa(addr);
-	ROOM myroom = { 0, 0, 0 };
-	disablecursor(1);
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	printf("■                                              ■\n");
-	printf("■            캐치마인드 방 만들기              ■\n");
-	printf("■          내 ip :  %s              ■\n", myip);
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	printf("■    제목    □                              □■\n");
-	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
-	printf("■  Password  □                              □■\n");
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-	cur(16, 5);
-	scanf("%[^\n]s", myroom.roomname);
-	getchar();
-	cur(16, 7);
 	while (1) {
+		CLS;
+		int count = 0;
+		int i = 0;
+		IN_ADDR addr;
 
-		if (_kbhit()) {
-			myroom.password[i] = _getch();
-			if (myroom.password[i] == 8) {
-				if (i == 0) {
-					myroom.password[0] = 0;
+		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
+		char * myip = inet_ntoa(addr);
+		ROOM myroom = { 0, 0, 0 };
+		disablecursor(1);
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("■                                              ■\n");
+		printf("■            캐치마인드 방 만들기              ■\n");
+		printf("■          내 ip :  %s              ■\n", myip);
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("■    제목    □                              □■\n");
+		printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
+		printf("■  Password  □                              □■\n");
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		cur(16, 5);
+		scanf("%[^\n]s", myroom.roomname);
+		getchar();
+		cur(16, 7);
+		while (1) {
+
+			if (_kbhit()) {
+				myroom.password[i] = _getch();
+				if (myroom.password[i] == 8) {
+					if (i == 0) {
+						myroom.password[0] = 0;
+						continue;
+					}
+					printf("\b \b");
+					myroom.password[i - 1] = 0;
+					myroom.password[i--] = 0;
+				}
+				else if (myroom.password[i] == 13 && i > 3) {
+					myroom.password[i] = 0;
+					break;
+				}
+				else if (myroom.password[i] == 13) {
+					myroom.password[i] = 0;
+				}
+				else if (i >= 15) {
 					continue;
 				}
-				printf("\b \b");
-				myroom.password[i - 1] = 0;
-				myroom.password[i--] = 0;
-			}
-			else if (myroom.password[i] == 13 && i > 3) {
-				myroom.password[i] = 0;
-				break;
-			}
-			else if (myroom.password[i] == 13) {
-				myroom.password[i] = 0;
-			}
-			else if (i >= 15) {
-				continue;
-			}
-			else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
-				myroom.password[i] = 0;
-			}
-			else {
-				printf("*");
-				i++;
+				else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
+					myroom.password[i] = 0;
+				}
+				else {
+					printf("*");
+					i++;
+				}
 			}
 		}
-	}
-	char query[100];
-	sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
-	mysql_query(cons, query);
-	disablecursor(1);
-	CLS;
-	printf("방 제작중....");
-	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
-	while (1) {
-		if (count == 1)
+		char query[100];
+		sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
+		if (!(mysql_query(cons, query)))
 		{
-			CLS;
-			Connect_Server(myip);
-			return;
+			cur(10, 1);
+			printf("(알수 없는 오류 중복이 안되게 만들어 주세요)");
 		}
-		Sleep(1000);
+		disablecursor(1);
+		CLS;
+		printf("방 제작중....");
+		_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
+		while (1) {
+			if (count == 1)
+			{
+				CLS;
+				Connect_Server(myip);
+				return;
+			}
+			Sleep(1000);
+		}
+		break;
 	}
 }
 void waitroom(void)
 {
 	ConsoleL(100, 50);
 	while (1) { //받아온 데이터 처리
-
+		
 		gotoxy(0, 3);
 		WHITE
-			printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 1 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■   [ STATUS ] : ");
+		cur(11, 5);
+		printf("[ %s ]", friendname[0]);
 		if (status[0] == 0) {
+
 			GRAY
 				gotoxy(24, 7);
 			printf("                   ");
@@ -351,9 +363,11 @@ void waitroom(void)
 		printf("      ■                                                                                            ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 2 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■   [ STATUS ] : ");
+		cur(11, 14);
+		printf("[ %s ]", friendname[1]);
 		if (status[1] == 0) {
 			GRAY
 				gotoxy(24, 16);
@@ -386,9 +400,11 @@ void waitroom(void)
 		printf("      ■                                                                                            ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 3 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■   [ STATUS ] : ");
+		cur(11, 23);
+		printf("[ %s ]", friendname[2]);
 		if (status[2] == 0) {
 			GRAY
 				gotoxy(24, 25);
@@ -421,9 +437,11 @@ void waitroom(void)
 		printf("      ■                                                                                            ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ PLAYER 4 ]                                                                             ■\n");
+		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n"); //92
 		printf("      ■   [ STATUS ] : ");
+		cur(11, 32);
+		printf("[ %s ]", friendname[3]);
 		if (status[3] == 0) {
 			GRAY
 				gotoxy(24, 34);
@@ -935,6 +953,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
 void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
+	char query[100];
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
 	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
@@ -943,7 +962,8 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 		ErrorHandling("connect() error");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
-	send(connect_sock, "player connect", 20, 0);
+	sprintf(query, "player   connect %s" , username);
+	send(connect_sock, query, 30, 0);
 	waitroom();
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
@@ -951,21 +971,24 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	Sleep(1000);
 	while (1) {
 
-		if (recv(connect_sock, message, 20, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
-			if (strcmp(message, "player 1 connect") == 0) {
+		if (recv(connect_sock, message, 40, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+			if (strncmp("player 1 connect", message, 15) == 0) {
+				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 2 connect") == 0) {
+			else if (strncmp("player 2 connect", message, 15) == 0) {
+				sscanf(message, "player 2 connect %s", friendname[1]);
 				status[1] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 3 connect") == 0) {
+			else if (strncmp("player 3 connect", message, 15) == 0) {
+				sscanf(message, "player 3 connect %s", friendname[2]);
 				status[2] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 4 connect") == 0) {
-				status[3] = 1;
+			else if (strncmp("player 4 connect", message, 15) == 0) {
+				sscanf(message, "player 4 connect %s", friendname[3]);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp(message, "player 1 ready") == 0) {
@@ -1553,19 +1576,19 @@ void jointema(void) {
 }
 void sendall(char *message) {
 	while (1) {
-		send(Sconnect_sock[0], message, 20, 0);
-		printf("Client 1 <- Server : %s\n", message);
+		send(Sconnect_sock[0], message, 40, 0);
+	//	printf("Client 1 <- Server : %s\n", message);
 		if (Sconnect_sock[1] != 0) {
-			send(Sconnect_sock[1], message, 20, 0);
-			printf("Client 2 <- Server : %s\n", message);
+			send(Sconnect_sock[1], message, 40, 0);
+	//		printf("Client 2 <- Server : %s\n", message);
 		}
 		if (Sconnect_sock[2] != 0) {
-			send(Sconnect_sock[2], message, 20, 0);
-			printf("Client 3 <- Server : %s\n", message);
+			send(Sconnect_sock[2], message, 40, 0);
+	//		printf("Client 3 <- Server : %s\n", message);
 		}
 		if (Sconnect_sock[3] != 0) {
-			send(Sconnect_sock[3], message, 20, 0);
-			printf("Client 4 <- Server : %s\n", message);
+			send(Sconnect_sock[3], message, 40, 0);
+	//		printf("Client 4 <- Server : %s\n", message);
 		}
 		Sleep(300);
 	}
@@ -1574,11 +1597,11 @@ void Clnt_1(void) {
 	char message[100];
 //	printf("hello\n");
 	while (1) {
-		if (recv(Sconnect_sock[0], message, 20, 0) > 0) {
+		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
 		//	printf("Client 1 -> Server : %s\n", message);
-			if (strcmp(message, "player connect") == 0) {
-				memset(&message, 0, sizeof(message));
-				strcpy(message, "player 1 connect");
+			if (strncmp(message, "player   connect", 16) == 0) {
+
+				message[7] = '1';
 			}
 			sendall(message);
 		}
@@ -1589,11 +1612,11 @@ void Clnt_2(void) {
 //	printf("hello\n");
 	while (1) {
 
-		if (recv(Sconnect_sock[1], message, 20, 0) > 0) {
+		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
 			//printf("Client 2 -> Server : %s\n", message);
-			if (strcmp(message, "player connect") == 0) {
-				memset(&message, 0, sizeof(message));
-				strcpy(message, "player 2 connect");
+			if (strncmp(message, "player   connect", 16) == 0) {
+
+				message[7] = '2';
 			}
 			sendall(message);
 		}
@@ -1604,11 +1627,11 @@ void Clnt_3(void) {
 //	printf("hello\n");
 	while (1) {
 
-		if (recv(Sconnect_sock[2], message, 20, 0) > 0) {
+		if (recv(Sconnect_sock[2], message, 40, 0) > 0) {
 	//		printf("Client 3 -> Server : %s\n", message);
-			if (strcmp(message, "player connect") == 0) {
-				memset(&message, 0, sizeof(message));
-				strcpy(message, "player 3 connect");
+			if (strncmp(message, "player   connect", 16) == 0) {
+
+				message[7] = '3';
 			}
 			sendall(message);
 		}
@@ -1621,9 +1644,9 @@ void Clnt_4(void) {
 
 		if (recv(Sconnect_sock[3], message, 20, 0) > 0) {
 	//		printf("Client 4 -> Server : %s\n", message);
-			if (strcmp(message, "player connect") == 0) {
-				memset(&message, 0, sizeof(message));
-				strcpy(message, "player 4 connect");
+			if (strncmp(message, "player   connect", 16) == 0) {
+
+				message[7] = '4';
 			}
 			sendall(message);
 		}
@@ -1685,4 +1708,12 @@ IN_ADDR GetDefaultMyIP()
 		ptr++;
 	}
 	return addr;
+}
+void signalall(void)
+{
+	signal(SIGINT, (_crt_signal_t)exitsignal);
+}
+void exitsignal(void)
+{
+
 }
