@@ -95,10 +95,12 @@ SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 ROOM connectroom[6];
+DWORD threads[10] = { 0, };
 char signalmode;
 char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
+
 MYSQL *con;
 
 //기본 함수들
@@ -123,6 +125,7 @@ void Clnt_3(void);								//서버 - 클라이언트 3통신
 void Clnt_4(void);								//서버 - 클라이언트 4통신
 void makeroom(int *count);							//방만들기(네트워크)
 IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
+bool exitallthread(void);
 
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
@@ -173,6 +176,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int i, j, k, v, result;
 	signalall();
 	char mainchoose = 0;
+	
 	char bangchoose;
 	char chooseroomcount;
 	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
@@ -186,6 +190,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
+	char serverreturn = 0;
 	mysql_query(cons, "use catchmind");
 	//변수 선언 끝
 	disablecursor(1);
@@ -213,6 +218,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				continue;
 			disablecursor(1);
 			while (1) {						//방 반복문
+				
 				ConsoleL(50, 20);
 				bangchoose = bangchose(cons);	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
@@ -241,7 +247,15 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
 
-						Connect_Server(connectroom[bangchoose - 2].ip);
+						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);
+						if (serverreturn == 3) {
+							exitallthread();
+							if (lead == true)
+								closesocket(listen_sock);
+							else
+								closesocket(connect_sock);
+							continue;
+						}
 						break;
 					}
 				}
@@ -318,7 +332,7 @@ void sqlmakeroom(MYSQL *cons) {
 		disablecursor(1);
 		CLS;
 		printf("방 제작중....");
-		_beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
+		threads[5] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
 		while (1) {
 			if (count == 1)
 			{
@@ -337,8 +351,12 @@ int waitroom(void)
 {
 	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
+	char query[100] = { 0, };
 	int mode = 0;
-	signalmode = 1;
+	if (lead == true)
+		signalmode = 2;
+	else
+		signalmode = 1;
 	while (1) { //받아온 데이터 처리
 		gotoxy(0, 3);
 		WHITE
@@ -512,11 +530,19 @@ int waitroom(void)
 				mode = 0;
 				send(connect_sock, "player not ready", 40, 0);
 			}
+			Sleep(100);
 			xx = 0;
 			yy = 0;
 		}
 		if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
+			if (lead == true)
+			{
+				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));			//내 ip받아서 처리	
+				mysql_query(con, query);
+			}
 			send(connect_sock, "player exit", 40, 0);
+		//	Sleep(500);
+			
 			return 3;
 		}
 		xx = 0;
@@ -1008,13 +1034,13 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	connect_addr.sin_port = htons(5555);					 //서버 포트
 	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
 		ErrorHandling("connect() error");
-	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
+	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
 	sprintf(query, "player   connect %s", username);
 	send(connect_sock, query, 30, 0);
 	Sleep(200);
 
-	waitroom();
+	return waitroom();
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
@@ -1678,8 +1704,6 @@ void Clnt_1(void)
 			if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 1 ready %s", friendname[0]);
-				cur(0, 1);
-				printf("Client 1 <- Server : %s\n", message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1833,10 +1857,10 @@ void makeroom(int *count) {
 				Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
 			if (Sconnect_sock[SOCKETCOUNT] != 0) {
 				switch (SOCKETCOUNT) {
-				case 0:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
-				case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
-				case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
-				case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
+				case 0:threads[1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
+				case 1:threads[2] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
+				case 2:threads[3] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
+				case 3:threads[4] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
 				default: break;
 				}
 			}
@@ -1868,6 +1892,16 @@ IN_ADDR GetDefaultMyIP()
 	}
 	return addr;
 }
+bool exitallthread(void)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		if (threads[i] != 0)
+			ExitThread(threads[i]);
+
+	}
+	return true;
+}
 void signalall(void)
 {
 	signal(SIGINT, (_crt_signal_t)exitsignal);
@@ -1878,10 +1912,18 @@ void signalall(void)
 }
 void exitsignal(void)
 {
+	char query[50];
 	if (signalmode == 1)
 	{
 		send(connect_sock, "exit", 40, 0);
 	}
+	if (signalmode == 2)
+	{
+		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+		mysql_query(con, query);
+
+	}
+	
 }
 void gotoxy(short x, short y)
 {
