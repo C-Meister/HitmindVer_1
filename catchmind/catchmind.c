@@ -99,7 +99,7 @@ char signalmode;
 char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
-
+MYSQL *con;
 
 //기본 함수들
 void gotoxy(short x, short y);
@@ -110,18 +110,20 @@ void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 void usermain(void);
+
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
+int Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
 void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);					//하나를받으면 전부전송
-void waitroom(void);							//네트워크 대기방
+int waitroom(void);							//네트워크 대기방
 void Clnt_1(void);								//서버 - 클라이언트 1통신
 void Clnt_2(void);								//서버 - 클라이언트 2통신
 void Clnt_3(void);								//서버 - 클라이언트 3통신
 void Clnt_4(void);								//서버 - 클라이언트 4통신
 void makeroom(int *count);							//방만들기(네트워크)
 IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
+
 //--------------------- MySQL 함수들 --------------------------------------
 int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
 int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
@@ -130,6 +132,7 @@ char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 
 void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
 void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
 void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
+
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
@@ -138,6 +141,7 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
+
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
@@ -147,9 +151,11 @@ int chooseroom(int roomnum);
 void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
+
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy);					//클릭함수 두번째, xx값과 yy값을 변환함
+
 //--------------------------미니게임 숫자야구 함수들----------------------
 void createainumber(int *ainum);
 void scanfirst(int *usnum);
@@ -195,7 +201,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			Connect_Server(ServerIP);
 		}*/
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
-
+	con = cons;
 	mainchoose = maintitle();				//main 화면
 						//
 	while (1) {								//로그인 반복문
@@ -327,7 +333,7 @@ void sqlmakeroom(MYSQL *cons) {
 	}
 	disablecursor(0);
 }
-void waitroom(void)
+int waitroom(void)
 {
 	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
@@ -498,7 +504,6 @@ void waitroom(void)
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
-			cur(0, 0);
 			if (mode == 0) {
 				mode = 1;
 				send(connect_sock, "player ready", 40, 0);
@@ -510,10 +515,17 @@ void waitroom(void)
 			xx = 0;
 			yy = 0;
 		}
-		Sleep(100);
-
+		if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
+			send(connect_sock, "player exit", 40, 0);
+			return 3;
+		}
+		xx = 0;
+		yy = 0;
 	}
+	Sleep(100);
+
 }
+
 void usermain(void) {
 #ifdef SANGHO
 
@@ -988,7 +1000,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
-void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
+int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	char query[100];
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
@@ -1659,8 +1671,6 @@ void Clnt_1(void)
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
-			cur(0, 0);
-			printf("Client 1 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '1';
 
@@ -1698,7 +1708,6 @@ void Clnt_2(void) {
 	//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
-			printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
 
@@ -1706,7 +1715,6 @@ void Clnt_2(void) {
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 2 ready %s", friendname[1]);
-				printf("Client 1 <- Server : %s\n", message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
