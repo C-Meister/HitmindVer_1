@@ -538,7 +538,11 @@ int waitroom(void)
 				return 1;
 		}
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
-			if (mode == 0) {
+			if (mode == 0 && togl == -1)
+				togl *= -1;
+			else if (mode == 1 && togl == 1)
+				togl *= -1;
+			else if (mode == 0) {
 				mode = 1;
 				send(connect_sock, "player ready", 40, 0);
 			}
@@ -602,7 +606,7 @@ restart:
 				gotoxy(16, 3);
 				printf("                    ");
 				gotoxy(16, 3);
-				printf("%s", user.name);
+				//printf("%s", user.name);
 
 			}
 			else {
