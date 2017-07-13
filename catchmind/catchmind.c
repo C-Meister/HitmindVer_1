@@ -684,8 +684,10 @@ return 0;// 종료
 #include <stdlib.h>
 #include <time.h>
 #include <conio.h>
+#include <math.h>
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
+#include <winapifamily.h>
 //#include <iostream>
 #include <stdbool.h>
 #include <signal.h>
@@ -703,7 +705,7 @@ return 0;// 종료
 #pragma comment (lib, "libmysql.lib")	//mysql라이브러리
 #pragma comment (lib, "SDL2")			//그래픽 라이브러리 1
 #pragma comment (lib, "SDL2main")		//그래픽 라이브러리 2
-#pragma comment (lib, "SDL2_image")
+#pragma comment (lib, "SDL2_image")		//그래픽 라이브러리 3
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
 
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
