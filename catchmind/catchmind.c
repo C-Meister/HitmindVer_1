@@ -1647,18 +1647,18 @@ void sendall(char *message) {
 	cur(0, 45);
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[0], message, 40, 0);
-	printf("Client 1 <- Server : %s\n", message);
+//	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
 		send(Sconnect_sock[1], message, 40, 0);
-		printf("Client 2 <- Server : %s\n", message);
+//		printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
 		send(Sconnect_sock[2], message, 40, 0);
-		printf("Client 3 <- Server : %s\n", message);
+//		printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
 		send(Sconnect_sock[3], message, 40, 0);
-		printf("Client 4 <- Server : %s\n", message);
+//		printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
 
