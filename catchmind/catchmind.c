@@ -325,6 +325,7 @@ void sqlmakeroom(MYSQL *cons) {
 		}
 		break;
 	}
+	disablecursor(0);
 }
 void waitroom(void)
 {
@@ -600,7 +601,7 @@ restart:
 		}*/
 		fgets(user.name, 13, stdin);
 	}
-		
+
 	i = 0;
 	gotoxy(16, 5);
 	while (1) {
@@ -1367,38 +1368,35 @@ int chooseroom(int roomnum) {
 	cur(17, 5);
 	printf("%s", connectroom[roomnum].roomname);
 	cur(17, 7);
+	disablecursor(1);
 	while (1) {
 
-		if (_kbhit()) {
-			roompassword[i] = _getch();
-			if (roompassword[i] == 8) {
-				if (i == 0) {
-					roompassword[0] = 0;
-					continue;
-				}
-				printf("\b \b");
-				roompassword[i - 1] = 0;
-				roompassword[i--] = 0;
-			}
-			else if (roompassword[i] == 13 && i > 3) {
-				roompassword[i] = 0;
-				break;
-			}
-			else if (roompassword[i] == 13) {
-				roompassword[i] = 0;
-			}
-			else if (i >= 15) {
+		roompassword[i] = _getch();
+		if (roompassword[i] == 8) {
+			if (i == 0) {
+				roompassword[0] = 0;
 				continue;
 			}
-			else if (!((roompassword[i] >= '0' && roompassword[i] <= '9') || (roompassword[i] >= 'a' && roompassword[i] <= 'z') || (roompassword[i] >= 'A' && roompassword[i] <= 'Z'))) {
-				roompassword[i] = 0;
-			}
-			else {
-				printf("*");
-				i++;
-			}
+			printf("\b \b");
+			roompassword[i - 1] = 0;
+			roompassword[i--] = 0;
+		}
+		else if (roompassword[i] == 13) {
+			roompassword[i] = 0;
+			break;
+		}
+		else if (i >= 15) {
+			continue;
+		}
+		else if (!((roompassword[i] >= '0' && roompassword[i] <= '9') || (roompassword[i] >= 'a' && roompassword[i] <= 'z') || (roompassword[i] >= 'A' && roompassword[i] <= 'Z'))) {
+			roompassword[i] = 0;
+		}
+		else {
+			printf("*");
+			i++;
 		}
 	}
+	disablecursor(0);
 	if (!(strcmp(connectroom[roomnum].password, roompassword)))
 	{
 		return 1;
