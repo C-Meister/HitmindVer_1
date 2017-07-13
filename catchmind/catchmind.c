@@ -175,7 +175,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int i, j, k, v, result;
 	signalall();
 	char mainchoose = 0;
-	
+
 	char bangchoose;
 	char chooseroomcount;
 	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
@@ -217,7 +217,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				continue;
 			disablecursor(1);
 			while (1) {						//방 반복문
-				
+
 				ConsoleL(50, 20);
 				bangchoose = bangchose(cons);	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
@@ -520,7 +520,7 @@ int waitroom(void)
 		printf("      ■                ■                                                        ■                ■\n");		// 4, 40		//11, 40		//42, 40		49, 40
 		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
 			printf("      ■     ready      ■                       Start!                           ■     exit       ■\n");
-			
+
 
 		}
 		else
@@ -536,7 +536,7 @@ int waitroom(void)
 		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
 			if (xx > 13 && xx < 41 && yy < 43 && yy > 39)
 				send(connect_sock, "game start", 40, 0);
-				return 1;
+			return 1;
 		}
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			if (mode == 0 && togl == -1)
@@ -564,7 +564,7 @@ int waitroom(void)
 	}
 	Sleep(100);
 
-	}
+}
 
 void usermain(void) {
 #ifdef SANGHO
@@ -619,7 +619,7 @@ restart:
 					buff = buff2;
 				}
 				buff = 0;
-				
+
 				gotoxy(16, 3);
 				printf("            ");
 				gotoxy(16, 3);
@@ -1145,10 +1145,11 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[0] = 10;
 				ZeroMemory(message, sizeof(message));
 			}
-			Sleep(100);
-		}
 
+		}
+		Sleep(100);
 	}
+	
 }
 int sqllogin(MYSQL *cons) {
 	char query[100];
@@ -1692,21 +1693,21 @@ void jointema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
 void sendall(char *message) {
-
+	cur(0, 45);
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[0], message, 40, 0);
-	//	printf("Client 1 <- Server : %s\n", message);
+			printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
 		send(Sconnect_sock[1], message, 40, 0);
-		//		printf("Client 2 <- Server : %s\n", message);
+			printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
 		send(Sconnect_sock[2], message, 40, 0);
-		//		printf("Client 3 <- Server : %s\n", message);
+			printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
 		send(Sconnect_sock[3], message, 40, 0);
-		//		printf("Client 4 <- Server : %s\n", message);
+			printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
 
@@ -1764,7 +1765,7 @@ void Clnt_2(void) {
 	//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
-			
+
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
 
@@ -1772,7 +1773,7 @@ void Clnt_2(void) {
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 2 ready %s", friendname[1]);
-				
+
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1962,7 +1963,7 @@ void exitsignal(void)
 
 	}
 	mysql_close(con);
-	
+
 }
 void gotoxy(short x, short y)
 {
