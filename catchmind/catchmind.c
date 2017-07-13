@@ -852,7 +852,7 @@ void numberbaseball();
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
-	SDL_MAIN();
+	//SDL_MAIN();
 	//변수 선언
 	int i, j, k, v, result;
 	signalall();
@@ -872,37 +872,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int bangnum = 0;						//고른 방의 번호
 	char serverreturn = 0;
 	mysql_query(cons, "use catchmind");
-	//-------------------그래픽 변수 선언------------------------
-	SDL_Window * Window;//SDL 윈도우 선언
-	SDL_Renderer * Renderer;// SDL 렌더러 선언
-	SDL_Window * Window2;
-	SDL_Renderer * Renderer2;
-	SDL_Window * Window3;
-	SDL_Renderer * Renderer3;
-	SDL_Rect center = { 0 };
-	// 텍스쳐와 사각형 선언
-	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * EraTexture = nullptr;// 지우개 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * NewTexture = nullptr;// 새로만들기 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * TraTexture = nullptr;// 스크롤 트랙 이미지를 담기위한 텍스쳐선언
-	SDL_Texture * BoxTexture = nullptr;// 스크롤 박스 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * ChaTexture = nullptr;// 채팅창 이미지를 담기위한 텍스쳐 선언
-	SDL_Texture * StaTexture = nullptr;// 상태창 이미지를 담기위한 텍스쳐 선언
-	SDL_Rect RgbCode = { 0 };// RgbCode 이미지의 정보를 담기위한 사각형변수 선언
-	SDL_Rect Pencil = { 0 }; // Pencil 이미지의 정보를 담기위한 사각형 변수 선언
-	SDL_Rect Eraser = { 0 }; // Eraser 이미지의 정보를 담기 위한 사각형 변수 선언
-	SDL_Rect New = { 0 }; // New 이미지의 정보를 담기 위한 사각형 변수 선언
-	SDL_Rect Track = { 0 };// Track 이미지의 정보를 담기 위한 사각형 변수 선언
-	SDL_Rect Box = { 0 };//Box 이미지의 정보를 담기 위한 사각형 변수 선언
-	SDL_Rect Chat = { 0 };// Chat 이미지의 정보를 담기 위한 사각형 변수 선언
-	SDL_Rect Status = { 0 };//Status 이미지의 정보를 담기 위한 사각형 변수 선언
-	//변수 선언 끝
-	// 초기화 과정
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_Init함수로 SDL 초기화하고 초기화 안되면 if문 실행 SDL_Init의 인수는 다양함(ex : SDL_INIT_VIDEO)
-		SDL_ExceptionRoutine(Renderer, Window, "SDL_Init", 1);//단계1의 예외 처리 루틴실행
-		return 0;// 종료
-	};
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
 	memset(&connect_addr, 0, sizeof(connect_addr));
@@ -1235,9 +1204,16 @@ int waitroom(void)
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		if (status[0] == 10)
 		{
-			cur(0, 0);
-			printf("게임 시작");
 			status[0] = 2;
+			CLS;
+			printf("게임을 시작합니다.");
+			for (int i = 0; i < 3; i++)
+			{
+				cur(0, 1);
+				printf("%d초후 시작", 3 - i);
+			}
+			SQL_MAIN();
+
 		}
 		POINT a;
 		GetCursorPos(&a);
@@ -2774,7 +2750,7 @@ int SDL_MAIN(void)
 		return 0;// 종료
 	};
 	// 윈도우창 3개로 나누는 기준 x좌표는 1920 - 1310/4-10이고, 1080-900/4-10은 y좌표의 기준이다.
-	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateWindow", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
@@ -2784,7 +2760,7 @@ int SDL_MAIN(void)
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateRenderer", 3);
 		return 0;
 	}
-	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS| SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window2 == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateWindow2", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
@@ -2794,7 +2770,7 @@ int SDL_MAIN(void)
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateRenderer2", 3);//단계3의 예외 처리 루틴 실행
 		return 0;// 종료
 	}
-	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS| SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window3 == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateWindow3", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
