@@ -350,6 +350,7 @@ void sqlmakeroom(MYSQL *cons) {
 int waitroom(void)
 {
 	int xx = 0, yy = 0;
+	int togl = -1;
 	ConsoleL(100, 50);
 	char query[100] = { 0, };
 	int mode = 0;
@@ -511,8 +512,10 @@ int waitroom(void)
 		printf("      ¡á                                                                                            ¡á\n");
 		printf("      ¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 		printf("      ¡á                ¡á                                                        ¡á                ¡á\n");		// 4, 40		//11, 40		//42, 40		49, 40
-		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2)
+		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
 			printf("      ¡á     ready      ¡á                       Start!                           ¡á     exit       ¡á\n");
+
+		}
 		else
 			printf("      ¡á     ready      ¡á                                                        ¡á     exit       ¡á\n");
 		printf("      ¡á                ¡á                                                        ¡á                ¡á\n");		// 4, 42		//11, 42		//42, 42		49, 42
@@ -522,7 +525,11 @@ int waitroom(void)
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
-			if (mode == 0) {
+			if (mode == 0 && togl == -1)
+				togl *= -1;
+			else if (mode == 1 && togl == 1)
+				togl *= -1;
+			else if (mode == 0) {
 				mode = 1;
 				send(connect_sock, "player ready", 40, 0);
 			}
@@ -1697,6 +1704,7 @@ void Clnt_1(void)
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
+			cur(0, 0);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '1';
 
@@ -1923,6 +1931,7 @@ void exitsignal(void)
 		mysql_query(con, query);
 
 	}
+	mysql_close(con);
 	
 }
 void gotoxy(short x, short y)
