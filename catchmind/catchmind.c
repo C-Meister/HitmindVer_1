@@ -257,6 +257,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 						}
 						if (serverreturn == 1)
 						{
+							CLS;
+							printf("시작!");
+							Sleep(100);
 						}
 						break;
 					}
