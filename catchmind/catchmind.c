@@ -528,7 +528,10 @@ int waitroom(void)
 		printf("      ¡á                ¡á                                                        ¡á                ¡á\n");		// 4, 42		//11, 42		//42, 42		49, 42
 		printf("      ¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 		if (status[0] == 10)
+		{
+			cur(0, 0);
 			return 1;
+		}
 		POINT a;
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
@@ -536,7 +539,7 @@ int waitroom(void)
 		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
 			if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
 				send(connect_sock, "game start", 40, 0);
-				
+				xx = 0; yy = 0;
 			}
 			
 		}
