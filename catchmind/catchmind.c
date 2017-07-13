@@ -1333,12 +1333,14 @@ void banglist(MYSQL *cons) {
 int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0;
-
+	POINT a;
 	while (1) {
 		banglist(cons);
 		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
 
+		GetCursorPos(&a);
+		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 
 		if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
