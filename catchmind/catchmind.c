@@ -709,6 +709,7 @@ return 0;// 종료
 #pragma comment (lib, "SDL2_image")		//그래픽 라이브러리 3
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
 
+#pragma warning (disable : 4244)
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
 //#define 정의문
 #define CLS system("cls")		//화면 지우기
@@ -852,11 +853,9 @@ void numberbaseball();
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	//변수 선언
-//	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
 	signalall();
 	char mainchoose = 0;
-
 	char bangchoose;
 	char chooseroomcount;
 	POINT pos;								//x, y좌표 표현 )pos.x, pos.y
@@ -872,23 +871,47 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	int bangnum = 0;						//고른 방의 번호
 	char serverreturn = 0;
 	mysql_query(cons, "use catchmind");
+	//-------------------그래픽 변수 선언------------------------
+	SDL_Window * Window;//SDL 윈도우 선언
+	SDL_Renderer * Renderer;// SDL 렌더러 선언
+	SDL_Window * Window2;
+	SDL_Renderer * Renderer2;
+	SDL_Window * Window3;
+	SDL_Renderer * Renderer3;
+	SDL_Rect center = { 0 };
+	// 텍스쳐와 사각형 선언
+	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * EraTexture = nullptr;// 지우개 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * NewTexture = nullptr;// 새로만들기 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * TraTexture = nullptr;// 스크롤 트랙 이미지를 담기위한 텍스쳐선언
+	SDL_Texture * BoxTexture = nullptr;// 스크롤 박스 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * ChaTexture = nullptr;// 채팅창 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * StaTexture = nullptr;// 상태창 이미지를 담기위한 텍스쳐 선언
+	SDL_Rect RgbCode = { 0 };// RgbCode 이미지의 정보를 담기위한 사각형변수 선언
+	SDL_Rect Pencil = { 0 }; // Pencil 이미지의 정보를 담기위한 사각형 변수 선언
+	SDL_Rect Eraser = { 0 }; // Eraser 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect New = { 0 }; // New 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Track = { 0 };// Track 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Box = { 0 };//Box 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Chat = { 0 };// Chat 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Status = { 0 };//Status 이미지의 정보를 담기 위한 사각형 변수 선언
 	//변수 선언 끝
-	disablecursor(1);
+	// 초기화 과정
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_Init함수로 SDL 초기화하고 초기화 안되면 if문 실행 SDL_Init의 인수는 다양함(ex : SDL_INIT_VIDEO)
+		SDL_ExceptionRoutine(Renderer, Window, "SDL_Init", 1);//단계1의 예외 처리 루틴실행
+		return 0;// 종료
+	};
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
 	memset(&connect_addr, 0, sizeof(connect_addr));
-	/*	maintitle();
-		bangnum = bangchose();
-		if (bangnum == 1) {
-			memset(&wsaData, 0, sizeof(wsaData));
-			memset(&connect_sock, 0, sizeof(connect_sock));
-			memset(&connect_addr, 0, sizeof(connect_addr));
-			Connect_Server(ServerIP);
-		}*/
+	
+	// 초기화 끝
+
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 	con = cons;
 	mainchoose = maintitle();				//main 화면
-						
+	disablecursor(1);
 	while (1) {								//로그인 반복문
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
