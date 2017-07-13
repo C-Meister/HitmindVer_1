@@ -29,6 +29,7 @@ void IMG_ErrorLog(const char * msg) {//에러코드 출력 함수
 printf("%s Error: %s\n", msg, IMG_GetError());
 return;
 }
+
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window ,char* msg, int step) {// 예외 처리 함수
 SDL_ErrorLog(msg);//에러코드 출력
 switch (step) {
@@ -804,7 +805,7 @@ void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
 void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
-void SDL_ErrorLog(const char * msg);			//그래픽에러코드 출력 함수
+void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step);	 // 그래픽예외 처리 함수
 void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 이미지예외 처리 함수
@@ -1585,6 +1586,7 @@ void ErrorHandling(char *Message) {
 }
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, SDL_GetError());
+	return;
 }
 void IMG_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, IMG_GetError());
@@ -1609,51 +1611,6 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
 	SDL_Quit();//SDL 종료
 	getchar();//에러코드 확인하기 위해 콘솔창 대기
 	return;
-}
-SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file) { // 텍스쳐에 이미지파일 로드하는 함수 선언
-	int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;// JPG파일과 PNG파일 로드 가능
-	if (IMG_Init(imgFlags) != imgFlags) {//IMG 초기화하고 초기화 안되면 if문 실행
-		IMG_ErrorLog("IMG_Init");
-		return nullptr;//널포인터 반환
-	}
-	SDL_Surface* Surface = IMG_Load(file);//서피스에 이미지로드
-	if (Surface == nullptr) {//서피스에 이미지로드가 안되면 
-		IMG_ErrorLog("IMG_Load");
-		IMG_Quit();// IMG 종료
-		return nullptr;// 널포인터 반환
-	}
-	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);//서피스로부터 텍스쳐 생성
-	SDL_FreeSurface(Surface);// 서피스 메모리해제
-	if (Texture == nullptr) {// 텍스쳐 생성 실패시 if문실행
-		SDL_ErrorLog("SDL_CreateTextureFromSurface");// 에러 코드 출력
-		IMG_Quit();// IMG 종료
-		return nullptr;// 널포인터 반환
-	}
-	IMG_Quit();// IMG 종료
-	return Texture;// Texture포인터 반환
-}
-SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip) { // 텍스쳐에 이미지파일 로드하는 함수 선언
-	int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;// JPG파일과 PNG파일 로드 가능
-	if (IMG_Init(imgFlags) != imgFlags) {//IMG 초기화하고 초기화 안되면 if문 실행
-		IMG_ErrorLog("IMG_Init");
-		return nullptr;//널포인터 반환
-	}
-	SDL_Surface* Surface = IMG_Load(file);//서피스에 이미지로드
-	if (Surface == nullptr) {//서피스에 이미지로드가 안되면 
-		IMG_ErrorLog("IMG_Load");
-		IMG_Quit();// IMG 종료
-		return nullptr;// 널포인터 반환
-	}
-	SDL_SetColorKey(Surface, 1, SDL_MapRGB(Surface->format, r, g, b));// r,g,b값에 해당하는 색상을 지우는 함수임
-	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);//서피스로부터 텍스쳐 생성
-	SDL_FreeSurface(Surface);// 서피스 메모리해제
-	if (Texture == nullptr) {// 텍스쳐 생성 실패시 if문실행
-		SDL_ErrorLog("SDL_CreateTextureFromSurface");// 에러 코드 출력
-		IMG_Quit();// IMG 종료
-		return nullptr;// 널포인터 반환
-	}
-	IMG_Quit();// IMG 종료
-	return Texture;// Texture포인터 반환
 }
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h) {//텍스쳐를 출력하는 함수 선언
 	SDL_Rect Src;// 직사각형 선언
@@ -2337,6 +2294,9 @@ void sendall(char *message) {
 	ZeroMemory(message, sizeof(message));
 
 }
+void processclnt(void) {
+	
+}
 void Clnt_1(void)
 {
 	if (Sconnect_sock[1] != 0)
@@ -2604,4 +2564,174 @@ void cur(short x, short y)
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step) {// 예외 처리 함수
+	SDL_ErrorLog(msg);//에러코드 출력
+	switch (step) {
+	case 3:
+		SDL_DestroyRenderer(Renderer);// SDL 렌더러 파괴
+	case 2:
+		SDL_DestroyWindow(Window);//SDL 윈도우 파괴
+	case 1:
+		SDL_Quit();//SDL 종료
+		getchar();//에러코드 확인하기 위해 콘솔창 대기
+		return;
+	}
+}
+void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
+	SDL_DestroyRenderer(Renderer);// SDL 렌더러 파괴
+	SDL_DestroyWindow(Window);//SDL 윈도우 파괴
+	SDL_Quit();//SDL 종료
+	getchar();//에러코드 확인하기 위해 콘솔창 대기
+	return;
+}
+void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks) {
+	if (clicks == true)
+		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 64);// 클릭했을 경우는 더진한 파랑
+	else
+		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 8);// 마우스가 올려져 있을 경우는 좀 연한 파랑
+	SDL_Rect Edge = { 0 };
+	Edge.x = Rect->x - 10;
+	Edge.y = Rect->y - 10;
+	Edge.w = Rect->w + 20;
+	Edge.h = Rect->h + 20;
+	SDL_RenderDrawRect(Renderer, &Edge);// 파란 테두리를 그림
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_BLEND);// 알파값을 이용해 투명하게 칠하는 것을 가능하게 함
+	SDL_RenderFillRect(Renderer, &Edge);// 조금 투명한 파란 사각형 그림
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_NONE);// 투명하게 칠하는 걸 불가능하게 함
+}
+void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect) {
+	SDL_Rect Edge = { 0 };
+	Edge.x = Rect->x - 10;
+	Edge.y = Rect->y - 10;
+	Edge.w = Rect->w + 20;
+	Edge.h = Rect->h + 20;
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 하얀색
+	SDL_RenderFillRect(Renderer, &Edge);// 조금 투명한 파란 사각형 그림
+}
+void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect Font, SDL_Rect Track, float strong, int r, int g, int b) {
+	if (clicks.pencil == true) {
+		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+		SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+		Font.x = Track.x + 35 - strong / 2;// 왼쪽 꼭짓점 좌표를 다시설정
+		Font.y = Track.y - 50 - strong / 2;// 오른쪽 꼭짓점 좌표를 다시설정
+		Font.h = Font.w = strong;// 굵기 다시설정
+		SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+		SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+		if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+			SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+			SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+		}
+	}
+	else if (clicks.eraser == true) {
+		printf("지우개 폰트 출력\n");
+		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+		int x1, y1, x2, y2;// 굵기만큼의 사각형을 만듬
+		int l;
+		for (l = 0; l < 180; l++) {
+			x1 = sin(3.14 / 180 * l)*strong / 2;
+			y1 = cos(3.14 / 180 * l)*strong / 2;
+			x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+			y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+			SDL_RenderDrawLine(Renderer, x1 + Font.x + strong / 2, y1 + Font.y + strong / 2, x2 + Font.x + strong / 2, y2 + Font.y + strong / 2);
+		}
+		Font.x = Track.x + 35 - strong / 2;// 왼쪽 꼭짓점 좌표를 다시설정
+		Font.y = Track.y - 50 - strong / 2;// 오른쪽 꼭짓점 좌표를 다시설정
+		Font.h = Font.w = strong;// 굵기 다시설정
+		SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+		SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+		if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+			SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+			SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+		}
+	}
+}
+SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file) { // 텍스쳐에 이미지파일 로드하는 함수 선언
+	int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;// JPG파일과 PNG파일 로드 가능
+	if (IMG_Init(imgFlags) != imgFlags) {//IMG 초기화하고 초기화 안되면 if문 실행
+		IMG_ErrorLog("IMG_Init");
+		return nullptr;//널포인터 반환
+	}
+	SDL_Surface* Surface = IMG_Load(file);//서피스에 이미지로드
+	if (Surface == nullptr) {//서피스에 이미지로드가 안되면
+		IMG_ErrorLog("IMG_Load");
+		IMG_Quit();// IMG 종료
+		return nullptr;// 널포인터 반환
+	}
+	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);//서피스로부터 텍스쳐 생성
+	SDL_FreeSurface(Surface);// 서피스 메모리해제
+	if (Texture == nullptr) {// 텍스쳐 생성 실패시 if문실행
+		SDL_ErrorLog("SDL_CreateTextureFromSurface");// 에러 코드 출력
+		IMG_Quit();// IMG 종료
+		return nullptr;// 널포인터 반환
+	}
+	IMG_Quit();// IMG 종료
+	return Texture;// Texture포인터 반환
+}
+SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip) { // 텍스쳐에 이미지파일 로드하는 함수 선언
+	int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;// JPG파일과 PNG파일 로드 가능
+	if (IMG_Init(imgFlags) != imgFlags) {//IMG 초기화하고 초기화 안되면 if문 실행
+		IMG_ErrorLog("IMG_Init");
+		return nullptr;//널포인터 반환
+	}
+	SDL_Surface* Surface = IMG_Load(file);//서피스에 이미지로드
+	if (Surface == nullptr) {//서피스에 이미지로드가 안되면
+		IMG_ErrorLog("IMG_Load");
+		IMG_Quit();// IMG 종료
+		return nullptr;// 널포인터 반환
+	}
+	SDL_SetColorKey(Surface, 1, SDL_MapRGB(Surface->format, r, g, b));// r,g,b값에 해당하는 색상을 지우는 함수임
+	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);//서피스로부터 텍스쳐 생성
+	SDL_FreeSurface(Surface);// 서피스 메모리해제
+	if (Texture == nullptr) {// 텍스쳐 생성 실패시 if문실행
+		SDL_ErrorLog("SDL_CreateTextureFromSurface");// 에러 코드 출력
+		IMG_Quit();// IMG 종료
+		return nullptr;// 널포인터 반환
+	}
+	IMG_Quit();// IMG 종료
+	return Texture;// Texture포인터 반환
+}
+void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect) {//텍스쳐를 출력하는 함수 선언
+	SDL_Rect Src;// 직사각형 선언
+	Src.x = 0;// 직사각형의 왼쪽위 꼭짓점의 x좌표초기화
+	Src.y = 0;// 직사각형의 왼쪽위 꼭짓점의 y좌표초기화
+	SDL_QueryTexture(Texture, NULL, NULL, &Src.w, &Src.h); // Texture의 너비와 높이 정보를 Src.w, Src.h에 저장
+	SDL_Rect Dst;
+	Dst.x = Rect->x;//매개변수x를 왼쪽위 꼭짓점의 x좌표에 대입
+	Dst.y = Rect->y;//매개변수y를 왼쪽위 꼭짓점의 y좌표에 대입
+	Dst.w = Rect->w;//매개변수w를 직사각형의 너비에 대입
+	Dst.h = Rect->h;//매개변수h를 직사각형의 높이에 대입
+	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
+	return;
+}
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect Font, float strong, int r, int g, int b) {
+	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// 색깔설정
+	RenderTexture(Renderer, TraTexture, &Track);// 렌더러에 저장하기
+	RenderTexture(Renderer, BoxTexture, &Box);// 렌더러에 저장하기
+	RenderTexture(Renderer, EraTexture, &Eraser);// 렌더러에 저장하기
+	RenderTexture(Renderer, PenTexture, &Pencil);// 렌더러에 저장하기
+	RenderTexture(Renderer, NewTexture, &New);// 렌더러에 저장하기
+	if (on.eraser == true || clicks.eraser == true) { // eraser가 클릭 되어 있거나 eraser아이콘위에 마우스가 있으면
+		SDL_RenderRemoveEdge(Renderer, &Eraser);
+		RenderTexture(Renderer, EraTexture, &Eraser);// 렌더러에 저장하기
+		SDL_RenderDrawEdge(Renderer, &Eraser, clicks.eraser);
+	}
+	if (on.pencil == true || clicks.pencil == true) { // pencil이 클릭 되어 있거나 pencil아이콘위에 마우스가 있으면
+		SDL_RenderRemoveEdge(Renderer, &Pencil);
+		RenderTexture(Renderer, PenTexture, &Pencil);// 렌더러에 저장하기
+		SDL_RenderDrawEdge(Renderer, &Pencil, clicks.pencil);
+	}
+	if (on.new == true) {
+		SDL_RenderRemoveEdge(Renderer, &New);
+		RenderTexture(Renderer, NewTexture, &New);// 렌더러에 저장하기
+		SDL_RenderDrawEdge(Renderer, &New, 0);
+	}
+	if (clicks.eraser == true || clicks.pencil == true)
+		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
+	SDL_RenderPresent(Renderer);// 렌더러 출력
+	SDL_RenderPresent(Renderer2);
+	SDL_RenderPresent(Renderer3);
+	SDL_RenderRemoveEdge(Renderer, &Eraser);
+	SDL_RenderRemoveEdge(Renderer, &Pencil);
+	SDL_RenderRemoveEdge(Renderer, &New);
 }
