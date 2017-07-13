@@ -876,12 +876,13 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 	con = cons;
 	mainchoose = maintitle();				//main 화면
-						//
+						
 	while (1) {								//로그인 반복문
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			//ConsoleL(26, 15);마우스가 콘솔창을 벗어나면 입력이 안되므로 잠시 보류				//콘솔크기를 로그인창에 맞게  
 			disablecursor(0);               //커서 보이게
+			ConsoleL(30, 30);
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 			disablecursor(1);
@@ -1255,7 +1256,7 @@ void usermain(void) {
 }
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
-	ConsoleL(30, 30);
+	
 	int n = 0;
 restart:
 
@@ -1263,8 +1264,7 @@ restart:
 	gotoxy(0, 0);
 	if (m == 1)
 		logintema();
-	else if (m == 2)
-		jointema();
+		
 	LOG user = { 0, 0, 0 };
 	int i = 0, j = 0;
 	int cnt = 0;
@@ -1272,6 +1272,8 @@ restart:
 	/*닉네임 생성*/
 	
 	if (m == 2) {
+		ConsoleL(30, 30);
+		jointema();
 		gotoxy(9, 13);
 		printf("닉네임 적을때는 마우스 사용 불가능");
 		gotoxy(16, 3);
