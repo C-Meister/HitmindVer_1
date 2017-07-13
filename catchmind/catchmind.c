@@ -95,7 +95,7 @@ SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 ROOM connectroom[6];
-DWORD threads[10] = { 0, };
+uintptr_t threads[10] = { 0, };
 char signalmode;
 char querys[10][100];
 bool lead = false;
@@ -1055,7 +1055,7 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
 	sprintf(query, "player   connect %s", username);
-	send(connect_sock, query, 30, 0);
+	send(connect_sock, query, 40, 0);
 	Sleep(200);
 
 	return waitroom();
@@ -1127,18 +1127,23 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp("player 1 exit", message, 12) == 0) {
 				status[0] = 0;
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 exit", message, 12) == 0) {
 				status[1] = 0;
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 exit", message, 12) == 0) {
 				status[2] = 0;
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp("game start", message) == 0) {
 				status[0] = 10;
+				ZeroMemory(message, sizeof(message));
 			}
 			Sleep(100);
 		}
@@ -1703,6 +1708,7 @@ void sendall(char *message) {
 		send(Sconnect_sock[3], message, 40, 0);
 		//		printf("Client 4 <- Server : %s\n", message);
 	}
+	ZeroMemory(message, sizeof(message));
 
 }
 void Clnt_1(void)
@@ -1730,6 +1736,7 @@ void Clnt_1(void)
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
+				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 1 exit");
 				closesocket(Sconnect_sock[0]);
 				SOCKETCOUNT = 0;
@@ -1740,10 +1747,10 @@ void Clnt_1(void)
 				cur(0, 0);
 				printf("%s", message);
 			}
-			
+			strcpy(querys[0], message);
+			sendall(message);
 		}
-		strcpy(querys[0], message);
-		sendall(message);
+		Sleep(100);
 	}
 }
 void Clnt_2(void) {
@@ -1778,10 +1785,10 @@ void Clnt_2(void) {
 				closesocket(Sconnect_sock[1]);
 				Sconnect_sock[1] = 0;
 			}
-			
+			strcpy(querys[1], message);
+			sendall(message);
 		}
-		strcpy(querys[1], message);
-		sendall(message);
+		Sleep(100);
 	}
 }
 void Clnt_3(void) {
@@ -1817,10 +1824,10 @@ void Clnt_3(void) {
 				closesocket(Sconnect_sock[2]);
 				Sconnect_sock[2] = 0;
 			}
-			
+			strcpy(querys[2], message);
+			sendall(message);
 		}
-		strcpy(querys[2], message);
-		sendall(message);
+		Sleep(100);
 	}
 }
 void Clnt_4(void) {
@@ -1854,10 +1861,10 @@ void Clnt_4(void) {
 				closesocket(Sconnect_sock[3]);
 				Sconnect_sock[3] = 0;
 			}
-			
+			strcpy(querys[3], message);
+			sendall(message);
 		}
-		strcpy(querys[3], message);
-		sendall(message);
+		Sleep(100);
 	}
 }
 void makeroom(int *count) {
@@ -1898,6 +1905,7 @@ void makeroom(int *count) {
 			if (SOCKETCOUNT == 4)
 				SOCKETCOUNT = 0;
 		}
+		Sleep(100);
 	}
 }
 IN_ADDR GetDefaultMyIP()
