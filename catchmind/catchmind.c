@@ -2774,7 +2774,7 @@ int SDL_MAIN(void)
 		return 0;// 종료
 	};
 	// 윈도우창 3개로 나누는 기준 x좌표는 1920 - 1310/4-10이고, 1080-900/4-10은 y좌표의 기준이다.
-	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS|SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateWindow", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
@@ -2784,7 +2784,7 @@ int SDL_MAIN(void)
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateRenderer", 3);
 		return 0;
 	}
-	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS| SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window2 == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateWindow2", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
@@ -2794,7 +2794,7 @@ int SDL_MAIN(void)
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateRenderer2", 3);//단계3의 예외 처리 루틴 실행
 		return 0;// 종료
 	}
-	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS| SDL_WINDOW_FULLSCREEN);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window3 == nullptr) {// 윈도우 생성 실패시 if문 실행
 		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateWindow3", 2);//단계2의 예외처리루틴실행
 		return 0;//종료
