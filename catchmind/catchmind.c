@@ -114,10 +114,10 @@ void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 void usermain(void);
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-void Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
+int Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
 void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);					//하나를받으면 전부전송
-void waitroom(void);							//네트워크 대기방
+int waitroom(void);							//네트워크 대기방
 void Clnt_1(void);								//서버 - 클라이언트 1통신
 void Clnt_2(void);								//서버 - 클라이언트 2통신
 void Clnt_3(void);								//서버 - 클라이언트 3통신
@@ -255,6 +255,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 								closesocket(connect_sock);
 							continue;
 						}
+						if (serverreturn == 1)
+						{
+						}
 						break;
 					}
 				}
@@ -346,7 +349,7 @@ void sqlmakeroom(MYSQL *cons) {
 	}
 	disablecursor(0);
 }
-void waitroom(void)
+int waitroom(void)
 {
 	int xx = 0, yy = 0;
 	int togl = -1;
@@ -520,6 +523,8 @@ void waitroom(void)
 			printf("      ■     ready      ■                                                        ■     exit       ■\n");
 		printf("      ■                ■                                                        ■                ■\n");		// 4, 42		//11, 42		//42, 42		49, 42
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		if (status[0] == 10)
+			return 1;
 		POINT a;
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
@@ -1016,7 +1021,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
-void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
+int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	char query[100];
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
@@ -1108,6 +1113,9 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
+			}
+			else if (strcmp("game start", message) == 0) {
+				status[0] = 10;
 			}
 			Sleep(100);
 		}
