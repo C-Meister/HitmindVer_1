@@ -1705,7 +1705,7 @@ void Clnt_1(void)
 				message[7] = '1';
 
 			}
-			if (strcmp(message, "player ready") == 0) {
+			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 1 ready %s", friendname[0]);
 			}
@@ -1720,10 +1720,14 @@ void Clnt_1(void)
 				SOCKETCOUNT = 0;
 				Sconnect_sock[0] = 0;
 			}
-
+			else if (strcmp(message, "game start") == 0)
+			{
+				cur(0, 0);
+				printf("%s", message);
+			}
+			strcpy(querys[0], message);
+			sendall(message);
 		}
-		strcpy(querys[0], message);
-		sendall(message);
 	}
 }
 void Clnt_2(void) {
