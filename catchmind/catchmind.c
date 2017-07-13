@@ -232,6 +232,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					}
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
+						
 						Connect_Server(connectroom[bangchoose - 2].ip);
 						break;
 					}
