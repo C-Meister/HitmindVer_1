@@ -89,7 +89,7 @@ CRITICAL_SECTION cs;	//이벤트
 //char message[100];		//소켓 프로그래밍 문자열
 char status[4];			//소켓용
 char username[30];		//사용자 이름
-char friendname[4][30] = {"Player 1", "Player 2", "Player 3", "Player 4"};
+char friendname[4][30] = { "Player 1", "Player 2", "Player 3", "Player 4" };
 WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
 SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
@@ -233,7 +233,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					}
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
-						
+
 						Connect_Server(connectroom[bangchoose - 2].ip);
 						break;
 					}
@@ -333,11 +333,11 @@ void waitroom(void)
 	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
 	int mode = 0;
-
+	signalmode = 1;
 	while (1) { //받아온 데이터 처리
 		gotoxy(0, 3);
 		WHITE
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+			printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
@@ -509,12 +509,12 @@ void waitroom(void)
 			yy = 0;
 		}
 		Sleep(100);
-		
+
 	}
 }
 void usermain(void) {
 #ifdef SANGHO
-	makeroom();
+
 #endif
 #ifdef SOOHAN
 #endif
@@ -571,8 +571,8 @@ restart:
 					putchar(user.name[i++]);
 			}
 
-		//	GetCursorPos(&a);
-		//	SetCursorPos(a.x, a.y+1);
+			//	GetCursorPos(&a);
+			//	SetCursorPos(a.x, a.y+1);
 			click(&xx, &yy);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
@@ -993,10 +993,10 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 		ErrorHandling("connect() error");
 	_beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
-	sprintf(query, "player   connect %s" , username);
+	sprintf(query, "player   connect %s", username);
 	send(connect_sock, query, 30, 0);
 	Sleep(200);
-	
+
 	waitroom();
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
@@ -1617,21 +1617,21 @@ void jointema(void) {
 }
 void sendall(char *message) {
 
-		send(Sconnect_sock[0], message, 40, 0);
+	send(Sconnect_sock[0], message, 40, 0);
 	//	printf("Client 1 <- Server : %s\n", message);
-		if (Sconnect_sock[1] != 0) {
-			send(Sconnect_sock[1], message, 40, 0);
-	//		printf("Client 2 <- Server : %s\n", message);
-		}
-		if (Sconnect_sock[2] != 0) {
-			send(Sconnect_sock[2], message, 40, 0);
-	//		printf("Client 3 <- Server : %s\n", message);
-		}
-		if (Sconnect_sock[3] != 0) {
-			send(Sconnect_sock[3], message, 40, 0);
-	//		printf("Client 4 <- Server : %s\n", message);
-		}
-		
+	if (Sconnect_sock[1] != 0) {
+		send(Sconnect_sock[1], message, 40, 0);
+		//		printf("Client 2 <- Server : %s\n", message);
+	}
+	if (Sconnect_sock[2] != 0) {
+		send(Sconnect_sock[2], message, 40, 0);
+		//		printf("Client 3 <- Server : %s\n", message);
+	}
+	if (Sconnect_sock[3] != 0) {
+		send(Sconnect_sock[3], message, 40, 0);
+		//		printf("Client 4 <- Server : %s\n", message);
+	}
+
 }
 void Clnt_1(void) {
 	if (Sconnect_sock[1] != 0)
@@ -1647,7 +1647,7 @@ void Clnt_1(void) {
 			printf("Client 1 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '1';
-				
+
 			}
 			if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1659,7 +1659,10 @@ void Clnt_1(void) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 1 not ready %s", friendname[0]);
 			}
-			
+			else if (strcmp(message, "exit") == 0)
+			{
+				closesocket(Sconnect_sock[0]);
+			}
 		}
 		strcpy(querys[0], message);
 		sendall(message);
@@ -1673,13 +1676,13 @@ void Clnt_2(void) {
 		send(Sconnect_sock[1], querys[2], 40, 0);
 	if (Sconnect_sock[3] != 0)
 		send(Sconnect_sock[1], querys[3], 40, 0);
-//	printf("hello\n");
+	//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
 			printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
-				
+
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1703,15 +1706,15 @@ void Clnt_3(void) {
 	if (Sconnect_sock[3] != 0)
 		send(Sconnect_sock[2], querys[3], 40, 0);
 	char message[100];
-//	printf("hello\n");
+	//	printf("hello\n");
 	while (1) {
 
 		if (recv(Sconnect_sock[2], message, 40, 0) > 0) {
-	//		printf("Client 3 -> Server : %s\n", message);
+			//		printf("Client 3 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '3';
-				
+
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -1734,11 +1737,11 @@ void Clnt_4(void) {
 	if (Sconnect_sock[2] != 0)
 		send(Sconnect_sock[3], querys[2], 40, 0);
 	char message[100];
-//	printf("hello\n");
+	//	printf("hello\n");
 	while (1) {
 
 		if (recv(Sconnect_sock[3], message, 40, 0) > 0) {
-	//		printf("Client 4 -> Server : %s\n", message);
+			//		printf("Client 4 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '4';
 			}
@@ -1777,16 +1780,21 @@ void makeroom(int *count) {
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
 	while (1) {
-		Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-		if (Sconnect_sock[i] != 0) {
-			switch (i) {
-			case 0:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
-			case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
-			case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
-			case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
-			default: break;
+		for (i = 0; i < 4;) {
+			if (Sconnect_sock[i] == 0)
+				Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+			if (Sconnect_sock[i] != 0) {
+				switch (i) {
+				case 0:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
+				case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
+				case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
+				case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
+				default: break;
+				}
+				i++;
+				if (i == 4)
+					i = 0;
 			}
-			i++;
 		}
 	}
 }
@@ -1822,7 +1830,10 @@ void signalall(void)
 }
 void exitsignal(void)
 {
-
+	if (signalmode == 1)
+	{
+		send(connect_sock, "exit", 40, 0);
+	}
 }
 void gotoxy(short x, short y)
 {
