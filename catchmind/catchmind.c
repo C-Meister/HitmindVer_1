@@ -98,7 +98,7 @@ ROOM connectroom[6];
 char signalmode;
 char querys[10][100];
 bool lead = false;
-
+char SOCKETCOUNT = 0;
 
 
 //기본 함수들
@@ -165,6 +165,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 //	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
+	signalall();
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
@@ -174,7 +175,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다	지금 윈도우7버전
-	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
+//	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
@@ -306,7 +307,7 @@ void sqlmakeroom(MYSQL *cons) {
 		if (!(mysql_query(cons, query)))
 		{
 			cur(10, 1);
-			printf("(알수 없는 오류 중복이 안되게 만들어 주세요)");
+			printf("(알수 없는 오류. 중복이 안되게 만들어 주세요)");
 		}
 		disablecursor(1);
 		CLS;
@@ -1067,6 +1068,18 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[3] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
+			else if (strncmp("player 1 exit", message, 12) == 0) {
+				status[0] = 0;
+			}
+			else if (strncmp("player 2 exit", message, 12) == 0) {
+				status[1] = 0;
+			}
+			else if (strncmp("player 3 exit", message, 12) == 0) {
+				status[2] = 0;
+			}
+			else if (strncmp("player 4 exit", message, 12) == 0) {
+				status[3] = 0;
+			}
 			Sleep(100);
 		}
 
@@ -1620,7 +1633,8 @@ void jointema(void) {
 }
 void sendall(char *message) {
 
-	send(Sconnect_sock[0], message, 40, 0);
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[0], message, 40, 0);
 	//	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
 		send(Sconnect_sock[1], message, 40, 0);
@@ -1636,7 +1650,8 @@ void sendall(char *message) {
 	}
 
 }
-void Clnt_1(void) {
+void Clnt_1(void)
+{
 	if (Sconnect_sock[1] != 0)
 		send(Sconnect_sock[1], querys[1], 40, 0);
 	if (Sconnect_sock[2] != 0)
@@ -1664,7 +1679,10 @@ void Clnt_1(void) {
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
+				sprintf(message, "player 1 exit");
 				closesocket(Sconnect_sock[0]);
+				SOCKETCOUNT = 0;
+				Sconnect_sock[0] = 0;
 			}
 		}
 		strcpy(querys[0], message);
@@ -1695,6 +1713,13 @@ void Clnt_2(void) {
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 2 not ready %s", friendname[1]);
+			}
+			else if (strcmp(message, "exit") == 0)
+			{
+				sprintf(message, "player 2 exit");
+				SOCKETCOUNT = 1;
+				closesocket(Sconnect_sock[1]);
+				Sconnect_sock[1] = 0;
 			}
 			strcpy(querys[1], message);
 			sendall(message);
@@ -1727,6 +1752,13 @@ void Clnt_3(void) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 3 not ready %s", friendname[2]);
 			}
+			else if (strcmp(message, "exit") == 0)
+			{
+				sprintf(message, "player 3 exit");
+				SOCKETCOUNT = 2;
+				closesocket(Sconnect_sock[2]);
+				Sconnect_sock[2] = 0;
+			}
 			strcpy(querys[2], message);
 			sendall(message);
 		}
@@ -1756,6 +1788,13 @@ void Clnt_4(void) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 4 not ready %s", friendname[3]);
 			}
+			else if (strcmp(message, "exit") == 0)
+			{
+				sprintf(message, "player 4 exit");
+				SOCKETCOUNT = 3;
+				closesocket(Sconnect_sock[3]);
+				Sconnect_sock[3] = 0;
+			}
 			strcpy(querys[3], message);
 			sendall(message);
 		}
@@ -1783,21 +1822,21 @@ void makeroom(int *count) {
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
 	while (1) {
-		for (i = 0; i < 4;) {
-			if (Sconnect_sock[i] == 0)
-				Sconnect_sock[i] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-			if (Sconnect_sock[i] != 0) {
-				switch (i) {
+		for (SOCKETCOUNT = 0; SOCKETCOUNT < 4;) {
+			if (Sconnect_sock[SOCKETCOUNT] == 0)
+				Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+			if (Sconnect_sock[SOCKETCOUNT] != 0) {
+				switch (SOCKETCOUNT) {
 				case 0:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
 				case 1:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
 				case 2:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
 				case 3:_beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
 				default: break;
 				}
-				i++;
-				if (i == 4)
-					i = 0;
 			}
+			SOCKETCOUNT++;
+			if (SOCKETCOUNT == 4)
+				SOCKETCOUNT = 0;
 		}
 	}
 }
