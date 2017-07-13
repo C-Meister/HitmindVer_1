@@ -1149,7 +1149,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 		}
 		Sleep(100);
 	}
-	
+
 }
 int sqllogin(MYSQL *cons) {
 	char query[100];
@@ -1696,18 +1696,18 @@ void sendall(char *message) {
 	cur(0, 45);
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[0], message, 40, 0);
-			printf("Client 1 <- Server : %s\n", message);
+	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
 		send(Sconnect_sock[1], message, 40, 0);
-			printf("Client 2 <- Server : %s\n", message);
+		printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
 		send(Sconnect_sock[2], message, 40, 0);
-			printf("Client 3 <- Server : %s\n", message);
+		printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
 		send(Sconnect_sock[3], message, 40, 0);
-			printf("Client 4 <- Server : %s\n", message);
+		printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
 
@@ -1890,25 +1890,28 @@ void makeroom(int *count) {
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
 	while (1) {
-		for (SOCKETCOUNT = 0; SOCKETCOUNT < 4;) {
-			if (Sconnect_sock[SOCKETCOUNT] == 0)
-				Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-			if (Sconnect_sock[SOCKETCOUNT] != 0) {
-				switch (SOCKETCOUNT) {
-				case 0:threads[1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
-				case 1:threads[2] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
-				case 2:threads[3] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
-				case 3:threads[4] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
-				default: break;
-				}
-			}
+		if (Sconnect_sock[SOCKETCOUNT] == 0)
+			Sconnect_sock[SOCKETCOUNT++] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+		else
 			SOCKETCOUNT++;
-			if (SOCKETCOUNT == 4)
-				SOCKETCOUNT = 0;
+		if (SOCKETCOUNT == 4)
+			SOCKETCOUNT = 0;
+
+		if (Sconnect_sock[SOCKETCOUNT] == 1) {
+			switch (SOCKETCOUNT) {
+			case 0:threads[1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, NULL, 0, NULL); break;
+			case 1:threads[2] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_2, NULL, 0, NULL); break;
+			case 2:threads[3] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_3, NULL, 0, NULL); break;
+			case 3:threads[4] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
+			default: break;
+			}
 		}
+
 		Sleep(100);
 	}
+
 }
+
 IN_ADDR GetDefaultMyIP()
 {
 
