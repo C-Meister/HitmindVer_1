@@ -3166,9 +3166,11 @@ int SDL_MAINS(void)
 				}
 			}
 		}
-		if (happen == true)
+		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, Font, strong, r, g, b);
-		happen = false;
+			send(connect_sock, , sizeof(Renderer2), 0);
+		}
+			happen = false;
 	}
 	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
 	SDL_DestroyTexture(ChaTexture);
