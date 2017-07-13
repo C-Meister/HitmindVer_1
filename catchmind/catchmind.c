@@ -205,7 +205,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			Connect_Server(ServerIP);
 		}*/
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
-
+	con = cons;
 	mainchoose = maintitle();				//main 화면
 						//
 	while (1) {								//로그인 반복문
@@ -1740,9 +1740,10 @@ void Clnt_1(void)
 				cur(0, 0);
 				printf("%s", message);
 			}
-			strcpy(querys[0], message);
-			sendall(message);
+			
 		}
+		strcpy(querys[0], message);
+		sendall(message);
 	}
 }
 void Clnt_2(void) {
@@ -1777,9 +1778,10 @@ void Clnt_2(void) {
 				closesocket(Sconnect_sock[1]);
 				Sconnect_sock[1] = 0;
 			}
-			strcpy(querys[1], message);
-			sendall(message);
+			
 		}
+		strcpy(querys[1], message);
+		sendall(message);
 	}
 }
 void Clnt_3(void) {
@@ -1815,9 +1817,10 @@ void Clnt_3(void) {
 				closesocket(Sconnect_sock[2]);
 				Sconnect_sock[2] = 0;
 			}
-			strcpy(querys[2], message);
-			sendall(message);
+			
 		}
+		strcpy(querys[2], message);
+		sendall(message);
 	}
 }
 void Clnt_4(void) {
@@ -1851,9 +1854,10 @@ void Clnt_4(void) {
 				closesocket(Sconnect_sock[3]);
 				Sconnect_sock[3] = 0;
 			}
-			strcpy(querys[3], message);
-			sendall(message);
+			
 		}
+		strcpy(querys[3], message);
+		sendall(message);
 	}
 }
 void makeroom(int *count) {
@@ -1938,7 +1942,7 @@ void signalall(void)
 }
 void exitsignal(void)
 {
-	char query[50];
+	char query[100];
 	if (signalmode == 1)
 	{
 		send(connect_sock, "exit", 40, 0);
