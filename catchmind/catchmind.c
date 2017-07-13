@@ -1291,6 +1291,7 @@ restart:
 		printf("닉네임 적을때는 마우스 사용 불가능");
 		gotoxy(16, 3);
 		fgets(user.name, 13, stdin);
+		CHOP(user.name);
 		gotoxy(9, 13);
 		printf("                                       ");
 	}
@@ -1775,7 +1776,7 @@ int sqllogin(MYSQL *cons) {
 }
 int sqlsignup(MYSQL *cons) {
 	LOG user;
-	char query[100];
+	char query3[100];
 	char query2[100];
 	user = login(2);
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
@@ -1794,9 +1795,9 @@ int sqlsignup(MYSQL *cons) {
 			return -1;
 	}
 
-	sprintf(query, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
+	sprintf(query3, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
 
-	if (!(mysql_query(cons, query)))											//		 password는 mysql에서 지원하는 암호화 형식임.
+	if (!(mysql_query(cons, query3)))											//		 password는 mysql에서 지원하는 암호화 형식임.
 		return 1; //성공
 	else
 		return 0; //실패
