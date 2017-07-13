@@ -545,7 +545,7 @@ restart:
 	/*닉네임 생성*/
 	gotoxy(16, 3);
 	if (m == 2) {
-		while (1) {
+		/*while (1) {
 			if (_kbhit()) {
 
 				user.name[i] = _getch();
@@ -572,8 +572,8 @@ restart:
 					putchar(user.name[i++]);
 			}
 
-			//	GetCursorPos(&a);
-			//	SetCursorPos(a.x, a.y+1);
+			GetCursorPos(&a);
+			SetCursorPos(a.x, a.y);
 			click(&xx, &yy);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
@@ -596,8 +596,10 @@ restart:
 				}
 			}
 			Sleep(20);
-		}
+		}*/
+		fgets(user.name, 13, stdin);
 	}
+		
 	i = 0;
 	gotoxy(16, 5);
 	while (1) {
