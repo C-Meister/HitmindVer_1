@@ -496,7 +496,7 @@ void waitroom(void)
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			cur(0, 0);
 			printf("¾Æ%d  ", xx);
-			send(connect_sock, "player ready", 20, 0);
+			send(connect_sock, "player ready", 40, 0);
 		}
 		Sleep(100);
 		
