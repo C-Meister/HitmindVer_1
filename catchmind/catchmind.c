@@ -1732,7 +1732,7 @@ void Clnt_2(void) {
 	//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
-			printf("Client 2 -> Server : %s\n", message);
+			
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
 
@@ -1740,7 +1740,7 @@ void Clnt_2(void) {
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 2 ready %s", friendname[1]);
-				printf("Client 1 <- Server : %s\n", message);
+				
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
