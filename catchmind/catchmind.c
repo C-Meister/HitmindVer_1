@@ -20,7 +20,8 @@
 #include <conio.h>
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
-#include <iostream>
+//#include <iostream>
+#include <stdbool.h>
 #include <signal.h>
 //#include <WinSock2.h>		//소켓프로그래밍
 
@@ -29,7 +30,7 @@
 #include "SDL/SDL_image.h"
 
 #include "mysql/mysql.h"
-
+#define nullptr 0
 
 // 라이브러리 선언문 라이브러리파일은 따로 추가안해도 됩니다.
 // #pragma comment 는 visual studio에서만 사용 가능 *솔루션 플렛폼을 64비트로 해주세요
@@ -42,8 +43,8 @@
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
 //#define 정의문
 #define CLS system("cls")		//화면 지우기
-#define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동
-#define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
+//#define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동
+//#define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //커서이동(같음)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))		//색깔설정 X글자 Y 배경
 #define CHOP(x) x[strlen(x) - 1] = ' '	//fgets를 쓰면 엔터도 배열에남음. 엔터를 배열에서 삭제해주는것
 //색깔출력 쉬운버전 
@@ -86,7 +87,7 @@ typedef struct tagPOINT *LPPOINT;
 
 CRITICAL_SECTION cs;	//이벤트
 char message[100];		//소켓 프로그래밍 문자열
-int status[4];			//소켓용
+char status[4];			//소켓용
 char username[30];		//사용자 이름
 char friendname[4][30] = {"Player 1", "Player 2", "Player 3", "Player 4"};
 WSADATA wsaData;						//소켓 WSAStartup()함수에 쓰이는 변수
@@ -94,7 +95,14 @@ SOCKET connect_sock, Sconnect_sock[4], listen_sock;	//서버 소켓변수
 SOCKADDR_IN connect_addr, listen_addr;			//서버 주소정보 저장하는 변수
 int sockaddr_in_size;
 ROOM connectroom[6];
+char signalmode;
+bool lead = false;
+
+
+
 //기본 함수들
+void gotoxy(short x, short y);
+void cur(short x, short y);
 void exitsignal(void);
 void signalall(void);
 void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같음
@@ -154,7 +162,7 @@ void numberbaseball();
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	//변수 선언
-	InitializeCriticalSection(&cs);
+//	InitializeCriticalSection(&cs);
 	int i, j, k, v, result;
 	char mainchoose = 0;
 	char bangchoose;
@@ -212,6 +220,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					chooseroomcount = chooseroom(bangchoose);
 					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
 					{
+						CLS;
 						continue;
 					}
 					if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
@@ -307,6 +316,7 @@ void sqlmakeroom(MYSQL *cons) {
 		while (1) {
 			if (count == 1)
 			{
+				lead = true;
 				CLS;
 				Connect_Server(myip);
 				return;
@@ -318,6 +328,7 @@ void sqlmakeroom(MYSQL *cons) {
 }
 void waitroom(void)
 {
+	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
 	while (1) { //받아온 데이터 처리
 		
@@ -473,11 +484,21 @@ void waitroom(void)
 		printf("      ■                                                                                            ■\n");
 		printf("      ■                                                                                            ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                ■                                                        ■                ■\n");
-		printf("      ■                ■                                                        ■                ■\n");
-		printf("      ■                ■                                                        ■                ■\n");
+		printf("      ■                ■                                                        ■                ■\n");		// 4, 40		//11, 40		//42, 40		49, 40
+		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2)
+			printf("      ■     ready      ■                       Start!                           ■     exit       ■\n");
+		else
+			printf("      ■     ready      ■                                                        ■     exit       ■\n");
+		printf("      ■                ■                                                        ■                ■\n");		// 4, 42		//11, 42		//42, 42		49, 42
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		click(&xx, &yy);
+		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
+			cur(0, 0);
+			printf("아%d  ", xx);
+			send(connect_sock, "player ready", 20, 0);
+		}
 		Sleep(100);
+		
 	}
 }
 void usermain(void) {
@@ -821,7 +842,7 @@ char **onemysqlquery(MYSQL *cons, char *query) {		//mysql 명령어의 결과하나를 바
 }
 POINT MouseClick(void)			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
 {
-	int x, y;
+	POINT pos;
 	HANDLE       hIn, hOut;
 	DWORD        dwNOER;
 	INPUT_RECORD rec;
@@ -835,9 +856,9 @@ POINT MouseClick(void)			//마우스를 클릭하면 그 값을 바로 반환해주는 함수
 
 		if (rec.EventType == MOUSE_EVENT) {
 			if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) {
-				x = rec.Event.MouseEvent.dwMousePosition.X;
-				y = rec.Event.MouseEvent.dwMousePosition.Y;
-				return { x, y };
+				pos.x = rec.Event.MouseEvent.dwMousePosition.X;
+				pos.y = rec.Event.MouseEvent.dwMousePosition.Y;
+				return pos;
 			}
 		}
 	}
@@ -868,11 +889,10 @@ void ErrorHandling(char *Message) {
 	exit(1);
 }
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
-	std::cout << msg << " Error: " << SDL_GetError() << std::endl;
-	return;
+	printf("%s Error: %s\n", msg, SDL_GetError());
 }
 void IMG_ErrorLog(const char * msg) {//에러코드 출력 함수
-	std::cout << msg << " Error: " << IMG_GetError() << std::endl;
+	printf("%s Error: %s\n", msg, IMG_GetError());
 	return;
 }
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step) {// 예외 처리 함수
@@ -1038,7 +1058,7 @@ int sqllogin(MYSQL *cons) {
 		int check = 0;
 
 		user = login(1);							//login 함수를 사용
-		if (user.id[0] == NULL)
+		if (user.id[0] == 0)
 		{
 			fflush(stdin);
 			check = sqlsignup(cons);
@@ -1104,7 +1124,7 @@ int sqlsignup(MYSQL *cons) {
 	sql_result = mysql_store_result(cons);
 	if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
-		if (sql_row[0][1] != NULL)
+		if (sql_row[0][1] != 0)
 			return -1;
 	}
 
@@ -1603,6 +1623,10 @@ void Clnt_1(void) {
 
 				message[7] = '1';
 			}
+			else if (strcmp(message, "player ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				strcpy(message, "player 1 ready");
+			}
 			sendall(message);
 		}
 	}
@@ -1617,6 +1641,10 @@ void Clnt_2(void) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '2';
+			}
+			else if (strcmp(message, "player ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				strcpy(message, "player 2 ready");
 			}
 			sendall(message);
 		}
@@ -1633,6 +1661,10 @@ void Clnt_3(void) {
 
 				message[7] = '3';
 			}
+			else if (strcmp(message, "player ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				strcpy(message, "player 3 ready");
+			}
 			sendall(message);
 		}
 	}
@@ -1647,6 +1679,10 @@ void Clnt_4(void) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '4';
+			}
+			else if (strcmp(message, "player ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				strcpy(message, "player 4 ready");
 			}
 			sendall(message);
 		}
@@ -1712,8 +1748,22 @@ IN_ADDR GetDefaultMyIP()
 void signalall(void)
 {
 	signal(SIGINT, (_crt_signal_t)exitsignal);
+	signal(SIGBREAK, (_crt_signal_t)exitsignal);
+	signal(SIGILL, (_crt_signal_t)exitsignal);
+	signal(SIGFPE, (_crt_signal_t)exitsignal);
+	signal(SIGSEGV, (_crt_signal_t)exitsignal);
 }
 void exitsignal(void)
 {
 
+}
+void gotoxy(short x, short y)
+{
+	COORD pos = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
+void cur(short x, short y)
+{
+	COORD pos = { x, y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
