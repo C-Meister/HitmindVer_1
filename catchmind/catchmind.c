@@ -332,7 +332,7 @@ void waitroom(void)
 {
 	int xx = 0, yy = 0;
 	ConsoleL(100, 50);
-	
+	int mode = 0;
 
 	while (1) { //받아온 데이터 처리
 		gotoxy(0, 3);
@@ -497,8 +497,14 @@ void waitroom(void)
 		click(&xx, &yy);
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			cur(0, 0);
-			printf("아%d  ", xx);
-			send(connect_sock, "player ready", 40, 0);
+			if (mode == 0) {
+				mode = 1;
+				send(connect_sock, "player ready", 40, 0);
+			}
+			else if (mode == 1) {
+				mode = 0;
+				send(connect_sock, "player not ready", 40, 0);
+			}
 			xx = 0;
 			yy = 0;
 		}
@@ -1015,37 +1021,46 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp("player 4 connect", message, 15) == 0) {
 				sscanf(message, "player 4 connect %s", friendname[3]);
+				status[3] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 1 ready") == 0) {
+			if (strncmp("player 1 ready", message, 13) == 0) {
+				sscanf(message, "player 1 ready %s", friendname[0]);
 				status[0] = 2;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 2 ready") == 0) {
+			else if (strncmp("player 2 ready", message, 13) == 0) {
+				sscanf(message, "player 2 ready %s", friendname[1]);
 				status[1] = 2;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 3 ready") == 0) {
+			else if (strncmp("player 3 ready", message, 13) == 0) {
+				sscanf(message, "player 3 ready %s", friendname[2]);
 				status[2] = 2;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 4 ready") == 0) {
+			else if (strncmp("player 4 ready", message, 13) == 0) {
+				sscanf(message, "player 4 ready %s", friendname[3]);
 				status[3] = 2;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 1 not ready") == 0) {
+			if (strncmp("player 1 not ready", message, 16) == 0) {
+				sscanf(message, "player 1 not ready %s", friendname[0]);
 				status[0] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 2 not ready") == 0) {
+			else if (strncmp("player 2 not ready", message, 16) == 0) {
+				sscanf(message, "player 2 not ready %s", friendname[1]);
 				status[1] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 3 not ready") == 0) {
+			else if (strncmp("player 3 not ready", message, 16) == 0) {
+				sscanf(message, "player 3 not ready %s", friendname[2]);
 				status[2] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strcmp(message, "player 4 not ready") == 0) {
+			else if (strncmp("player 4 not ready", message, 16) == 0) {
+				sscanf(message, "player 4 not ready %s", friendname[3]);
 				status[3] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
@@ -1635,8 +1650,14 @@ void Clnt_1(void) {
 				
 			}
 			if (strcmp(message, "player ready") == 0) {
-			//	ZeroMemory(message, sizeof(message));
-				strcpy(message, "player 1 ready");
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player 1 ready %s", friendname[0]);
+				cur(0, 1);
+				printf("Client 1 <- Server : %s\n", message);
+			}
+			else if (strcmp(message, "player not ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player 1 not ready %s", friendname[0]);
 			}
 			
 		}
@@ -1655,14 +1676,19 @@ void Clnt_2(void) {
 //	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
-			//printf("Client 2 -> Server : %s\n", message);
+			printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
 				
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				strcpy(message, "player 2 ready");
+				sprintf(message, "player 2 ready %s", friendname[1]);
+				printf("Client 1 <- Server : %s\n", message);
+			}
+			else if (strcmp(message, "player not ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player 2 not ready %s", friendname[1]);
 			}
 			strcpy(querys[1], message);
 			sendall(message);
@@ -1689,7 +1715,11 @@ void Clnt_3(void) {
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				strcpy(message, "player 3 ready");
+				sprintf(message, "player 3 ready %s", friendname[2]);
+			}
+			else if (strcmp(message, "player not ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player 3 not ready %s", friendname[2]);
 			}
 			strcpy(querys[2], message);
 			sendall(message);
@@ -1714,7 +1744,11 @@ void Clnt_4(void) {
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				strcpy(message, "player 4 ready");
+				sprintf(message, "player 4 ready %s", friendname[3]);
+			}
+			else if (strcmp(message, "player not ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player 4 not ready %s", friendname[3]);
 			}
 			strcpy(querys[3], message);
 			sendall(message);
