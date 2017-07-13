@@ -246,8 +246,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
 
-						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);
-						if (serverreturn == 3) {
+						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);		//서버 대기방 접속
+						if (serverreturn == 3) {											//return값 3이면 종료 버튼
 							exitallthread();
 							if (lead == true)
 								closesocket(listen_sock);
@@ -255,11 +255,12 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 								closesocket(connect_sock);
 							continue;
 						}
-						if (serverreturn == 1)
+						if (serverreturn == 1)												//리턴값 1이면 start
 						{
 							CLS;
 							printf("시작!");
-							Sleep(100);
+							Sleep(1000);
+							getchar();
 						}
 						break;
 					}
@@ -533,9 +534,11 @@ int waitroom(void)
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
-			if (xx > 13 && xx < 41 && yy < 43 && yy > 39)
+			if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
 				send(connect_sock, "game start", 40, 0);
-			return 1;
+				
+			}
+			
 		}
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			if (mode == 0 && togl == -1)
@@ -1696,9 +1699,11 @@ void Clnt_1(void)
 			{
 				cur(0, 0);
 				printf("%s", message);
+				sendall(message);
 			}
 			strcpy(querys[0], message);
 			sendall(message);
+			ZeroMemory(message, sizeof(message));
 		}
 		Sleep(100);
 	}
@@ -1897,9 +1902,9 @@ void signalall(void)
 {
 	signal(SIGINT, (_crt_signal_t)exitsignal);
 	signal(SIGBREAK, (_crt_signal_t)exitsignal);
-	signal(SIGILL, (_crt_signal_t)exitsignal);
-	signal(SIGFPE, (_crt_signal_t)exitsignal);
-	signal(SIGSEGV, (_crt_signal_t)exitsignal);
+//	signal(SIGILL, (_crt_signal_t)exitsignal);
+//	signal(SIGFPE, (_crt_signal_t)exitsignal);
+//	signal(SIGSEGV, (_crt_signal_t)exitsignal);
 }
 void exitsignal(void)
 {
