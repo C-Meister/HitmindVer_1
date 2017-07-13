@@ -285,12 +285,9 @@ void sqlmakeroom(MYSQL *cons) {
 					myroom.password[i - 1] = 0;
 					myroom.password[i--] = 0;
 				}
-				else if (myroom.password[i] == 13 && i > 3) {
-					myroom.password[i] = 0;
-					break;
-				}
 				else if (myroom.password[i] == 13) {
 					myroom.password[i] = 0;
+					break;
 				}
 				else if (i >= 15) {
 					continue;
@@ -494,6 +491,9 @@ void waitroom(void)
 			printf("      ¡á     ready      ¡á                                                        ¡á     exit       ¡á\n");
 		printf("      ¡á                ¡á                                                        ¡á                ¡á\n");		// 4, 42		//11, 42		//42, 42		49, 42
 		printf("      ¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
+		POINT a;
+		GetCursorPos(&a);
+		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 			cur(0, 0);
