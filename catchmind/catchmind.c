@@ -751,7 +751,15 @@ typedef struct {
 }ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
-
+struct {
+	bool eraser;
+	bool pencil;
+}clicks = { false,false };
+struct on {
+	bool eraser;
+	bool pencil;
+	bool new;
+}on = { false,false,false };
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
@@ -805,13 +813,17 @@ void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
 void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
-void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수			//그래픽에러코드 출력 함수
+void SDL_ErrorLog(const char * msg);//에러코드 출력 함수			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step);	 // 그래픽예외 처리 함수
 void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 이미지예외 처리 함수
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
-void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h);	//텍스쳐를 출력하는 함수 선언
+void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//텍스쳐를 출력하는 함수 선언
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect Font, float strong, int r, int g, int b);	//랜더러를 올리는 함수
+void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect Font, SDL_Rect Track, float strong, int r, int g, int b);
+void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
+void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
@@ -1593,38 +1605,6 @@ void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
 void IMG_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, IMG_GetError());
 	return;
-}
-void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step) {// 예외 처리 함수
-	SDL_ErrorLog(msg);//에러코드 출력
-	switch (step) {
-	case 3:
-		SDL_DestroyRenderer(Renderer);// SDL 렌더러 파괴
-	case 2:
-		SDL_DestroyWindow(Window);//SDL 윈도우 파괴
-	case 1:
-		SDL_Quit();//SDL 종료
-		getchar();//에러코드 확인하기 위해 콘솔창 대기
-		return;
-	}
-}
-void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
-	SDL_DestroyRenderer(Renderer);// SDL 렌더러 파괴
-	SDL_DestroyWindow(Window);//SDL 윈도우 파괴
-	SDL_Quit();//SDL 종료
-	getchar();//에러코드 확인하기 위해 콘솔창 대기
-	return;
-}
-void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, int w, int h) {//텍스쳐를 출력하는 함수 선언
-	SDL_Rect Src;// 직사각형 선언
-	Src.x = 0;// 직사각형의 왼쪽위 꼭짓점의 x좌표초기화
-	Src.y = 0;// 직사각형의 왼쪽위 꼭짓점의 y좌표초기화
-	SDL_QueryTexture(Texture, NULL, NULL, &Src.w, &Src.h); // Texture의 너비와 높이 정보를 Src.w, Src.h에 저장
-	SDL_Rect Dst;
-	Dst.x = x;//매개변수x를 왼쪽위 꼭짓점의 x좌표에 대입
-	Dst.y = y;//매개변수y를 왼쪽위 꼭짓점의 y좌표에 대입
-	Dst.w = w;//매개변수w를 직사각형의 너비에 대입
-	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
-	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
 int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	char query[100];
