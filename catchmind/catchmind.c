@@ -995,7 +995,6 @@ void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 }
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
-	Sleep(1000);
 	while (1) {
 
 		if (recv(connect_sock, message, 40, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
@@ -1672,11 +1671,11 @@ void Clnt_2(void) {
 }
 void Clnt_3(void) {
 	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[1], querys[0], 40, 0);
+		send(Sconnect_sock[2], querys[0], 40, 0);
 	if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[1], querys[1], 40, 0);
+		send(Sconnect_sock[2], querys[1], 40, 0);
 	if (Sconnect_sock[3] != 0)
-		send(Sconnect_sock[1], querys[3], 40, 0);
+		send(Sconnect_sock[2], querys[3], 40, 0);
 	char message[100];
 //	printf("hello\n");
 	while (1) {
@@ -1686,24 +1685,24 @@ void Clnt_3(void) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 
 				message[7] = '3';
-				strcpy(querys[2], message);
+				
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 3 ready");
 			}
-			strcpy(querys[1], message);
+			strcpy(querys[2], message);
 			sendall(message);
 		}
 	}
 }
 void Clnt_4(void) {
 	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[1], querys[0], 40, 0);
+		send(Sconnect_sock[3], querys[0], 40, 0);
 	if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[1], querys[1], 40, 0);
+		send(Sconnect_sock[3], querys[1], 40, 0);
 	if (Sconnect_sock[2] != 0)
-		send(Sconnect_sock[1], querys[2], 40, 0);
+		send(Sconnect_sock[3], querys[2], 40, 0);
 	char message[100];
 //	printf("hello\n");
 	while (1) {
@@ -1711,15 +1710,13 @@ void Clnt_4(void) {
 		if (recv(Sconnect_sock[3], message, 40, 0) > 0) {
 	//		printf("Client 4 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
-
 				message[7] = '4';
-				strcpy(querys[3], message);
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				strcpy(message, "player 4 ready");
 			}
-			strcpy(querys[1], message);
+			strcpy(querys[3], message);
 			sendall(message);
 		}
 	}
