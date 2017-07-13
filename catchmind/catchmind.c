@@ -1705,7 +1705,7 @@ void Clnt_1(void)
 			sendall(message);
 			ZeroMemory(message, sizeof(message));
 		}
-		Sleep(100);
+	//	Sleep(100);
 	}
 }
 void Clnt_2(void) {
