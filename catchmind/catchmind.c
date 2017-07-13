@@ -825,7 +825,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
-int SDL_MAIN(void);
+int SDL_MAINS(void);
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
@@ -1212,7 +1212,7 @@ int waitroom(void)
 				cur(0, 1);
 				printf("%d초후 시작", 3 - i);
 			}
-			SQL_MAIN();
+			SDL_MAINS();
 
 		}
 		POINT a;
@@ -2718,7 +2718,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
-int SDL_MAIN(void)
+int SDL_MAINS(void)
 {
 	SDL_Window * Window;//SDL 윈도우 선언
 	SDL_Renderer * Renderer;// SDL 렌더러 선언
