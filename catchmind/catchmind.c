@@ -272,7 +272,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 }
 
 
-
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void sqlmakeroom(MYSQL *cons) {
 	while (1) {
@@ -565,7 +564,6 @@ int waitroom(void)
 	Sleep(100);
 
 }
-
 void usermain(void) {
 #ifdef SANGHO
 
