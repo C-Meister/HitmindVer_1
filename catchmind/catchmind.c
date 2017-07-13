@@ -100,8 +100,8 @@ char signalmode;
 char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
-
 MYSQL *con;
+
 
 //기본 함수들
 void gotoxy(short x, short y);
@@ -112,13 +112,12 @@ void ConsoleL(int x, int y);					//콘솔창의 크기를 설정하는 함수 x y의 너비가 같
 POINT MouseClick(void);							//마우스를 클릭하면 그 값을 바로 반환해주는 함수 반환값은 POINT이다 (x, y)
 void disablecursor(bool a);						//커서 보이기, 숨기기  0 = 보이기 1 = 숨기기
 void usermain(void);
-
 //--------------------- 네트워크 함수들 -----------------------------------
 void ErrorHandling(char *Message);				//소켓 에러 출력 하는 함수
-int Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
+void Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
 void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);					//하나를받으면 전부전송
-int waitroom(void);							//네트워크 대기방
+void waitroom(void);							//네트워크 대기방
 void Clnt_1(void);								//서버 - 클라이언트 1통신
 void Clnt_2(void);								//서버 - 클라이언트 2통신
 void Clnt_3(void);								//서버 - 클라이언트 3통신
@@ -206,7 +205,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			Connect_Server(ServerIP);
 		}*/
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
-	con = cons;
+
 	mainchoose = maintitle();				//main 화면
 						//
 	while (1) {								//로그인 반복문
@@ -347,7 +346,7 @@ void sqlmakeroom(MYSQL *cons) {
 	}
 	disablecursor(0);
 }
-int waitroom(void)
+void waitroom(void)
 {
 	int xx = 0, yy = 0;
 	int togl = -1;
@@ -525,11 +524,7 @@ int waitroom(void)
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy);
 		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
-			if (mode == 0 && togl == -1)
-				togl *= -1;
-			else if (mode == 1 && togl == 1)
-				togl *= -1;
-			else if (mode == 0) {
+			if (mode == 0) {
 				mode = 1;
 				send(connect_sock, "player ready", 40, 0);
 			}
@@ -542,14 +537,7 @@ int waitroom(void)
 			yy = 0;
 		}
 		if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
-			if (lead == true)
-			{
-				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));			//내 ip받아서 처리	
-				mysql_query(con, query);
-			}
 			send(connect_sock, "player exit", 40, 0);
-		//	Sleep(500);
-			
 			return 3;
 		}
 		xx = 0;
@@ -557,7 +545,7 @@ int waitroom(void)
 	}
 	Sleep(100);
 
-}
+	}
 
 void usermain(void) {
 #ifdef SANGHO
@@ -585,66 +573,51 @@ restart:
 		logintema();
 	else if (m == 2)
 		jointema();
-	LOG user = { 0, 0 };
+	LOG user = { 0, 0, 0 };
 	int i = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0;
 	/*닉네임 생성*/
-	gotoxy(16, 3);
+	
 	if (m == 2) {
-		/*while (1) {
+		while (1) {
 			if (_kbhit()) {
 
-				user.name[i] = _getch();
-				if (user.name[i] == 8) {
-					if (i == 0) {
-						user.name[0] = 0;
-						continue;
-					}
-					printf("\b \b");
-					user.name[i - 1] = 0;
-					user.name[i--] = 0;
-				}
-				else if ((user.name[i] == 9 || user.name[i] == 13)) {
-					user.name[i] = 0;
-					break;
-				}
-				else if (i >= 15) {
-					continue;
-				}
-				else if (!((user.name[i] >= '0' && user.name[i] <= '9') || (user.name[i] >= 'a' && user.name[i] <= 'z') || (user.name[i] >= 'A' && user.name[i] <= 'Z'))) {
-					user.name[i] = 0;
-				}
-				else
-					putchar(user.name[i++]);
+				user.name[i++] = _getch();
+
+				gotoxy(16, 3);
+				printf("                    ");
+				gotoxy(16, 3);
+				printf("%s", user.name);
+
 			}
+			else {
+				GetCursorPos(&a);
+				SetCursorPos(a.x, a.y);
+				click(&xx, &yy);
 
-			GetCursorPos(&a);
-			SetCursorPos(a.x, a.y);
-			click(&xx, &yy);
-			//gotoxy(20,20);
-			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
+				if (9 <= yy && yy <= 11) {
 
-			if (9 <= yy && yy <= 11) {
-				if (1 <= xx && xx <= 7) {
-					system("start https://blog.naver.com/dgsw102");
-					system("start https://blog.naver.com/soohan530");
-				}
-				else if (n < 1)
-					n++;
-				else if (9 <= xx && xx <= 15) {
-					for (i = 0; i <= 15; i++) {
-						user.name[i] = 0;
+					if (1 <= xx && xx <= 7) {
+						system("start https://blog.naver.com/dgsw102");
+						system("start https://blog.naver.com/soohan530");
 					}
-					return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
-				}
-				else if (17 <= xx && xx <= 23) {
-					goto restart;
+					else if (n < 1)
+						n++;
+					else if (9 <= xx && xx <= 15) {
+						for (i = 0; i <= 15; i++) {
+							user.name[i] = 0;
+						}
+						return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+					}
+					else if (17 <= xx && xx <= 23) {
+						goto restart;
+					}
 				}
 			}
 			Sleep(20);
-		}*/
-		fgets(user.name, 13, stdin);
+		}
+
 	}
 
 	i = 0;
@@ -678,29 +651,31 @@ restart:
 			else
 				putchar(user.id[i++]);
 		}
-		GetCursorPos(&a);
-		SetCursorPos(a.x, a.y);
-		click(&xx, &yy);
-		//gotoxy(20,20);
-		//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
+		else {
+			GetCursorPos(&a);
+			SetCursorPos(a.x, a.y);
+			click(&xx, &yy);
+			//gotoxy(20,20);
+			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
 
-		if (9 <= yy && yy <= 11) {
-			if (1 <= xx && xx <= 7) {
-				system("start https://blog.naver.com/dgsw102");
-				system("start https://blog.naver.com/soohan530");
-			}
-			else if (n < 1)
-				n++;
-			else if (9 <= xx && xx <= 15) {
-				for (i = 0; i <= 15; i++) {
-					user.id[i] = 0;
-					user.pass[i] = 0;
-					user.name[i] = 0;
+			if (9 <= yy && yy <= 11) {
+				if (1 <= xx && xx <= 7) {
+					system("start https://blog.naver.com/dgsw102");
+					system("start https://blog.naver.com/soohan530");
 				}
-				return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
-			}
-			else if (17 <= xx && xx <= 23) {
-				goto restart;
+				else if (n < 1)
+					n++;
+				else if (9 <= xx && xx <= 15) {
+					for (i = 0; i <= 15; i++) {
+						user.id[i] = 0;
+						user.pass[i] = 0;
+						user.name[i] = 0;
+					}
+					return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+				}
+				else if (17 <= xx && xx <= 23) {
+					goto restart;
+				}
 			}
 		}
 		Sleep(20);
@@ -740,32 +715,34 @@ restart:
 				i++;
 			}
 		}
-		GetCursorPos(&a);
-		SetCursorPos(a.x, a.y);
-		click(&xx, &yy);
+		else {
+			GetCursorPos(&a);
+			SetCursorPos(a.x, a.y);
+			click(&xx, &yy);
 
-		if (9 <= yy && yy <= 11) {
-			if (1 <= xx && xx <= 7) {
-				system("start https://blog.naver.com/dgsw102");
-				system("start https://blog.naver.com/soohan530");
-			}
-			else if (9 <= xx && xx <= 15) {
-				for (i = 0; i <= 15; i++) {
-					user.id[i] = 0;
-					user.pass[i] = 0;
-					user.name[i] = 0;
+			if (9 <= yy && yy <= 11) {
+				if (1 <= xx && xx <= 7) {
+					system("start https://blog.naver.com/dgsw102");
+					system("start https://blog.naver.com/soohan530");
 				}
-				break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+				else if (9 <= xx && xx <= 15) {
+					for (i = 0; i <= 15; i++) {
+						user.id[i] = 0;
+						user.pass[i] = 0;
+						user.name[i] = 0;
+					}
+					break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+				}
+				else if (17 <= xx && xx <= 23) {
+					goto restart;
+				}
 			}
-			else if (17 <= xx && xx <= 23) {
-				goto restart;
+			else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
+				break;
 			}
-		}
-		else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
-			break;
-		}
-		else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
-			break;
+			else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+				break;
+			}
 		}
 
 
@@ -1033,7 +1010,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, int x, int y, 
 	Dst.h = h;//매개변수h를 직사각형의 높이에 대입
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 }
-int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
+void Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	char query[100];
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
@@ -1279,9 +1256,6 @@ void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
 
 	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
-
-
-
 	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
 
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
@@ -1297,6 +1271,7 @@ void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 			*yy = 0;
 		}
 	}
+
 
 }
 void banglist(MYSQL *cons) {
@@ -1704,7 +1679,6 @@ void Clnt_1(void)
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
-			cur(0, 0);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '1';
 
@@ -1740,6 +1714,7 @@ void Clnt_2(void) {
 	//	printf("hello\n");
 	while (1) {
 		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
+			printf("Client 2 -> Server : %s\n", message);
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = '2';
 
@@ -1747,6 +1722,7 @@ void Clnt_2(void) {
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player 2 ready %s", friendname[1]);
+				printf("Client 1 <- Server : %s\n", message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
