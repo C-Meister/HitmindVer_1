@@ -596,65 +596,16 @@ restart:
 	int i = 0, j = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0;
-	TCHAR buff;
-	char buff2 = 0;
-	TCHAR buffer[100] = { 0, };
 	/*닉네임 생성*/
-	gotoxy(16, 3);
+	
 	if (m == 2) {
-		while (1) {
-			if (_kbhit()) {
-				buff = _getch();
-				if (buff == 13)
-					break;
-				else if (buff == 8 && i != 0) {
-					buffer[i--] = 0;
-				}
-				else
-				{
-					if (buff == buff2)
-						i++;
-					buffer[i++] = buff;
-					buffer[i + 1] = 0;
-					buff = buff2;
-				}
-				buff = 0;
-
-				gotoxy(16, 3);
-				printf("            ");
-				gotoxy(16, 3);
-				printf("%ls", buffer);
-			}
-			else {
-				GetCursorPos(&a);
-				SetCursorPos(a.x, a.y);
-				click(&xx, &yy);
-
-				if (9 <= yy && yy <= 11) {
-
-					if (1 <= xx && xx <= 7) {
-						system("start https://blog.naver.com/dgsw102");
-						system("start https://blog.naver.com/soohan530");
-					}
-					else if (n < 1)
-						n++;
-					else if (9 <= xx && xx <= 15) {
-						for (i = 0; i <= 15; i++) {
-							user.name[i] = 0;
-						}
-						return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
-					}
-					else if (17 <= xx && xx <= 23) {
-						goto restart;
-					}
-				}
-			}
-			Sleep(20);
-		}
-
+		gotoxy(9, 13);
+		printf("닉네임 적을때는 마우스 사용 불가능");
+		gotoxy(16, 3);
+		fgets(user.name, 13, stdin);
+		gotoxy(9, 13);
+		printf("                                       ");
 	}
-
-	i = 0;
 	gotoxy(16, 5);
 	while (1) {
 		if (_kbhit()) {
