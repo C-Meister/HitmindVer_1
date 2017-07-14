@@ -560,9 +560,7 @@ int waitroom(void)
 		}
 		
 		gotoxy(51, 41);
-		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1)
-			printf("start!");
-		else
+		if (!(lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1))
 			printf("          ");
 			
 		
@@ -615,6 +613,38 @@ int waitroom(void)
 			}
 			xx = 0;
 			yy = 0;
+		}
+		else if (lr == 0) {
+			if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
+				if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
+					gotoxy(51, 41);
+					HIGH_GREEN printf("start!");
+				}
+				else {
+					gotoxy(51, 41);
+					WHITE printf("start!");
+				}
+
+			}
+			else if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
+				gotoxy(13, 41);
+				HIGH_GREEN printf("ready");
+				gotoxy(89, 41);
+				WHITE printf("exit");
+			}
+			else if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
+				gotoxy(89, 41);
+				HIGH_GREEN printf("exit");
+				gotoxy(13, 41);
+				WHITE printf("ready");
+			}
+			else {
+				gotoxy(13, 41);
+				WHITE printf("ready");
+				gotoxy(89, 41);
+				WHITE printf("exit");
+			}
+			WHITE
 		}
 	}
 	Sleep(50);
