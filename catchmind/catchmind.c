@@ -838,7 +838,7 @@ LOG login(int m);								//기본적인 로그인 입력
 
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
-void click(int *xx, int *yy);					//클릭함수 두번째, xx값과 yy값을 변환함
+void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
 
 //--------------------------미니게임 숫자야구 함수들----------------------
 void createainumber(int *ainum);
@@ -1028,7 +1028,7 @@ void sqlmakeroom(MYSQL *cons) {
 int waitroom(void)
 {
 	disablecursor(1);
-	int xx = 0, yy = 0;
+	int xx = 0, yy = 0, lr = 0;
 	int togl = -1;
 	ConsoleL(100, 50);
 	char query[100] = { 0, };
@@ -1216,37 +1216,39 @@ int waitroom(void)
 		POINT a;
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
-		click(&xx, &yy);
-		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
-			if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
-				send(connect_sock, "game start", 40, 0);
-				xx = 0; yy = 0;
+		click(&xx, &yy, &lr);
+		if (lr == 1) {
+			if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
+				if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
+					send(connect_sock, "game start", 40, 0);
+					xx = 0; yy = 0;
+				}
+
 			}
-			
-		}
-		if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
-			if (mode == 0 && togl == -1)
-				togl *= -1;
-			else if (mode == 1 && togl == 1)
-				togl *= -1;
-			else if (mode == 0) {
-				mode = 1;
-				send(connect_sock, "player ready", 40, 0);
+			if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
+				if (mode == 0 && togl == -1)
+					togl *= -1;
+				else if (mode == 1 && togl == 1)
+					togl *= -1;
+				else if (mode == 0) {
+					mode = 1;
+					send(connect_sock, "player ready", 40, 0);
+				}
+				else if (mode == 1) {
+					mode = 0;
+					send(connect_sock, "player not ready", 40, 0);
+				}
+				Sleep(100);
+				xx = 0;
+				yy = 0;
 			}
-			else if (mode == 1) {
-				mode = 0;
-				send(connect_sock, "player not ready", 40, 0);
+			if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
+				send(connect_sock, "player exit", 40, 0);
+				return 3;
 			}
-			Sleep(100);
 			xx = 0;
 			yy = 0;
 		}
-		if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
-			send(connect_sock, "player exit", 40, 0);
-			return 3;
-		}
-		xx = 0;
-		yy = 0;
 	}
 	Sleep(100);
 
@@ -1279,7 +1281,7 @@ restart:
 	LOG user = { 0, 0, 0 };
 	int i = 0, j = 0;
 	int cnt = 0;
-	int xx = 0, yy = 0;
+	int xx = 0, yy = 0, lr = 0;
 	/*닉네임 생성*/
 	disablecursor(0);
 	if (m == 2) {
@@ -1326,27 +1328,28 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click(&xx, &yy);
+			click(&xx, &yy, &lr);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
-
-			if (9 <= yy && yy <= 11) {
-				if (1 <= xx && xx <= 7) {
-					system("start https://blog.naver.com/dgsw102");
-					system("start https://blog.naver.com/soohan530");
-				}
-				else if (n < 1)
-					n++;
-				else if (9 <= xx && xx <= 15) {
-					for (i = 0; i <= 15; i++) {
-						user.id[i] = 0;
-						user.pass[i] = 0;
-						user.name[i] = 0;
+			if (lr == 1) {
+				if (9 <= yy && yy <= 11) {
+					if (1 <= xx && xx <= 7) {
+						system("start https://blog.naver.com/dgsw102");
+						system("start https://blog.naver.com/soohan530");
 					}
-					return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
-				}
-				else if (17 <= xx && xx <= 23) {
-					goto restart;
+					else if (n < 1)
+						n++;
+					else if (9 <= xx && xx <= 15) {
+						for (i = 0; i <= 15; i++) {
+							user.id[i] = 0;
+							user.pass[i] = 0;
+							user.name[i] = 0;
+						}
+						return user; //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+					}
+					else if (17 <= xx && xx <= 23) {
+						goto restart;
+					}
 				}
 			}
 		}
@@ -1390,30 +1393,32 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click(&xx, &yy);
+			click(&xx, &yy, &lr);
 
-			if (9 <= yy && yy <= 11) {
-				if (1 <= xx && xx <= 7) {
-					system("start https://blog.naver.com/dgsw102");
-					system("start https://blog.naver.com/soohan530");
-				}
-				else if (9 <= xx && xx <= 15) {
-					for (i = 0; i <= 15; i++) {
-						user.id[i] = 0;
-						user.pass[i] = 0;
-						user.name[i] = 0;
+			if (lr == 1) {
+				if (9 <= yy && yy <= 11) {
+					if (1 <= xx && xx <= 7) {
+						system("start https://blog.naver.com/dgsw102");
+						system("start https://blog.naver.com/soohan530");
 					}
-					break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+					else if (9 <= xx && xx <= 15) {
+						for (i = 0; i <= 15; i++) {
+							user.id[i] = 0;
+							user.pass[i] = 0;
+							user.name[i] = 0;
+						}
+						break;  //함수를 끝내고 제로값이 도착하면 알아서 걸러내길
+					}
+					else if (17 <= xx && xx <= 23) {
+						goto restart;
+					}
 				}
-				else if (17 <= xx && xx <= 23) {
-					goto restart;
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
+					break;
 				}
-			}
-			else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
-				break;
-			}
-			else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
-				break;
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+					break;
+				}
 			}
 		}
 
@@ -1835,21 +1840,21 @@ void mainatitleimage(void) {
 int maintitle(void) { //게임 메인타이틀 출력
 	ConsoleL(100, 60);
 	disablecursor(true);
-	int xx = 0, yy = 0;
+	int xx = 0, yy = 0, lr = 0;
 	mainatitleimage();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
 
-		click(&xx, &yy);
+		click(&xx, &yy, &lr);
 
-		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25)
+		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr ==1)
 			return 1;
 
 		gotoxy(0, 0);
 	}
 	CLS;
 }
-void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
+void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 
 	HANDLE       hIn, hOut;
 	DWORD        dwNOER;
@@ -1863,18 +1868,18 @@ void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 
 	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
 	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
+		int mouse_x = rec.Event.MouseEvent.dwMousePosition.X; // X값 받아옴
+		int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y; // Y값 받아옴
+
+		*xx = mouse_x / 2;
+		*yy = mouse_y;
 
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
-			int mouse_x = rec.Event.MouseEvent.dwMousePosition.X; // X값 받아옴
-			int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y; // Y값 받아옴
-
-			*xx = mouse_x / 2;
-			*yy = mouse_y;
+			*lr = 1;
 			Sleep(100);
 		}
 		else {
-			*xx = 0;
-			*yy = 0;
+			*lr = 0;
 		}
 	}
 
@@ -1943,7 +1948,7 @@ void banglist(MYSQL *cons) {
 }
 int bangchose(MYSQL *cons) {
 
-	int xx = 0, yy = 0;
+	int xx = 0, yy = 0, lr = 0;
 	POINT a;
 	while (1) {
 		banglist(cons);
@@ -1952,25 +1957,26 @@ int bangchose(MYSQL *cons) {
 
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
-		click(&xx, &yy);
+		click(&xx, &yy, &lr);
 
-		if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
-			return 0;
-		else if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
-			return 1;
-		else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
-			return 2;
-		else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//방 2
-			return 3;
-		else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//방 3
-			return 4;
-		else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//방 4
-			return 5;
-		else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//방 5
-			return 6;
-		else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//방 6
-			return 7;
-
+		if (lr == 1) {
+			if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
+				return 0;
+			else if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
+				return 1;
+			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
+				return 2;
+			else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//방 2
+				return 3;
+			else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//방 3
+				return 4;
+			else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//방 4
+				return 5;
+			else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//방 5
+				return 6;
+			else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//방 6
+				return 7;
+		}
 		Sleep(50);
 
 	}
