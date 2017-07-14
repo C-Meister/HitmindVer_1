@@ -165,12 +165,14 @@ int SDL_MAINS(void);
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
-void banglist(MYSQL *cons,int j);						//게임 방 출력
+void banglist(MYSQL *cons, int j);						//게임 방 출력
 int bangchose(MYSQL *cons);						//게임 방 출력및 선택
 int chooseroom(int roomnum);
+void waitroomtema();
 void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
+void zeroprint(int xx, int yy, int lr, int m);  //디자인
 
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
@@ -188,7 +190,7 @@ void numberbaseball();
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
-	
+
 	//SDL_MAIN();
 	//변수 선언
 	int i, j, k, v, result;
@@ -218,7 +220,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 	con = cons;
-	
+
 	disablecursor(1);
 	while (1) {								//로그인 반복문
 		mainchoose = maintitle();				//main 화면
@@ -227,7 +229,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			ConsoleL(30, 30);
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
-			
+
 			ConsoleL(50, 20);
 			while (1) {						//방 반복문
 				gotoxy(0, 0);
@@ -306,7 +308,7 @@ void inserttopic(MYSQL *cons)
 		{
 			printf("%s : %s\n", sql_row[0], sql_row[1]);
 			num = atoi(sql_row[0]);
-			
+
 		}
 		num++;
 		getchar();
@@ -318,7 +320,7 @@ void inserttopic(MYSQL *cons)
 		{
 			break;
 		}
-		
+
 		sprintf(query, "insert into catchmind.topic (top) values ('%s')", topic);
 		mysql_query(cons, query);
 	}
@@ -336,7 +338,7 @@ void sqlmakeroom(MYSQL *cons) {
 		ROOM myroom = { 0, 0, 0 };
 		disablecursor(0);
 		WHITE
-		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+			printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■                                              ■\n");
 		printf("■            캐치마인드 방 만들기              ■\n");
 		printf("■          내 ip :  %s \n", myip);
@@ -407,7 +409,7 @@ void sqlmakeroom(MYSQL *cons) {
 }
 void waitroomtema() {
 	WHITE
-	gotoxy(0, 3);
+		gotoxy(0, 3);
 	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("      ■                                                                                            ■\n");
 	printf("      ■                                                                                            ■\n");
@@ -464,50 +466,50 @@ int waitroom(void)
 		signalmode = 1;
 	waitroomtema();
 	while (1) { //받아온 데이터 처리
-		
-	
+
+
 		cur(11, 5);
 		printf("[ %s ]             ", friendname[0]);
 		if (status[0] == 0) {
 
 			GRAY
-			gotoxy(24, 7);
+				gotoxy(24, 7);
 			printf("DISCONNECTED            ");
 			WHITE
 		}
 		else if (status[0] == 1) {
 			HIGH_GREEN
-			gotoxy(24, 7);
+				gotoxy(24, 7);
 			printf("JOIN               ");
 			WHITE
 		}
 		if (status[0] == 2) {
 			SKY_BLUE
-			gotoxy(24, 7);
+				gotoxy(24, 7);
 			printf("READY             ");
 			WHITE
 		}
-		
+
 
 		cur(11, 14);
 		printf("[ %s ]             ", friendname[1]);
 		if (status[1] == 0) {
 			GRAY
 
-			gotoxy(24, 16);
+				gotoxy(24, 16);
 			printf("DISCONNECTED                  ");
 			WHITE
 		}
 		else if (status[1] == 1) {
 			HIGH_GREEN
 
-			gotoxy(24, 16);
+				gotoxy(24, 16);
 			printf("JOIN                 ");
 			WHITE
 		}
 		if (status[1] == 2) {
 			SKY_BLUE
-			gotoxy(24, 16);
+				gotoxy(24, 16);
 			printf("READY                ");
 			WHITE
 		}
@@ -516,50 +518,50 @@ int waitroom(void)
 		printf("[ %s ]          ", friendname[2]);
 		if (status[2] == 0) {
 			GRAY
-			gotoxy(24, 25);
+				gotoxy(24, 25);
 			printf("DISCONNECTED              ");
 			WHITE
 		}
 		else if (status[2] == 1) {
 			HIGH_GREEN
-			gotoxy(24, 25);
+				gotoxy(24, 25);
 			printf("JOIN                  ");
 			WHITE
 		}
 		if (status[2] == 2) {
 			SKY_BLUE
-			gotoxy(24, 25);
+				gotoxy(24, 25);
 			printf("READY              ");
 			WHITE
 		}
-		
+
 		cur(11, 32);
 		printf("[ %s ]             ", friendname[3]);
 		if (status[3] == 0) {
 			GRAY
-			gotoxy(24, 34);
+				gotoxy(24, 34);
 			printf("DISCONNECTED        ");
 			WHITE
 		}
 		else if (status[3] == 1) {
 			HIGH_GREEN
-			gotoxy(24, 34);
+				gotoxy(24, 34);
 			printf("JOIN                 ");
 			WHITE
 		}
 		if (status[3] == 2) {
 			SKY_BLUE
-			gotoxy(24, 34);
+				gotoxy(24, 34);
 			printf("READY                ");
 			WHITE
 		}
-		
+
 		gotoxy(51, 41);
 		if (!(lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1))
 			printf("          ");
-			
-		
-		
+
+
+
 		if (status[0] == 10)
 		{
 			status[0] = 2;
@@ -665,6 +667,75 @@ void usermain(void) {
 #endif
 	exit(1);
 }
+void zeroprint(int xx, int yy, int lr, int m) {
+	disablecursor(1);
+	if (9 <= yy && yy <= 11) {
+		if (1 <= xx && xx <= 7) {
+			gotoxy(3, 10);
+			HIGH_GREEN printf("개발자사이트");
+			WHITE
+
+				if (m == 2) {
+					gotoxy(22, 10);
+					printf("나가기");
+				}
+				else {
+					gotoxy(21, 10);
+					printf("회원가입");
+				}
+				gotoxy(38, 10);
+				printf("초기화");
+		}
+		else if (9 <= xx && xx <= 15) {
+
+			HIGH_GREEN
+
+				if (m == 2) {
+					gotoxy(22, 10);
+					printf("나가기");
+				}
+				else {
+					gotoxy(21, 10);
+					printf("회원가입");
+				}
+				WHITE
+					gotoxy(3, 10);
+				printf("개발자사이트");
+				gotoxy(38, 10);
+				printf("초기화");
+		}
+		else if (17 <= xx && xx <= 23) {
+			gotoxy(38, 10);
+			HIGH_GREEN printf("초기화");
+			WHITE
+				gotoxy(3, 10);
+			printf("개발자사이트");
+			if (m == 2) {
+				gotoxy(22, 10);
+				printf("나가기");
+			}
+			else {
+				gotoxy(21, 10);
+				printf("회원가입");
+			}
+		}
+	}
+	else {
+		WHITE
+			gotoxy(3, 10);
+		printf("개발자사이트");
+		if (m == 2) {
+			gotoxy(22, 10);
+			printf("나가기");
+		}
+		else {
+			gotoxy(21, 10);
+			printf("회원가입");
+		}
+		gotoxy(38, 10);
+		printf("초기화");
+	}
+}
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 	int to = -1;
@@ -676,7 +747,7 @@ restart:
 	gotoxy(0, 0);
 	if (m == 1)
 		logintema();
-		
+
 	LOG user = { 0, 0, 0 };
 	int i = 0, j = 0;
 	int cnt = 0;
@@ -756,79 +827,12 @@ restart:
 				}
 			}
 			else if (lr == 0) {
-				disablecursor(1);
-				if (9 <= yy && yy <= 11) {
-					if (1 <= xx && xx <= 7) {
-						gotoxy(3, 10);
-						HIGH_GREEN printf("개발자사이트");
-						WHITE
-						
-						if (m == 2) {
-							gotoxy(22, 10);
-							printf("나가기");
-						}
-						else {
-							gotoxy(21, 10);
-							printf("회원가입");
-						}
-						gotoxy(38, 10);
-						printf("초기화");
-					}
-					else if (n < 1)
-						n++;
-					else if (9 <= xx && xx <= 15) {
-						
-						HIGH_GREEN 
-						
-						if (m == 2) {
-							gotoxy(22, 10);
-							printf("나가기");
-						}
-						else {
-							gotoxy(21, 10);
-							printf("회원가입");
-						}
-						WHITE
-							gotoxy(3, 10);
-						printf("개발자사이트");
-						gotoxy(38, 10);
-						printf("초기화");
-					}
-					else if (17 <= xx && xx <= 23) {
-						gotoxy(38, 10);
-						HIGH_GREEN printf("초기화");
-						WHITE
-						gotoxy(3, 10);
-						printf("개발자사이트");
-						if (m == 2) {
-							gotoxy(22, 10);
-							printf("나가기");
-						}
-						else {
-							gotoxy(21, 10);
-							printf("회원가입");
-						}
-					}
-				}
-				else {
-					WHITE
-					gotoxy(3, 10);
-					printf("개발자사이트");
-					if (m == 2) {
-						gotoxy(22, 10);
-						printf("나가기");
-					}
-					else {
-						gotoxy(21, 10);
-						printf("회원가입");
-					}
-					gotoxy(38, 10);
-					printf("초기화");
-				}
+				zeroprint(xx, yy, lr, m);
 			}
+			gotoxy(16 + i, 5);
+			disablecursor(0);
 		}
-		gotoxy(16+i, 5);
-		disablecursor(0);
+
 		Sleep(20);
 	}
 	i = 0;
@@ -907,59 +911,33 @@ restart:
 				}
 			}
 			else if (lr == 0) {
-				disablecursor(1);
-				if (9 <= yy && yy <= 11) {
-					if (1 <= xx && xx <= 7) {
+				if (9 <= yy && yy <= 11)
+					zeroprint(xx, yy, lr, m);
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
+					HIGH_GREEN
+						gotoxy(41, 6);
+					printf("login");
+					WHITE
 						gotoxy(3, 10);
-						HIGH_GREEN printf("개발자사이트");
-						WHITE
+					printf("개발자사이트");
 
-							if (m == 2) {
-								gotoxy(22, 10);
-								printf("나가기");
-							}
-							else {
-								gotoxy(21, 10);
-								printf("회원가입");
-							}
-							gotoxy(38, 10);
-							printf("초기화");
-					}
-					else if (n < 1)
-						n++;
-					else if (9 <= xx && xx <= 15) {
+					gotoxy(21, 10);
+					printf("회원가입");
 
-						HIGH_GREEN
-
-							if (m == 2) {
-								gotoxy(22, 10);
-								printf("나가기");
-							}
-							else {
-								gotoxy(21, 10);
-								printf("회원가입");
-							}
-							WHITE
-								gotoxy(3, 10);
-							printf("개발자사이트");
-							gotoxy(38, 10);
-							printf("초기화");
-					}
-					else if (17 <= xx && xx <= 23) {
-						gotoxy(38, 10);
-						HIGH_GREEN printf("초기화");
-						WHITE
-							gotoxy(3, 10);
-						printf("개발자사이트");
-						if (m == 2) {
-							gotoxy(22, 10);
-							printf("나가기");
-						}
-						else {
-							gotoxy(21, 10);
-							printf("회원가입");
-						}
-					}
+					gotoxy(38, 10);
+					printf("초기화");
+				}
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+					HIGH_GREEN
+						gotoxy(39, 5);
+					printf("회원가입");
+					WHITE
+						gotoxy(3, 10);
+					printf("개발자사이트");
+					gotoxy(22, 10);
+					printf("나가기");
+					gotoxy(38, 10);
+					printf("초기화");
 				}
 				else {
 					WHITE
@@ -968,22 +946,29 @@ restart:
 					if (m == 2) {
 						gotoxy(22, 10);
 						printf("나가기");
+						gotoxy(39, 5);
+						printf("회원가입");
 					}
 					else {
 						gotoxy(21, 10);
 						printf("회원가입");
+						gotoxy(41, 6);
+						printf("login");
 					}
 					gotoxy(38, 10);
 					printf("초기화");
+
 				}
 			}
-		gotoxy(16 + i, 7);
-		disablecursor(0);
+			gotoxy(16 + i, 7);
+			disablecursor(0);
 		}
-
-
 		Sleep(20);
 	}
+
+
+
+
 	disablecursor(1);
 	return user;
 }
@@ -1275,7 +1260,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				SDL_Clear = false;
 			}
 		}
-	//	Sleep(100);
+		//	Sleep(100);
 	}
 
 }
@@ -1369,23 +1354,23 @@ int sqlsignup(MYSQL *cons) {
 }
 void mainatitleimage(void) {
 	WHITE
-	gotoxy(6, 3);
-	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");gotoxy(6, 4);
-	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■");gotoxy(6, 5);
-	printf("                ■      ■■■■■      ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■");gotoxy(6, 6);
-	printf("      ■■■    ■      ■              ■      ■  ■■      ■■■    ■      ■■■■■      ■      ■       ■■■  ■      ■");gotoxy(6, 7);
-	printf("    ■      ■  ■      ■■■■■      ■      ■  ■                                          ■  ■  ■   ■    ■    ■■    ■");gotoxy(6, 8);
-	printf("    ■      ■  ■                      ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■");gotoxy(6, 9);
+		gotoxy(6, 3);
+	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
+	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■"); gotoxy(6, 5);
+	printf("                ■      ■■■■■      ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■"); gotoxy(6, 6);
+	printf("      ■■■    ■      ■              ■      ■  ■■      ■■■    ■      ■■■■■      ■      ■       ■■■  ■      ■"); gotoxy(6, 7);
+	printf("    ■      ■  ■      ■■■■■      ■      ■  ■                                          ■  ■  ■   ■    ■    ■■    ■"); gotoxy(6, 8);
+	printf("    ■      ■  ■                      ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■"); gotoxy(6, 9);
 	printf("      ■■■    ■    ■■■■■■■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
-	
-	
+
+
 	gotoxy(12, 20);
-	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");gotoxy(12, 21);
-	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 22);
-	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 23);
-	printf("■  게임 시작   ■                      ■   주제 추가  ■                      ■              ■");gotoxy(12, 24);
-	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 25);
-	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 26);
+	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■"); gotoxy(12, 21);
+	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 22);
+	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 23);
+	printf("■  게임 시작   ■                      ■   주제 추가  ■                      ■              ■"); gotoxy(12, 24);
+	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 25);
+	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
 int maintitle(void) { //게임 메인타이틀 출력
@@ -1396,13 +1381,13 @@ int maintitle(void) { //게임 메인타이틀 출력
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
 		WHITE
-		click(&xx, &yy, &lr);
+			click(&xx, &yy, &lr);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
 			gotoxy(16, 23);
 			HIGH_GREEN printf("게임 시작");
 		}
-		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr ==1)
+		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 1)
 			return 1;
 		else if (27 <= xx && xx <= 33 && 21 <= yy && yy <= 25 && lr == 0)
 		{
@@ -1459,7 +1444,7 @@ void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 }
 void bangtema() {
 	WHITE
-	printf("\n"); //좌표값때문에 한칸 밀어냄
+		printf("\n"); //좌표값때문에 한칸 밀어냄
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
 	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n");
@@ -1534,14 +1519,14 @@ void banglist(MYSQL *cons, int j) {
 			cur(25, 7 + (i * 2));
 		else
 			cur(55, 7 + ((i / 2) * 4));
-		
+
 		if (j == i) {
 			HIGH_GREEN printf("%-7s", sql_row[1]);
 		}
 		else {
 			WHITE printf("%-7s", sql_row[1]);
 		}
-		
+
 		strcpy(connectroom[i].ip, sql_row[0]);
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
@@ -1623,7 +1608,7 @@ int bangchose(MYSQL *cons) {
 				gotoxy(58, 2);
 				printf("빠른시작");
 			}
-			
+
 		}
 		Sleep(50);
 
@@ -1638,7 +1623,7 @@ int chooseroom(int roomnum) {
 		return -1;
 	CLS;
 	WHITE
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■              캐치마인드 방 접속              ■\n");
 	printf("■          접속 ip :  %s\n", connectroom[roomnum].ip);
@@ -1883,7 +1868,7 @@ void aicheck(int(*aiall)[10][10], int(*aire)[100], int t) {
 }
 void logintema(void) {
 	WHITE
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            히트마인드 서버에 로그인          ■\n");
 	printf("■\n");
@@ -1901,7 +1886,7 @@ void logintema(void) {
 }
 void jointema(void) {
 	WHITE
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■  회원가입 : 닉네임은 공백 특수문자 안됩니다  ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■    닉네임  □                    □          ■\n");
@@ -1918,24 +1903,24 @@ void jointema(void) {
 void sendall(char *message) {
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[0], message, 45, 0);
-//	printf("Client 1 <- Server : %s\n", message);
+	//	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
 		send(Sconnect_sock[1], message, 45, 0);
-//		printf("Client 2 <- Server : %s\n", message);
+		//		printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
 		send(Sconnect_sock[2], message, 45, 0);
-//		printf("Client 3 <- Server : %s\n", message);
+		//		printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
 		send(Sconnect_sock[3], message, 45, 0);
-//		printf("Client 4 <- Server : %s\n", message);
+		//		printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
 
 }
 void processclnt(void) {
-	
+
 }
 void Clnt_1(int v)
 {
@@ -1955,7 +1940,7 @@ void Clnt_1(int v)
 		send(Sconnect_sock[v], querys[3], 40, 0);
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[v], querys[0], 40, 0);*/
-	
+
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
@@ -1966,12 +1951,12 @@ void Clnt_1(int v)
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d ready %s",v + 1, friendname[i]);
+				sprintf(message, "player %d ready %s", v + 1, friendname[i]);
 				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d not ready %s",v + 1,  friendname[i]);
+				sprintf(message, "player %d not ready %s", v + 1, friendname[i]);
 				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "exit") == 0)
@@ -1989,11 +1974,11 @@ void Clnt_1(int v)
 				printf("%s", message);
 				sendall(message);
 			}
-			
+
 			sendall(message);
 			ZeroMemory(message, sizeof(message));
 		}
-	//	Sleep(100);
+		//	Sleep(100);
 	}
 }
 void makeroom(int *count) {
@@ -2018,9 +2003,9 @@ void makeroom(int *count) {
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
 	while (1) {
-		if (Sconnect_sock[SOCKETCOUNT] == 0){
+		if (Sconnect_sock[SOCKETCOUNT] == 0) {
 			Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-			threads[SOCKETCOUNT+1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, (int *)SOCKETCOUNT, 0, NULL);
+			threads[SOCKETCOUNT + 1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, (int *)SOCKETCOUNT, 0, NULL);
 		}
 		else {
 			SOCKETCOUNT++;
@@ -2084,9 +2069,9 @@ void signalall(void)
 {
 	signal(SIGINT, (_crt_signal_t)exitsignal);
 	signal(SIGBREAK, (_crt_signal_t)exitsignal);
-//	signal(SIGILL, (_crt_signal_t)exitsignal);
-//	signal(SIGFPE, (_crt_signal_t)exitsignal);
-//	signal(SIGSEGV, (_crt_signal_t)exitsignal);
+	//	signal(SIGILL, (_crt_signal_t)exitsignal);
+	//	signal(SIGFPE, (_crt_signal_t)exitsignal);
+	//	signal(SIGSEGV, (_crt_signal_t)exitsignal);
 }
 void exitsignal(void)
 {
@@ -2143,7 +2128,7 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
 	return;
 }
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks) {
-	if (clicks== true)
+	if (clicks == true)
 		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 64);// 클릭했을 경우는 더진한 파랑
 	else
 		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 8);// 마우스가 올려져 있을 경우는 좀 연한 파랑
@@ -2270,7 +2255,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 	return;
 }
-void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, int x, int y, float strong, int r, int g, int b) {
+void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, int r, int g, int b) {
 	if (SDL_Clear == true) {
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
@@ -2288,7 +2273,7 @@ void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, 
 		else if (eraser == true && drag == false) {
 			strong *= 80 / 50.0;
 			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
-			int x1, y1, x2, y2,l;
+			int x1, y1, x2, y2, l;
 			ReceiveRect.x = x;
 			ReceiveRect.y = y;// 굵기만큼의 사각형을 만듬
 			for (l = 0; l < 180; l++) {
@@ -2320,9 +2305,9 @@ void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, 
 			}
 			return;
 		}
-		else if (eraser == true && drag == true){
+		else if (eraser == true && drag == true) {
 			strong *= 80 / 50.0;
-			float i = 0, j = 0, k = 0,l=0, xpos = 0, ypos = 0;
+			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
 			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
 			i = (x - ReceiveRect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
@@ -2477,7 +2462,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	RgbCode.h /= 4;
 	RgbCode.h *= (1);
 	RgbCode.x = 5 * (1);// 이미지의 x,y좌표와 너비와 높이 설정
-	RgbCode.y = 1080 * (1) - RgbCode.h - 10* (1);
+	RgbCode.y = 1080 * (1) - RgbCode.h - 10 * (1);
 	// 끝
 	// Track 이미지
 	TraTexture = LoadTextureEx(Renderer, "Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
@@ -2487,7 +2472,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		IMG_ExceptionRoutine(Renderer3, Window3);
 		return 0;
 	}
-	
+
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//이미지 정보 불러오기
 	Track.w /= 4;
 	Track.w *= (1);
@@ -2523,8 +2508,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
 	Pencil.w /= 15;
 	Pencil.h /= 15;
-	Pencil.x = Track.x + 50  + 40;
-	Pencil.y = Track.y - 30-Pencil.h;
+	Pencil.x = Track.x + 50 + 40;
+	Pencil.y = Track.y - 30 - Pencil.h;
 	// 끝
 	// Eraser 이미지
 	EraTexture = LoadTexture(Renderer, "Eraser.jpg"); // 이미지 불러오기
@@ -2536,7 +2521,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	}
 	Eraser.w = Pencil.w;
 	Eraser.h = Pencil.h;
-	Eraser.x =Pencil.x + 50 * (1) + 30*(1);;
+	Eraser.x = Pencil.x + 50 * (1) + 30 * (1);;
 	Eraser.y = Pencil.y;
 	// 끝
 	// New 이미지
@@ -2551,7 +2536,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	New.h = Eraser.h;
 	New.x = Eraser.x + 50 * (1) + 30 * (1);
 	New.y = Eraser.y;
-	
+
 	// 끝
 	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
 	bool quit = false;//불 변수 선언
@@ -2749,7 +2734,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							clicks.pencil = false;
 							happen = true;
 						}
-						
+
 						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
 							Font.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
 							Font.h += 2;
@@ -2773,7 +2758,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 
 							happen = true;
 							// 여기~~~~~~~~~
-							
+
 							break;
 						}
 						else if (clicks.eraser == true) {
@@ -2839,10 +2824,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
-			
+
 		}
 		happen = false;
-		
+
 	}
 	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
 	SDL_DestroyTexture(ChaTexture);
