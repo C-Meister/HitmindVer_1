@@ -2280,6 +2280,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
 	float i = 0, j = 0, k = 0, l = 0, length = 0;// for¹®¿¡¼­ ¾µ º¯¼ö¼±¾ð
+	int newclick = 0;
 	float xpos = 0, ypos = 0;// ¸¶¿ì½º xÁÂÇ¥ yÁÂÇ¥¸¦ ÀúÀåÇÏ´Â º¯¼ö¼±¾ð 
 	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// ±½±âÀÇ ¼±¾ð
 	SDL_Rect Rect = { 0 }; // ±×¸± »ç°¢ÇüÀÇ º¯¼ö¸¦ ¹Ýº¹¹® ¹Û¿¡¼­ ¼±¾ð
@@ -2441,16 +2442,18 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							clicks.pencil = false;
 							happen = true;
 						}
-						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {
+						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 							SDL_RenderClear(Renderer2);
 							Font.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
 							Font.h += 2;
+							newclick = 1;
 							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = false;
 							happen = true;
 						}
+						
 						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
 							Font.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
 							Font.h += 2;
@@ -2530,7 +2533,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 			printf("happen is true!!!\n");
 			if (connect_sock != 0) {
-				sprintf(query, "%d %d %d %d %d %d %d %d %d", on.eraser, on.pencil, on.new, x, y, strong, r, g, b);
+				sprintf(query, "%d %d %d %d %d %f %f %f %f", clicks.eraser,clicks.pencil, newclick, x, y, strong, r, g, b);
+				if (newclick == 1)
+					newclick = 0;
 				send(connect_sock, query, 256, 0);
 			}
 		}
