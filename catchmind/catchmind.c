@@ -1333,6 +1333,7 @@ void banglist(MYSQL *cons, int j) {
 		else {
 			WHITE printf("%-7s", sql_row[1]);
 		}
+		memset(connectroom, 0, sizeof(connectroom));
 		strcpy(connectroom[i].ip, sql_row[0]);
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
