@@ -31,6 +31,7 @@
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
+#include "SDL/sdl_ttf"
 //#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #define nullptr 0
@@ -41,7 +42,9 @@
 #pragma comment (lib, "SDL2")			//그래픽 라이브러리 1
 #pragma comment (lib, "SDL2main")		//그래픽 라이브러리 2
 #pragma comment (lib, "SDL2_image")		//그래픽 라이브러리 3
+
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
+
 
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
