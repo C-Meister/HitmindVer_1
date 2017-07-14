@@ -1903,23 +1903,27 @@ void gotoxy(short x, short y)
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-}/*
+}
 void rooprender(SDL_Renderer *Renderer2)
 {
-	char click_eraser, click_pencil, dragging;
+	char click_eraser, click_pencil;
+	char dragging;
 	int x, y;
-	float strong, r, g, b;
+	float strong;
+	int rr, gg, bb;
 	int buff = 0;
+	CLS;
 	while (1) {
-		if (buff <= SDLCLOCK) {
+		if (buff < SDLCLOCK) {
 			buff++;
-			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &r, &g, &b);
-			//		printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
-			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
+			sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &rr, &gg, &bb);
+			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, (float)rr, (float)gg, (float)bb);
 		}
+
 	}
 
-}*/
+}
 void cur(short x, short y)
 {
 	COORD pos = { x, y };
@@ -2371,29 +2375,29 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Rect Rect = { 0 }; // 그릴 사각형의 변수를 반복문 밖에서 선언
 	SDL_Rect Font = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// 색깔, 굵기등을 보여주기 위한 사각형 변수 선언
 	SDL_Rect Edge = { 0 };// 테두리를 그리기 위한 사각형 변수 선언 
-						  // 끝
+	char click_eraser, click_pencil;
+	char dragging;
+	int xxx, yyy;
+	float strong;
+	int rr, gg, bb;
+	int buff = 0;		  // 끝
 						  // while문에서 쓸 변수의 초기값 설정
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// 렌더러에 저장하기
 												  // 변수 초기값 설정끝
-	if (lead == false)
-	{
-		char click_eraser, click_pencil;
-		char dragging;
-		int rr, gg, bb;
-		int buff = 0;
+//	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
+
+	while (!quit) {// quit가 true가 아닐때 동안 무한반복
+		
 		CLS;
-		SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
-		while (1) {
+	
 			if (buff < SDLCLOCK) {
 				buff++;
-				sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &rr, &gg, &bb);
+				sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &strong, &rr, &gg, &bb);
 				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, (float)rr, (float)gg, (float)bb);
+				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, strong, (float)rr, (float)gg, (float)bb);
 			}
 
-		}
-	}
-	while (!quit) {// quit가 true가 아닐때 동안 무한반복
+		
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
 			case SDL_WINDOWEVENT://SDL종료 타입일 경우
