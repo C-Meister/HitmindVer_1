@@ -23,9 +23,9 @@
 #include <windows.h>
 #include <process.h>		//process 멀티쓰레드용
 #include <winapifamily.h>
-//#include <iostream>
 #include <stdbool.h>
 #include <signal.h>
+#include <stdint.h>
 //#include <WinSock2.h>		//소켓프로그래밍
 
 //특수 헤더파일 (따로 설치) 
@@ -2268,6 +2268,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	New.h = Eraser.h;
 	New.x = Eraser.x + 50 + 30;
 	New.y = Eraser.y;
+	TTF_Font *defaultFont = TTF_OpenFont("C:\\WINDOWS\\Fonts\\HYSNRL.TTF", 36);
+	TTF_SetFontStyle(defaultFont, TTF_STYLE_NORMAL | TTF_STYLE_UNDERLINE);
+	wchar_t str[50] = L"한글 폰트";
+	SDL_Color white = { 0xFF,0xFF,0xFF,0 };
+	SDL_Surface *surfaceText = TTF_RenderUNICODE_Blended(defaultFont, str, white);
+	SDL_Rect textrect = { 4,4,surfaceText->w,surfaceText->h };
+	
 	// 끝
 	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
 	bool quit = false;//불 변수 선언
@@ -2492,6 +2499,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					drag = false;// 드래그로 하는 모든 것을 불가능하게 만듦
 			}
 		}
+
 		SDL_GetMouseState(&x, &y);
 		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser안에 마우스가 있을때
 			if (on.eraser == false && clicks.eraser == false) // 그전까지는 마우스가 올려져있지않고 지우개가 활성화되지않았을때
