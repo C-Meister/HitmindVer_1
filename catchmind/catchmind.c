@@ -407,6 +407,59 @@ void sqlmakeroom(MYSQL *cons) {
 	}
 	disablecursor(0);
 }
+void waitroomtema() {
+	WHITE
+	gotoxy(0, 3);
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■   [ STATUS ] : ");
+	gotoxy(100, 7);
+	printf("■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■   [ STATUS ] : ");
+	gotoxy(100, 16);
+	printf("■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■   [ STATUS ] : ");
+	gotoxy(100, 25);
+	printf("■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n"); //92
+	printf("      ■   [ STATUS ] : ");
+	gotoxy(100, 34);
+	printf("■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■                                                                                            ■\n");
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■                ■                                                        ■                ■\n");		// 4, 40		//11, 40		//42, 40		49, 40
+	
+	printf("      ■                ■                                                        ■                ■\n");		// 4, 42		//11, 42		//42, 42		49, 42
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+}
 int waitroom(void)
 {
 	disablecursor(1);
@@ -419,14 +472,10 @@ int waitroom(void)
 		signalmode = 2;
 	else
 		signalmode = 1;
+	waitroomtema();
 	while (1) { //받아온 데이터 처리
-		gotoxy(0, 3);
-		WHITE
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
+		
+		
 		cur(11, 5);
 		printf("[ %s ]", friendname[0]);
 		if (status[0] == 0) {
@@ -454,17 +503,7 @@ int waitroom(void)
 			printf("READY");
 			WHITE
 		}
-		gotoxy(100, 7);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
+		
 		cur(11, 14);
 		printf("[ %s ]", friendname[1]);
 		if (status[1] == 0) {
@@ -491,17 +530,7 @@ int waitroom(void)
 			printf("READY");
 			WHITE
 		}
-		gotoxy(100, 16);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■   [ STATUS ] : ");
+		
 		cur(11, 23);
 		printf("[ %s ]", friendname[2]);
 		if (status[2] == 0) {
@@ -528,17 +557,7 @@ int waitroom(void)
 			printf("READY");
 			WHITE
 		}
-		gotoxy(100, 25);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n"); //92
-		printf("      ■   [ STATUS ] : ");
+		
 		cur(11, 32);
 		printf("[ %s ]", friendname[3]);
 		if (status[3] == 0) {
@@ -565,21 +584,15 @@ int waitroom(void)
 			printf("READY");
 			WHITE
 		}
-		gotoxy(100, 34);
-		printf("■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■                                                                                            ■\n");
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
-		printf("      ■                ■                                                        ■                ■\n");		// 4, 40		//11, 40		//42, 40		49, 40
+		
+		
 		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
 			printf("      ■     ready      ■                       Start!                           ■     exit       ■\n");
 		}
 		else
 			printf("      ■     ready      ■                                                        ■     exit       ■\n");
-		printf("      ■                ■                                                        ■                ■\n");		// 4, 42		//11, 42		//42, 42		49, 42
-		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+		
+		
 		if (status[0] == 10)
 		{
 			status[0] = 2;
@@ -1732,7 +1745,6 @@ void jointema(void) {
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
 void sendall(char *message) {
-	cur(0, 45);
 	if (Sconnect_sock[0] != 0)
 		send(Sconnect_sock[0], message, 256, 0);
 //	printf("Client 1 <- Server : %s\n", message);
