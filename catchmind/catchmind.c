@@ -803,9 +803,6 @@ void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);					//하나를받으면 전부전송
 int waitroom(void);							//네트워크 대기방
 void Clnt_1(int v);								//서버 - 클라이언트 1통신
-void Clnt_2(void);								//서버 - 클라이언트 2통신
-void Clnt_3(void);								//서버 - 클라이언트 3통신
-void Clnt_4(void);								//서버 - 클라이언트 4통신
 void makeroom(int *count);							//방만들기(네트워크)
 IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
 bool exitallthread(void);
@@ -2346,120 +2343,6 @@ void Clnt_1(int v)
 			ZeroMemory(message, sizeof(message));
 		}
 	//	Sleep(100);
-	}
-}
-void Clnt_2(void) {
-	char message[100];
-	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[1], querys[0], 40, 0);
-	if (Sconnect_sock[2] != 0)
-		send(Sconnect_sock[1], querys[2], 40, 0);
-	if (Sconnect_sock[3] != 0)
-		send(Sconnect_sock[1], querys[3], 40, 0);
-	//	printf("hello\n");
-	while (1) {
-		if (recv(Sconnect_sock[1], message, 40, 0) > 0) {
-
-			if (strncmp(message, "player   connect", 16) == 0) {
-				message[7] = '2';
-
-			}
-			else if (strcmp(message, "player ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 2 ready %s", friendname[1]);
-
-			}
-			else if (strcmp(message, "player not ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 2 not ready %s", friendname[1]);
-			}
-			else if (strcmp(message, "exit") == 0)
-			{
-				sprintf(message, "player 2 exit");
-				SOCKETCOUNT = 1;
-				closesocket(Sconnect_sock[1]);
-				Sconnect_sock[1] = 0;
-			}
-			strcpy(querys[1], message);
-			sendall(message);
-		}
-		Sleep(100);
-	}
-}
-void Clnt_3(void) {
-	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[2], querys[0], 40, 0);
-	if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[2], querys[1], 40, 0);
-	if (Sconnect_sock[3] != 0)
-		send(Sconnect_sock[2], querys[3], 40, 0);
-	char message[100];
-	//	printf("hello\n");
-	while (1) {
-
-		if (recv(Sconnect_sock[2], message, 40, 0) > 0) {
-			//		printf("Client 3 -> Server : %s\n", message);
-			if (strncmp(message, "player   connect", 16) == 0) {
-
-				message[7] = '3';
-
-			}
-			else if (strcmp(message, "player ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 3 ready %s", friendname[2]);
-			}
-			else if (strcmp(message, "player not ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 3 not ready %s", friendname[2]);
-			}
-			else if (strcmp(message, "exit") == 0)
-			{
-				sprintf(message, "player 3 exit");
-				SOCKETCOUNT = 2;
-				closesocket(Sconnect_sock[2]);
-				Sconnect_sock[2] = 0;
-			}
-			strcpy(querys[2], message);
-			sendall(message);
-		}
-		Sleep(100);
-	}
-}
-void Clnt_4(void) {
-	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[3], querys[0], 40, 0);
-	if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[3], querys[1], 40, 0);
-	if (Sconnect_sock[2] != 0)
-		send(Sconnect_sock[3], querys[2], 40, 0);
-	char message[100];
-	//	printf("hello\n");
-	while (1) {
-
-		if (recv(Sconnect_sock[3], message, 40, 0) > 0) {
-			//		printf("Client 4 -> Server : %s\n", message);
-			if (strncmp(message, "player   connect", 16) == 0) {
-				message[7] = '4';
-			}
-			else if (strcmp(message, "player ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 4 ready %s", friendname[3]);
-			}
-			else if (strcmp(message, "player not ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 4 not ready %s", friendname[3]);
-			}
-			else if (strcmp(message, "exit") == 0)
-			{
-				sprintf(message, "player 4 exit");
-				SOCKETCOUNT = 3;
-				closesocket(Sconnect_sock[3]);
-				Sconnect_sock[3] = 0;
-			}
-			strcpy(querys[3], message);
-			sendall(message);
-		}
-		Sleep(100);
 	}
 }
 void makeroom(int *count) {
