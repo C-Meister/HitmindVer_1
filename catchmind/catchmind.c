@@ -148,6 +148,7 @@ void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
 char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
 void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
 void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
+void inserttopic(MYSQL *cons);
 void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
@@ -286,6 +287,33 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void inserttopic(MYSQL *cons)
 {
+	char topic[50];
+	char query[100];
+	int num;
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
+	while (1) {
+		CLS;
+		mysql_query(cons, "select * from catchmind.topic order by num");
+		sql_result = mysql_store_result(cons);
+		printf("내용들입니다. 엔터를 입력해주세요\n");
+		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+		{
+			printf("%s : %s\n", sql_row[0], sql_row[1]);
+			num = atoi(sql_row[1]);
+			getchar();
+		}
+		CLS;
+		printf("\n주제를 입력해 주세요. 나가려면 p를 입력해주세요\n-> %d : ", num);
+		fgets(query, sizeof(query), stdin);
+		CHOP(query);
+		if (strcmp(query, "p"))
+		{
+			return 1;
+		}
+		sprintf(query, "insert into catchmind.topic (top) values ('%s')", query);
+		mysql_query(cons, query);
+	}
 
 }
 void sqlmakeroom(MYSQL *cons) {
