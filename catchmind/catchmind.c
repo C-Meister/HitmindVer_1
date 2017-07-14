@@ -885,14 +885,11 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	while (1) {								//로그인 반복문
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
-			//ConsoleL(26, 15);마우스가 콘솔창을 벗어나면 입력이 안되므로 잠시 보류				//콘솔크기를 로그인창에 맞게  
-			disablecursor(0);               //커서 보이게
 			ConsoleL(30, 30);
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
-			disablecursor(1);
+			
 			while (1) {						//방 반복문
-
 				ConsoleL(50, 20);
 				bangchoose = bangchose(cons);	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
@@ -913,9 +910,10 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					}
 					if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
 					{
-						cur(10, 1);
+						cur(14, 1);
 						printf("(비밀번호가 틀렸습니다)");
-						getchar();
+						_getch();
+						fflush(stdin);
 						continue;
 					}
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
@@ -959,7 +957,7 @@ void sqlmakeroom(MYSQL *cons) {
 		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
 		char * myip = inet_ntoa(addr);
 		ROOM myroom = { 0, 0, 0 };
-		disablecursor(1);
+		disablecursor(0);
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■                                              ■\n");
 		printf("■            캐치마인드 방 만들기              ■\n");
@@ -1283,7 +1281,7 @@ restart:
 	int cnt = 0;
 	int xx = 0, yy = 0;
 	/*닉네임 생성*/
-	
+	disablecursor(0);
 	if (m == 2) {
 		ConsoleL(30, 30);
 		jointema();
@@ -1422,6 +1420,7 @@ restart:
 
 		Sleep(20);
 	}
+	disablecursor(1);
 	return user;
 }
 void checkword(char*nowword, char*scanword) {
@@ -1882,7 +1881,7 @@ void click(int *xx, int *yy) {//마우스에서 2를 나눈값을 받는다
 
 }
 void banglist(MYSQL *cons) {
-	CLS;
+	gotoxy(0, 0);
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	short i = 0;
@@ -1997,7 +1996,7 @@ int chooseroom(int roomnum) {
 	cur(17, 5);
 	printf("%s", connectroom[roomnum].roomname);
 	cur(17, 7);
-	disablecursor(1);
+	disablecursor(0);
 	while (1) {
 
 		roompassword[i] = _getch();
@@ -2025,7 +2024,7 @@ int chooseroom(int roomnum) {
 			i++;
 		}
 	}
-	disablecursor(0);
+	disablecursor(1);
 	if (!(strcmp(connectroom[roomnum].password, roompassword)))
 	{
 		return 1;
@@ -3169,7 +3168,7 @@ int SDL_MAINS(void)
 		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, Font, strong, r, g, b);
-			send(connect_sock, , sizeof(Renderer2), 0);
+			//send(connect_sock, , sizeof(Renderer2), 0);
 		}
 			happen = false;
 	}
