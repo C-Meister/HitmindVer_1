@@ -117,13 +117,7 @@ bool lead = false;
 char SOCKETCOUNT = 0;
 char clientcatchmind[256];
 MYSQL *con;
-SDL_Window * Window;//SDL À©µµ¿ì ¼±¾ð
-SDL_Renderer * Renderer;// SDL ·»´õ·¯ ¼±¾ð
-SDL_Window * Window2;
-SDL_Renderer * Renderer2;
-SDL_Window * Window3;
-SDL_Renderer * Renderer3;
-
+bool SDL_Clear = false;
 //±âº» ÇÔ¼öµé
 void gotoxy(short x, short y);
 void cur(short x, short y);
@@ -1268,6 +1262,10 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				cur(0, 0);
 				printf("%s                    ", message);
 				strcpy(clientcatchmind, message);
+			}
+			else if (strcmp(message, "SDLCLEAR") == 0)
+			{
+				SDL_Clear = false;
 			}
 		}
 	//	Sleep(100);
@@ -2637,8 +2635,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							newclick = 1;
 							//¿©±â~~~~~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
+								send(connect_sock, "SDLCLEAR", 45, 0);
 							}
 							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
@@ -2661,13 +2658,15 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							Rect.y = event.button.y - strong / 2;// ±½±â¸¸Å­ÀÇ »ç°¢ÇüÀ» ¸¸µë
 							Rect.w = Rect.h = strong;// ±½±â ¼³Á¤
 							SDL_RenderFillRect(Renderer2, &Rect);// ·»´õ·¯¿¡ ±×¸²
-							drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
-							happen = true;
-							// ¿©±â~~~~~~~~~
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
+							drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
+
+							happen = true;
+							// ¿©±â~~~~~~~~~
+							
 							break;
 						}
 						else if (clicks.eraser == true) {
@@ -2733,7 +2732,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
-			printf("happen is true!!!\n");
 			
 		}
 		happen = false;
