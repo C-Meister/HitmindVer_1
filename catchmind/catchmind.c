@@ -2118,7 +2118,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
-int SDL_MAINS(int argc, char ** argv) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
+int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	SDL_Window * Window;//SDL 윈도우 선언
 	SDL_Renderer * Renderer;// SDL 렌더러 선언 
 	SDL_Window * Window2;
@@ -2527,6 +2527,8 @@ int SDL_MAINS(int argc, char ** argv) {// 이 메인은 SDL.h에 선언된 메인함수로 우
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 			printf("happen is true!!!\n");
+			sprintf(query, "%d %d %d %d %d %d %d %d %d", on.eraser, on.pencil, on.new, x, y, strong, r, g, b);
+			send(connect_sock, query, 256, 0);
 		}
 		happen = false;
 	}
