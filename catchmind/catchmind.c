@@ -31,7 +31,7 @@
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
-#include "SDL/sdl_ttf"
+#include "SDL/sdl_ttf.h"
 //#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #define nullptr 0
