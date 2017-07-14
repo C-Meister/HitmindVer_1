@@ -1089,6 +1089,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
+				cur(0, 0);
+				printf("%s", message);
 				strcpy(clientcatchmind, message);
 			}
 		}
@@ -2268,12 +2270,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	New.h = Eraser.h;
 	New.x = Eraser.x + 50 + 30;
 	New.y = Eraser.y;
-	TTF_Font *defaultFont = TTF_OpenFont("C:\\WINDOWS\\Fonts\\HYSNRL.TTF", 36);
-	TTF_SetFontStyle(defaultFont, TTF_STYLE_NORMAL | TTF_STYLE_UNDERLINE);
-	wchar_t str[50] = L"한글 폰트";
-	SDL_Color white = { 0xFF,0xFF,0xFF,0 };
-	SDL_Surface *surfaceText = TTF_RenderUNICODE_Blended(defaultFont, str, white);
-	SDL_Rect textrect = { 4,4,surfaceText->w,surfaceText->h };
 	
 	// 끝
 	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
