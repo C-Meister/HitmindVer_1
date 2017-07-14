@@ -754,7 +754,80 @@ restart:
 					}
 				}
 			}
+			else if (lr == 0) {
+				disablecursor(1);
+				if (9 <= yy && yy <= 11) {
+					if (1 <= xx && xx <= 7) {
+						gotoxy(3, 10);
+						HIGH_GREEN printf("개발자사이트");
+						WHITE
+						
+						if (m == 2) {
+							gotoxy(22, 10);
+							printf("나가기");
+						}
+						else {
+							gotoxy(21, 10);
+							printf("회원가입");
+						}
+						gotoxy(38, 10);
+						printf("초기화");
+					}
+					else if (n < 1)
+						n++;
+					else if (9 <= xx && xx <= 15) {
+						
+						HIGH_GREEN 
+						
+						if (m == 2) {
+							gotoxy(22, 10);
+							printf("나가기");
+						}
+						else {
+							gotoxy(21, 10);
+							printf("회원가입");
+						}
+						WHITE
+							gotoxy(3, 10);
+						printf("개발자사이트");
+						gotoxy(38, 10);
+						printf("초기화");
+					}
+					else if (17 <= xx && xx <= 23) {
+						gotoxy(38, 10);
+						HIGH_GREEN printf("초기화");
+						WHITE
+						gotoxy(3, 10);
+						printf("개발자사이트");
+						if (m == 2) {
+							gotoxy(22, 10);
+							printf("나가기");
+						}
+						else {
+							gotoxy(21, 10);
+							printf("회원가입");
+						}
+					}
+				}
+				else {
+					WHITE
+					gotoxy(3, 10);
+					printf("개발자사이트");
+					if (m == 2) {
+						gotoxy(22, 10);
+						printf("나가기");
+					}
+					else {
+						gotoxy(21, 10);
+						printf("회원가입");
+					}
+					gotoxy(38, 10);
+					printf("초기화");
+				}
+			}
 		}
+		gotoxy(16+i, 5);
+		disablecursor(0);
 		Sleep(20);
 	}
 	i = 0;
@@ -832,6 +905,79 @@ restart:
 					break;
 				}
 			}
+			else if (lr == 0) {
+				disablecursor(1);
+				if (9 <= yy && yy <= 11) {
+					if (1 <= xx && xx <= 7) {
+						gotoxy(3, 10);
+						HIGH_GREEN printf("개발자사이트");
+						WHITE
+
+							if (m == 2) {
+								gotoxy(22, 10);
+								printf("나가기");
+							}
+							else {
+								gotoxy(21, 10);
+								printf("회원가입");
+							}
+							gotoxy(38, 10);
+							printf("초기화");
+					}
+					else if (n < 1)
+						n++;
+					else if (9 <= xx && xx <= 15) {
+
+						HIGH_GREEN
+
+							if (m == 2) {
+								gotoxy(22, 10);
+								printf("나가기");
+							}
+							else {
+								gotoxy(21, 10);
+								printf("회원가입");
+							}
+							WHITE
+								gotoxy(3, 10);
+							printf("개발자사이트");
+							gotoxy(38, 10);
+							printf("초기화");
+					}
+					else if (17 <= xx && xx <= 23) {
+						gotoxy(38, 10);
+						HIGH_GREEN printf("초기화");
+						WHITE
+							gotoxy(3, 10);
+						printf("개발자사이트");
+						if (m == 2) {
+							gotoxy(22, 10);
+							printf("나가기");
+						}
+						else {
+							gotoxy(21, 10);
+							printf("회원가입");
+						}
+					}
+				}
+				else {
+					WHITE
+						gotoxy(3, 10);
+					printf("개발자사이트");
+					if (m == 2) {
+						gotoxy(22, 10);
+						printf("나가기");
+					}
+					else {
+						gotoxy(21, 10);
+						printf("회원가입");
+					}
+					gotoxy(38, 10);
+					printf("초기화");
+				}
+			}
+		gotoxy(16 + i, 7);
+		disablecursor(0);
 		}
 
 
