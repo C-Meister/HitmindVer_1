@@ -2260,7 +2260,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//Src의 정보를 가지고 있는 Texture를 Dst의 정보를 가진 Texture 로 변환하여 렌더러에 저장
 	return;
 }
-void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, int r, int g, int b) {
+void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
 	if (SDL_Clear == true) {
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
