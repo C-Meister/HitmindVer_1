@@ -1901,7 +1901,23 @@ void gotoxy(short x, short y)
 {
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
-}
+}/*
+void rooprender(SDL_Renderer *Renderer2)
+{
+	char click_eraser, click_pencil, dragging;
+	int x, y;
+	float strong, r, g, b;
+	int buff = 0;
+	while (1) {
+		if (buff <= SDLCLOCK) {
+			buff++;
+			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &r, &g, &b);
+			//		printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
+			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
+		}
+	}
+
+}*/
 void cur(short x, short y)
 {
 	COORD pos = { x, y };
@@ -2064,8 +2080,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	return;
 }
 void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
-	cur(0, 0);
-//	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f       \n", eraser, pencil, drag, x, y, strong, r, g, b);
+	cur(0, 1);
+	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f           ", eraser, pencil, drag, x, y, strong, r, g, b);
 	if (SDL_Clear == true) {
 		printf("clear문 실행할게슴\n");
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
@@ -2370,191 +2386,194 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		while (1) {
 			if (buff <= SDLCLOCK) {
 				buff++;
-				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y,  &strong, &r, &g, &b);
-		//		printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
+				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &r, &g, &b);
+				cur(0, 0);
+				printf("%d %d %d %d %d %f %f %f %f", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
 				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
 			}
-		}
 
+		}
 	}
-	while (!quit) {// quit가 true가 아닐때 동안 무한반복
-		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
-			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
-			case SDL_WINDOWEVENT://SDL종료 타입일 경우
-				switch (event.window.event) {
-				case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
-					quit = true;// quit를 true로 변경
-					break;// 브레이크
-				case SDL_WINDOWEVENT_ENTER:// 윈도우
-					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
-					break;
-				case SDL_WINDOWEVENT_LEAVE:
-					drag = false;//마우스가 창에서 나갔으므로 드래그 기능을 중지시킴
-					break;
-				case SDL_WINDOWEVENT_FOCUS_GAINED:
-					break;
-				}
-			case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
-				if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
-					if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
-						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
-							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
-							SDL_RenderFillRect(Renderer, &Box);// 지우개같이 흰색으로 칠함
-							Box.x = event.motion.x;// 박스의 x좌표를 클릭한곳의 x좌표로 바꿈 == 이동시킴
-							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌			
+		while (!quit) {// quit가 true가 아닐때 동안 무한반복
+			if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
+				switch (event.type) {//이벤트 타입에 따라 케이스문 실행
+				case SDL_WINDOWEVENT://SDL종료 타입일 경우
+					switch (event.window.event) {
+					case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
+						quit = true;// quit를 true로 변경
+						break;// 브레이크
+					case SDL_WINDOWEVENT_ENTER:// 윈도우
+						SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
+						break;
+					case SDL_WINDOWEVENT_LEAVE:
+						drag = false;//마우스가 창에서 나갔으므로 드래그 기능을 중지시킴
+						break;
+					case SDL_WINDOWEVENT_FOCUS_GAINED:
+						break;
+					}
+				case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
+					if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
+						if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
+							if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
+								SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+								SDL_RenderFillRect(Renderer, &Box);// 지우개같이 흰색으로 칠함
+								Box.x = event.motion.x;// 박스의 x좌표를 클릭한곳의 x좌표로 바꿈 == 이동시킴
+								strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌			
+								happen = true;
+								break;// 이 구문을 탈출함
+							}
+						}
+						else if (event.motion.windowID == SDL_GetWindowID(Window2)) {// 마우스가 움직인 곳이 두번째 윈도우 창일 경우
+							length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+							if (length == 0) break;
+							if (clicks.pencil == true) {// 펜슬일 경우
+								if (connect_sock != 0) {
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									cur(0, 6);
+									printf("query : %s", query);
+									send(connect_sock, query, 45, 0);
+								}
+								i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+								j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+								k = 0;// while문안에 쓸 변수 초기화.
+								xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+								ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+								Rect.w = Rect.h = strong;// 굵기설정
+								for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+									Rect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
+									Rect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+									SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
+								}
+								// 여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+							}
+							else if (clicks.eraser == true) {// 지우개 경우
+								strong *= 80 / 50.0;
+								if (connect_sock != 0) {
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									send(connect_sock, query, 45, 0);
+								}
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
+								i = (event.motion.x - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+								j = (event.motion.y - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+								k = 0;// while문안에 쓸 변수 초기화.
+								xpos = Rect.x;// 전에찍은점 x좌표를 따로 저장
+								ypos = Rect.y;// 전에찍은점 y좌표를 따로 저장
+								Rect.w = Rect.h = strong;// 굵기설정
+								for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+									Rect.x = xpos + k*i;// 찍을 점의 중심 점 x좌표를 설정 
+									Rect.y = ypos + k*j;// 찍을 점의 중심 점 y좌표를 설정
+									int x1, y1, x2, y2;
+									for (l = 0; l < 180; l++) {
+										x1 = sin(3.14 / 180 * l)*strong / 2;
+										y1 = cos(3.14 / 180 * l)*strong / 2;
+										x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+										y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+										SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+									}
+								}
+								strong *= 50 / 80.0;
+							}
 							happen = true;
-							break;// 이 구문을 탈출함
+							//		send(connect_sock, "", 45, 0);
+									//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 						}
 					}
-					else if (event.motion.windowID == SDL_GetWindowID(Window2)) {// 마우스가 움직인 곳이 두번째 윈도우 창일 경우
-						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
-						if (length == 0) break;
-						if (clicks.pencil == true) {// 펜슬일 경우
-							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
-							}
-							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
-							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
-							k = 0;// while문안에 쓸 변수 초기화.
-							xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
-							ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
-							Rect.w = Rect.h = strong;// 굵기설정
-							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
-								Rect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
-								Rect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
-								SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
-							}
-							// 여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-						}
-						else if (clicks.eraser == true) {// 지우개 경우
-							strong *= 80 / 50.0;
-							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
-							}
-							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
-							i = (event.motion.x - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
-							j = (event.motion.y - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
-							k = 0;// while문안에 쓸 변수 초기화.
-							xpos = Rect.x;// 전에찍은점 x좌표를 따로 저장
-							ypos = Rect.y;// 전에찍은점 y좌표를 따로 저장
-							Rect.w = Rect.h = strong;// 굵기설정
-							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
-								Rect.x = xpos + k*i;// 찍을 점의 중심 점 x좌표를 설정 
-								Rect.y = ypos + k*j;// 찍을 점의 중심 점 y좌표를 설정
-								int x1, y1, x2, y2;
-								for (l = 0; l < 180; l++) {
-									x1 = sin(3.14 / 180 * l)*strong / 2;
-									y1 = cos(3.14 / 180 * l)*strong / 2;
-									x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
-									y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
-									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					if (event.button.button == 1) {
+						if (event.button.windowID == SDL_GetWindowID(Window)) {
+							if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
+								alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
+								switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
+								case 0:// 색 설정 코드
+									r = 255; g = 0; b = 0;
+									break;
+								case 1:
+									r = 255; g = 128; b = 0;
+									break;
+								case 2:
+									r = 255; g = 255; b = 0;
+									break;
+								case 3:
+									r = 128; g = 255; b = 0;
+									break;
+								case 4:
+									r = 0; g = 255; b = 0;
+									break;
+								case 5:
+									r = 0; g = 255; b = 128;
+									break;
+								case 6:
+									r = 0; g = 255; b = 255;
+									break;
+								case 7:
+									r = 0; g = 128; b = 255;
+									break;
+								case 8:
+									r = 0; g = 0; b = 255;
+									break;
+								case 9:
+									r = 127; g = 0; b = 255;
+									break;
+								case 10:
+									r = 255; g = 0; b = 255;
+									break;
+								case 11:
+									r = 255; g = 0; b = 127;
+									break;
+								case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
+									r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
+									alpha = 4;
+									break;
+								}
+								// 수식으로 rgb값 설정
+								if (alpha <= 4) {
+									r = r + r / 5 * (alpha - 4);
+									g = g + g / 5 * (alpha - 4);
+									b = b + b / 5 * (alpha - 4);
+									happen = true;
+									break;
+								}
+								else {
+									r = r + (255 - r) / 5 * (alpha - 4);
+									g = g + (255 - g) / 5 * (alpha - 4);
+									b = b + (255 - b) / 5 * (alpha - 4);
+									happen = true;
+									break;
+
 								}
 							}
-							strong *= 50 / 80.0;
-						}
-						happen = true;
-				//		send(connect_sock, "", 45, 0);
-						//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-					
-					}
-				}
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == 1) {
-					if (event.button.windowID == SDL_GetWindowID(Window)) {
-						if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
-							alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
-							switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
-							case 0:// 색 설정 코드
-								r = 255; g = 0; b = 0;
-								break;
-							case 1:
-								r = 255; g = 128; b = 0;
-								break;
-							case 2:
-								r = 255; g = 255; b = 0;
-								break;
-							case 3:
-								r = 128; g = 255; b = 0;
-								break;
-							case 4:
-								r = 0; g = 255; b = 0;
-								break;
-							case 5:
-								r = 0; g = 255; b = 128;
-								break;
-							case 6:
-								r = 0; g = 255; b = 255;
-								break;
-							case 7:
-								r = 0; g = 128; b = 255;
-								break;
-							case 8:
-								r = 0; g = 0; b = 255;
-								break;
-							case 9:
-								r = 127; g = 0; b = 255;
-								break;
-							case 10:
-								r = 255; g = 0; b = 255;
-								break;
-							case 11:
-								r = 255; g = 0; b = 127;
-								break;
-							case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
-								r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
-								alpha = 4;
-								break;
-							}
-							// 수식으로 rgb값 설정
-							if (alpha <= 4) {
-								r = r + r / 5 * (alpha - 4);
-								g = g + g / 5 * (alpha - 4);
-								b = b + b / 5 * (alpha - 4);
+							else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
+								SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
+								SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
+								Box.x = event.button.x;//스크롤 박스를 이동시킴
+								drag = true; //드래그로 조정이 가능하게 설정
+								strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
 								happen = true;
 								break;
 							}
-							else {
-								r = r + (255 - r) / 5 * (alpha - 4);
-								g = g + (255 - g) / 5 * (alpha - 4);
-								b = b + (255 - b) / 5 * (alpha - 4);
+							else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
+								SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = true;
+								clicks.pencil = false;
 								happen = true;
-								break;
-
 							}
-						}
-						else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
-							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
-							SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
-							Box.x = event.button.x;//스크롤 박스를 이동시킴
-							drag = true; //드래그로 조정이 가능하게 설정
-							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
-							happen = true;
-							break;
-						}
-						else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
-							SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
-							clicks.eraser = true;
-							clicks.pencil = false;
-							happen = true;
-						}
-						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New 이미지를 클릭했을때
-							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-							SDL_RenderClear(Renderer2);
-							Font.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
-							Font.h += 2;
-							newclick = 1;
-							//여기~~~~~~~~~~~~~~~~~~
-							if (connect_sock != 0) {
-								send(connect_sock, "SDLCLEAR", 45, 0);
+							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New 이미지를 클릭했을때
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								SDL_RenderClear(Renderer2);
+								Font.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
+								Font.h += 2;
+								newclick = 1;
+								//여기~~~~~~~~~~~~~~~~~~
+								if (connect_sock != 0) {
+									send(connect_sock, "SDLCLEAR", 45, 0);
+								}
+								SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = false;
+								clicks.pencil = false;
+								happen = true;
 							}
-							SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
-							clicks.eraser = false;
-							clicks.pencil = false;
-							happen = true;
-						}
 
 						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
 							Font.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
@@ -2613,52 +2632,52 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			}
 		}
 
-		SDL_GetMouseState(&x, &y);
-		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser안에 마우스가 있을때
-			if (on.eraser == false && clicks.eraser == false) // 그전까지는 마우스가 올려져있지않고 지우개가 활성화되지않았을때
-				happen = true;// happen이 발생
-			if (clicks.eraser == false)//지우개가 클릭된 상태가 아니었다면
-				on.eraser = true;// 마우스가 올려진것으로 간주함
-		}
-		else if (on.eraser == true) {//그전까지는 마우스가 올려져있었고 지금은 eraser안에 마우스가 없으면
-			happen = true;//happen이 발생
-			on.eraser = false;// 마우스가 안 올려진것으로 간주함
-		}
-		if ((x >= Pencil.x - 10 && x <= Pencil.x + Pencil.w + 10) && (y >= Pencil.y - 10 && y <= Pencil.y + Pencil.h + 10)) {// eraser 안에 마우스가 있을때
-			if (on.pencil == false && clicks.pencil == false)// 그전까지는 마우스가 올려져있지않고 펜슬이 활성화되지 않았을때
-				happen = true;// happen이 발생
-			if (clicks.pencil == false)//지우개가 클릭된 상태가 아니었다면
-				on.pencil = true;// 마우스가 올려진 것으로 간주함
-		}
-		else if (on.pencil == true) {
-			happen = true;
-			on.pencil = false;
-		}
-		if ((x >= New.x - 10 && x <= New.x + New.w + 10) && (y >= New.y - 10 && y <= New.y + New.h + 10)) {
-			if (on.new == false)
+			SDL_GetMouseState(&x, &y);
+			if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser안에 마우스가 있을때
+				if (on.eraser == false && clicks.eraser == false) // 그전까지는 마우스가 올려져있지않고 지우개가 활성화되지않았을때
+					happen = true;// happen이 발생
+				if (clicks.eraser == false)//지우개가 클릭된 상태가 아니었다면
+					on.eraser = true;// 마우스가 올려진것으로 간주함
+			}
+			else if (on.eraser == true) {//그전까지는 마우스가 올려져있었고 지금은 eraser안에 마우스가 없으면
+				happen = true;//happen이 발생
+				on.eraser = false;// 마우스가 안 올려진것으로 간주함
+			}
+			if ((x >= Pencil.x - 10 && x <= Pencil.x + Pencil.w + 10) && (y >= Pencil.y - 10 && y <= Pencil.y + Pencil.h + 10)) {// eraser 안에 마우스가 있을때
+				if (on.pencil == false && clicks.pencil == false)// 그전까지는 마우스가 올려져있지않고 펜슬이 활성화되지 않았을때
+					happen = true;// happen이 발생
+				if (clicks.pencil == false)//지우개가 클릭된 상태가 아니었다면
+					on.pencil = true;// 마우스가 올려진 것으로 간주함
+			}
+			else if (on.pencil == true) {
 				happen = true;
-			on.new = true;
-		}
-		else if (on.new == true) {
-			happen = true;
-			on.new = false;
-		}
-		if (happen == true) {
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
+				on.pencil = false;
+			}
+			if ((x >= New.x - 10 && x <= New.x + New.w + 10) && (y >= New.y - 10 && y <= New.y + New.h + 10)) {
+				if (on.new == false)
+					happen = true;
+				on.new = true;
+			}
+			else if (on.new == true) {
+				happen = true;
+				on.new = false;
+			}
+			if (happen == true) {
+				SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
+
+			}
+			happen = false;
 
 		}
-		happen = false;
-
+		SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
+		SDL_DestroyTexture(ChaTexture);
+		SDL_DestroyTexture(BoxTexture);
+		SDL_DestroyTexture(TraTexture);
+		SDL_DestroyTexture(EraTexture);
+		SDL_DestroyTexture(PenTexture);
+		SDL_DestroyTexture(NewTexture);
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;// 종료
 	}
-	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
-	SDL_DestroyTexture(ChaTexture);
-	SDL_DestroyTexture(BoxTexture);
-	SDL_DestroyTexture(TraTexture);
-	SDL_DestroyTexture(EraTexture);
-	SDL_DestroyTexture(PenTexture);
-	SDL_DestroyTexture(NewTexture);
-	IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
-	IMG_ExceptionRoutine(Renderer2, Window2);
-	IMG_ExceptionRoutine(Renderer3, Window3);
-	return 0;// 종료
-}
