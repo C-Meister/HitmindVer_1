@@ -279,12 +279,17 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			}
 			break;
 		}
-
+		if (mainchoose == 2)
+		{
+			inserttopic(cons);
+			continue;
+		}
 	}return 0;
 }
 
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
+
 void inserttopic(MYSQL *cons)
 {
 	char topic[50];
@@ -309,7 +314,7 @@ void inserttopic(MYSQL *cons)
 		CHOP(query);
 		if (strcmp(query, "p"))
 		{
-			return 1;
+			return;
 		}
 		sprintf(query, "insert into catchmind.topic (top) values ('%s')", query);
 		mysql_query(cons, query);
@@ -1200,7 +1205,7 @@ void mainatitleimage(void) {
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");gotoxy(12, 21);
 	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 22);
 	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 23);
-	printf("■  게임 시작   ■                      ■              ■                      ■              ■");gotoxy(12, 24);
+	printf("■  게임 시작   ■                      ■   주제 추가  ■                      ■              ■");gotoxy(12, 24);
 	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 25);
 	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
@@ -1212,7 +1217,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 	mainatitleimage();
 	while (1) {
 		printf("%3d %3d\n", xx, yy);
-
+		WHITE
 		click(&xx, &yy, &lr);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
@@ -1221,9 +1226,22 @@ int maintitle(void) { //게임 메인타이틀 출력
 		}
 		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr ==1)
 			return 1;
+		else if (27 <= xx && xx <= 33 && 21 <= yy && yy <= 25 && lr == 0)
+		{
+			gotoxy(56, 23);
+			HIGH_GREEN printf("주제 추가");
+		}
+		else if (27 <= xx && xx <= 33 && 21 <= yy && yy <= 25 && lr == 1)
+		{
+			return 2;
+		}
+		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 1)
+			return 1;
 		else {
 			gotoxy(16, 23);
 			WHITE printf("게임 시작");
+			gotoxy(56, 23);
+			WHITE printf("주제 추가");
 		}
 
 		gotoxy(0, 0);
