@@ -2101,36 +2101,29 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			return;
 		}
 		else if (pencil == true && drag == true) {
-
-			printf("pencil 드래그문 실행할게슴\n");
 			float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
-		//	printf("length:%f\n", length);
+			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 			if (length == 0) return;
-		//	printf("clicks.pencil %d\n", clicks.pencil);
-		//	if (pencil == true) {// 펜슬일 경우
-				SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
-				printf("rgb값은 %d %d %d임\n", r, g, b);
-				i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
-				j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
-				k = 0;// while문안에 쓸 변수 초기화.
-				xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
-				ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
-				ReceiveRect.w = ReceiveRect.h = strong;// 굵기설정
-				for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
-					ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
-					ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
-					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
-				}
-		//	}
+			i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+			j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+			xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+			ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+			ReceiveRect.w = ReceiveRect.h = strong;// 굵기설정
+			for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+				ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
+				ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+				SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
+			}
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == true) {
 			strong *= 80 / 50.0;
 			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
-			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
-			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
+			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함						
+			if (length == 0)return;
+			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로			
 			i = (x - ReceiveRect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 			j = (y - ReceiveRect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
 			k = 0;// while문안에 쓸 변수 초기화.
@@ -2593,8 +2586,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							strong *= 80 / 50.0;
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 							int x1, y1, x2, y2;
-							Rect.x = event.button.x;
-							Rect.y = event.button.y;// 굵기만큼의 사각형을 만듬
+							Rect.x = event.button.x;// 원이라서 꼭짓점의 좌표가아닌 중심좌표를 찍어줘야함
+							Rect.y = event.button.y;
 							for (l = 0; l < 180; l++) {
 								x1 = sin(3.14 / 180 * l)*strong / 2;
 								y1 = cos(3.14 / 180 * l)*strong / 2;
