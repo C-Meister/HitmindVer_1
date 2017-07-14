@@ -2295,33 +2295,42 @@ void processclnt(void) {
 }
 void Clnt_1(int v)
 {
-	if (Sconnect_sock[1] != 0)
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		if (i == v)
+			continue;
+		if (Sconnect_sock[i] != 0)
+			send(Sconnect_sock[v], querys[i], 40, 0);
+	}
+	/*if (Sconnect_sock[1] != 0)
 		send(Sconnect_sock[v], querys[1], 40, 0);
 	if (Sconnect_sock[2] != 0)
 		send(Sconnect_sock[v], querys[2], 40, 0);
 	if (Sconnect_sock[3] != 0)
 		send(Sconnect_sock[v], querys[3], 40, 0);
 	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[v], querys[0], 40, 0);
+		send(Sconnect_sock[v], querys[0], 40, 0);*/
+	
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[v], message, 40, 0) > 0) {
 			if (strncmp(message, "player   connect", 16) == 0) {
-				message[7] = v + '0';
+				message[7] = v + '0' + 1;
 
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d ready %s",v, friendname[0]);
+				sprintf(message, "player %d ready %s",v + 1, friendname[0]);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d not ready %s",v,  friendname[0]);
+				sprintf(message, "player %d not ready %s",v + 1,  friendname[0]);
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d exit", v);
+				sprintf(message, "player %d exit", v + 1);
 				closesocket(Sconnect_sock[v]);
 				SOCKETCOUNT = v;
 				Sconnect_sock[v] = 0;
@@ -2477,7 +2486,7 @@ void makeroom(int *count) {
 	while (1) {
 		if (Sconnect_sock[SOCKETCOUNT] == 0){
 			Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
-			threads[SOCKETCOUNT+1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, SOCKETCOUNT, 0, NULL); break;
+			threads[SOCKETCOUNT+1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, (int *)SOCKETCOUNT, 0, NULL);
 		}
 		else {
 			SOCKETCOUNT++;
