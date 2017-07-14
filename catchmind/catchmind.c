@@ -2265,7 +2265,7 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 }
 void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
 	cur(0, 0);
-	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f       \n", eraser, pencil, drag, x, y, strong, r, g, b);
+//	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f       \n", eraser, pencil, drag, x, y, strong, r, g, b);
 	if (SDL_Clear == true) {
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
@@ -2656,7 +2656,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							strong *= 50 / 80.0;
 						}
 						happen = true;
-						send(connect_sock, "clear", 45, 0);
+						send(connect_sock, "SDLCLEAR", 45, 0);
 						//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 					
 					}
