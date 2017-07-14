@@ -585,7 +585,7 @@ int waitroom(void)
 		if (lr == 1) {
 			if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
 				if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
-					send(connect_sock, "game start", 40, 0);
+					send(connect_sock, "game start", 45, 0);
 					xx = 0; yy = 0;
 				}
 
@@ -1766,18 +1766,18 @@ void jointema(void) {
 }
 void sendall(char *message) {
 	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[0], message, 30, 0);
+		send(Sconnect_sock[0], message, 45, 0);
 //	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
-		send(Sconnect_sock[1], message, 30, 0);
+		send(Sconnect_sock[1], message, 45, 0);
 //		printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
-		send(Sconnect_sock[2], message, 30, 0);
+		send(Sconnect_sock[2], message, 45, 0);
 //		printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
-		send(Sconnect_sock[3], message, 30, 0);
+		send(Sconnect_sock[3], message, 45, 0);
 //		printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
