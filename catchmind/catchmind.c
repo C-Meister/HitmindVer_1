@@ -336,15 +336,18 @@ void sqlmakeroom(MYSQL *cons) {
 		char * myip = inet_ntoa(addr);
 		ROOM myroom = { 0, 0, 0 };
 		disablecursor(0);
+		WHITE
 		printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
 		printf("♂                                              ♂\n");
 		printf("♂            某摹付牢靛 规 父甸扁              ♂\n");
-		printf("♂          郴 ip :  %s              ♂\n", myip);
+		printf("♂          郴 ip :  %s \n", myip);
 		printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
 		printf("♂    力格    ∴                              ∴♂\n");
 		printf("♂∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴♂\n");
 		printf("♂  Password  ∴                              ∴♂\n");
 		printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
+		gotoxy(48, 3);
+		printf("♂");
 		cur(16, 5);
 		scanf("%[^\n]s", myroom.roomname);
 		getchar();
@@ -418,7 +421,7 @@ int waitroom(void)
 	while (1) { //罐酒柯 单捞磐 贸府
 		gotoxy(0, 3);
 		WHITE
-			printf("      ♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
+		printf("      ♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
 		printf("      ♂                                                                                            ♂\n");
 		printf("      ♂                                                                                            ♂\n");
 		printf("      ♂                                                                                            ♂\n");
@@ -571,8 +574,6 @@ int waitroom(void)
 		printf("      ♂                ♂                                                        ♂                ♂\n");		// 4, 40		//11, 40		//42, 40		49, 40
 		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
 			printf("      ♂     ready      ♂                       Start!                           ♂     exit       ♂\n");
-
-
 		}
 		else
 			printf("      ♂     ready      ♂                                                        ♂     exit       ♂\n");
@@ -1386,15 +1387,15 @@ int bangchose(MYSQL *cons) {
 				return 1;
 			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//规 1
 				return 2;
-			else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//规 2
+			else if (24 <= xx && xx <= 37 && 6 <= yy && yy <= 8)	//规 2
 				return 3;
 			else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//规 3
 				return 4;
-			else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//规 4
+			else if (24 <= xx && xx <= 37 && 10 <= yy && yy <= 12)	//规 4
 				return 5;
 			else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//规 5
 				return 6;
-			else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//规 6
+			else if (24 <= xx && xx <= 37 && 14 <= yy && yy <= 16)	//规 6
 				return 7;
 		}
 		else if (lr == 0) {
@@ -1416,18 +1417,19 @@ int bangchose(MYSQL *cons) {
 
 			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//规 1
 				j = 0;
-			else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//规 2
+			else if (24 <= xx && xx <= 37 && 6 <= yy && yy <= 8)	//规 2
 				j = 1;
 			else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//规 3
 				j = 2;
-			else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//规 4
+			else if (24 <= xx && xx <= 37 && 10 <= yy && yy <= 12)	//规 4
 				j = 3;
 			else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//规 5
 				j = 4;
-			else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//规 6
+			else if (24 <= xx && xx <= 37 && 14 <= yy && yy <= 16)	//规 6
 				j = 5;
 			else {
 				WHITE
+					j = -1;
 				gotoxy(28, 2);
 				printf("规父甸扁");
 				gotoxy(58, 2);
@@ -1447,16 +1449,18 @@ int chooseroom(int roomnum) {
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
 	CLS;
-
+	WHITE
 	printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
 	printf("♂                                              ♂\n");
 	printf("♂              某摹付牢靛 规 立加              ♂\n");
-	printf("♂          立加 ip :  %s            ♂\n", connectroom[roomnum].ip);
+	printf("♂          立加 ip :  %s\n", connectroom[roomnum].ip);
 	printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
 	printf("♂  规 力格   ∴                              ∴♂\n");			// x = 17 y = 5
 	printf("♂∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴∴♂\n");
 	printf("♂  Password  ∴                              ∴♂\n");
 	printf("♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂♂\n");
+	gotoxy(48, 3);
+	printf("♂");
 	cur(17, 5);
 	printf("%s", connectroom[roomnum].roomname);
 	cur(17, 7);
