@@ -115,10 +115,13 @@ char signalmode;
 char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
-char clientcatchmind[256];
+char clientcatchmind[50];
 MYSQL *con;
 bool SDL_Clear = false;
 SDL_Rect ReceiveRect = { 0 };
+
+
+
 //기본 함수들
 void gotoxy(short x, short y);
 void cur(short x, short y);
@@ -572,6 +575,7 @@ int waitroom(void)
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
 				mysql_query(con, query);
+				
 			}
 			for (int i = 0; i < 3; i++)
 			{
@@ -2556,7 +2560,17 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						  // while문에서 쓸 변수의 초기값 설정
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// 렌더러에 저장하기
 												  // 변수 초기값 설정끝
+	if (lead == false)
+	{
+		char click_eraser, click_pencil;
+		char dragging;
+		SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
+		while (1) {
+			sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &x, &y, &dragging, &strong, &r, &g, &b);
+			ReceiveRender(Renderer2, click_eraser, click_pencil,x,y, dragging, strong, r, g, b);
+		}
 
+	}
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
