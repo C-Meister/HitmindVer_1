@@ -1298,6 +1298,8 @@ void banglist(MYSQL *cons, int j) {
 	short i = 0;
 	mysql_query(cons, "select ip, name, password from catchmind.room");
 	sql_result = mysql_store_result(cons);
+
+	memset(connectroom, 0, sizeof(connectroom));
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
 
@@ -1333,7 +1335,7 @@ void banglist(MYSQL *cons, int j) {
 		else {
 			WHITE printf("%-7s", sql_row[1]);
 		}
-		memset(connectroom, 0, sizeof(connectroom));
+		
 		strcpy(connectroom[i].ip, sql_row[0]);
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
