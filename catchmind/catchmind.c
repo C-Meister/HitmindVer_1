@@ -315,10 +315,11 @@ void inserttopic(MYSQL *cons)
 		printf("\n주제를 입력해 주세요. 나가려면 p를 입력해주세요\n-> %d : ", num);
 		fgets(topic, sizeof(topic), stdin);
 		CHOP(topic);
-		if (strcmp(topic, "p") == 0)
+		if (strcmp(topic, "p ") == 0 || topic[0] == ' ' || topic[0] == 0)
 		{
-			return;
+			break;
 		}
+		
 		sprintf(query, "insert into catchmind.topic (top) values ('%s')", topic);
 		mysql_query(cons, query);
 	}
