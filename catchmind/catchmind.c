@@ -1739,7 +1739,7 @@ void Clnt_1(int v)
 		if (i == v)
 			continue;
 		if (Sconnect_sock[i] != 0)
-			send(Sconnect_sock[v], querys[i], 40, 0);
+			send(Sconnect_sock[v], querys[i], 256, 0);
 	}
 	/*if (Sconnect_sock[1] != 0)
 		send(Sconnect_sock[v], querys[1], 40, 0);
@@ -2185,6 +2185,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		IMG_ExceptionRoutine(Renderer3, Window3);
 		return 0;
 	}
+	
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//이미지 정보 불러오기
 	Track.w /= 4;
 	Track.h /= 8;
