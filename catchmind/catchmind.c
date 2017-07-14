@@ -45,7 +45,7 @@
 
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
 
-
+#pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
 //#define 정의문
@@ -2564,10 +2564,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	{
 		char click_eraser, click_pencil;
 		char dragging;
+		CLS;
 		SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 		while (1) {
-			sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &x, &y, &dragging, &strong, &r, &g, &b);
-			ReceiveRender(Renderer2, click_eraser, click_pencil,x,y, dragging, strong, r, g, b);
+			sscanf(clientcatchmind, "%hhd %hhd %d %d %hhd %f %f %f %f", &click_eraser, &click_pencil, &x, &y, &dragging, &strong, &r, &g, &b);
+			printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, x, y, dragging, strong, r, g, b);
+			//	ReceiveRender(Renderer2, click_eraser, click_pencil,x,y, dragging, strong, r, g, b);
 		}
 
 	}
