@@ -414,9 +414,7 @@ void waitroomtema() {
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
-	printf("      бс   [ STATUS ] : ");
-	gotoxy(100, 7);
-	printf("бс\n");
+	printf("      бс   [ STATUS ] :                                                                             бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
@@ -425,9 +423,7 @@ void waitroomtema() {
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
-	printf("      бс   [ STATUS ] : ");
-	gotoxy(100, 16);
-	printf("бс\n");
+	printf("      бс   [ STATUS ] :                                                                             бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
@@ -436,9 +432,7 @@ void waitroomtema() {
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
-	printf("      бс   [ STATUS ] : ");
-	gotoxy(100, 25);
-	printf("бс\n");
+	printf("      бс   [ STATUS ] :                                                                             бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
@@ -447,9 +441,7 @@ void waitroomtema() {
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n"); //92
-	printf("      бс   [ STATUS ] : ");
-	gotoxy(100, 34);
-	printf("бс\n");
+	printf("      бс   [ STATUS ] :                                                                             бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
 	printf("      бс                                                                                            бс\n");
