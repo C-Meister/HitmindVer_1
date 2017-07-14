@@ -610,7 +610,7 @@ void usermain(void) {
 }
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
-	
+	int to = -1;
 	int n = 0;
 restart:
 
@@ -674,9 +674,13 @@ restart:
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
 			if (lr == 1) {
 				if (9 <= yy && yy <= 11) {
-					if (1 <= xx && xx <= 7) {
+					if (1 <= xx && xx <= 7 && to == 1) {
 						system("start https://blog.naver.com/dgsw102");
 						system("start https://blog.naver.com/soohan530");
+						to *= -1;
+					}
+					else if (1 <= xx && xx <= 7 && to == -1) {
+						to *= -1;
 					}
 					else if (n < 1)
 						n++;
@@ -738,9 +742,13 @@ restart:
 
 			if (lr == 1) {
 				if (9 <= yy && yy <= 11) {
-					if (1 <= xx && xx <= 7) {
+					if (1 <= xx && xx <= 7 && to == 1) {
 						system("start https://blog.naver.com/dgsw102");
 						system("start https://blog.naver.com/soohan530");
+						to *= -1;
+					}
+					else if (1 <= xx && xx <= 7 && to == -1) {
+						to *= -1;
 					}
 					else if (9 <= xx && xx <= 15) {
 						for (i = 0; i <= 15; i++) {
