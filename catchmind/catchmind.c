@@ -597,18 +597,18 @@ int waitroom(void)
 					togl *= -1;
 				else if (mode == 0) {
 					mode = 1;
-					send(connect_sock, "player ready", 40, 0);
+					send(connect_sock, "player ready", 45, 0);
 				}
 				else if (mode == 1) {
 					mode = 0;
-					send(connect_sock, "player not ready", 40, 0);
+					send(connect_sock, "player not ready", 45, 0);
 				}
 
 				xx = 0;
 				yy = 0;
 			}
 			if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
-				send(connect_sock, "player exit", 40, 0);
+				send(connect_sock, "player exit", 45, 0);
 				return 3;
 			}
 			xx = 0;
@@ -1036,7 +1036,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
 	while (1) {
 
-		if (recv(connect_sock, message, 30, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -1794,7 +1794,7 @@ void Clnt_1(int v)
 		if (i == v)
 			continue;
 		if (Sconnect_sock[i] != 0)
-			send(Sconnect_sock[v], querys[i], 30, 0);
+			send(Sconnect_sock[v], querys[i], 45, 0);
 	}
 	/*if (Sconnect_sock[1] != 0)
 		send(Sconnect_sock[v], querys[1], 40, 0);
@@ -1807,7 +1807,7 @@ void Clnt_1(int v)
 	
 	char message[100];
 	while (1) {
-		if (recv(Sconnect_sock[v], message, 30, 0) > 0) {
+		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
 
@@ -2571,7 +2571,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser,clicks.pencil, newclick, x, y, strong, r, g, b);
 				if (newclick == 1)
 					newclick = 0;
-				send(connect_sock, query, 30, 0);
+				send(connect_sock, query, 45, 0);
 			}
 		}
 		happen = false;
