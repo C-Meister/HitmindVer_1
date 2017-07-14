@@ -2105,9 +2105,12 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			printf("pencil 드래그문 실행할게슴\n");
 			float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+		//	printf("length:%f\n", length);
 			if (length == 0) return;
-			if (clicks.pencil == true) {// 펜슬일 경우
+		//	printf("clicks.pencil %d\n", clicks.pencil);
+		//	if (pencil == true) {// 펜슬일 경우
 				SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
+				printf("rgb값은 %d %d %d임\n", r, g, b);
 				i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 				j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
 				k = 0;// while문안에 쓸 변수 초기화.
@@ -2119,7 +2122,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 					ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
 					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 				}
-			}
+		//	}
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
@@ -2375,7 +2378,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			if (buff <= SDLCLOCK) {
 				buff++;
 				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y,  &strong, &r, &g, &b);
-				printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
+		//		printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
 				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
 			}
 		}
