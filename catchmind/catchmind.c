@@ -120,6 +120,7 @@ char clientcatchmind[50];
 MYSQL *con;
 bool SDL_Clear = false;
 SDL_Rect ReceiveRect = { 0 };
+int SDLCLOCK = 0;
 
 
 
@@ -1256,12 +1257,14 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
+				SDLCLOCK++;
 				cur(0, 0);
 				printf("%s                    ", message);
 				strcpy(clientcatchmind, message);
 			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
+				SDLCLOCK++;
 				SDL_Clear = false;
 			}
 		}
@@ -2562,12 +2565,16 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	{
 		char click_eraser, click_pencil;
 		char dragging;
+		int buff = 0;
 		CLS;
 		SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 		while (1) {
-			sscanf(clientcatchmind, "%hhd %hhd %d %d %hhd %f %f %f %f", &click_eraser, &click_pencil, &x, &y, &dragging, &strong, &r, &g, &b);
-			printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, x, y, dragging, strong, r, g, b);
-			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
+			if (buff < SDLCLOCK) {
+				buff++;
+				sscanf(clientcatchmind, "%hhd %hhd %d %d %hhd %f %f %f %f", &click_eraser, &click_pencil, &x, &y, &dragging, &strong, &r, &g, &b);
+				printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, x, y, dragging, strong, r, g, b);
+				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
+			}
 		}
 
 	}
@@ -2649,6 +2656,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						send(connect_sock, "clear", 45, 0);
 						//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 						if (connect_sock != 0) {
+							
 							sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil,drag, event.motion.x, event.motion.y, strong, r, g, b);
 							send(connect_sock, query, 45, 0);
 						}
