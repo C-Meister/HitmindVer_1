@@ -1266,7 +1266,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 				cur(0, 0);
-				printf("%s", message);
+				printf("%s                    ", message);
 				strcpy(clientcatchmind, message);
 			}
 		}
@@ -2513,7 +2513,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
 						}
@@ -2544,7 +2544,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						send(connect_sock, "clear", 45, 0);
 						//¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 						if (connect_sock != 0) {
-							sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+							sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
 							send(connect_sock, query, 45, 0);
 						}
 					}
@@ -2637,7 +2637,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							newclick = 1;
 							//¿©±â~~~~~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
 							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
@@ -2664,6 +2664,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 							happen = true;
 							// ¿©±â~~~~~~~~~
+							if (connect_sock != 0) {
+								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 							break;
 						}
 						else if (clicks.eraser == true) {
@@ -2681,7 +2685,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							}
 							// ¿©±â~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, drag, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
 							strong *= 50.0 / 80;
