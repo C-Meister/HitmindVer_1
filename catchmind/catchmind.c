@@ -2295,8 +2295,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 				y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
 				SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
 			}
-			strong *= 50.0 / 80;
-
+			strong *= 50.0 / 80;\
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
@@ -2305,6 +2304,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
 			if (length == 0) return;
 			if (clicks.pencil == true) {// 펜슬일 경우
+				SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 				i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 				j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
 				k = 0;// while문안에 쓸 변수 초기화.
@@ -2317,7 +2317,6 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 				}
 			}
-
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
@@ -2628,10 +2627,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 								SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
 							}
 							// 여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-						
 						}
 						else if (clicks.eraser == true) {// 지우개 경우
 							strong *= 80 / 50.0;
+							if (connect_sock != 0) {
+								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
 							i = (event.motion.x - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 							j = (event.motion.y - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
@@ -2656,11 +2658,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						happen = true;
 						send(connect_sock, "clear", 45, 0);
 						//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-						if (connect_sock != 0) {
-							
-							sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil,drag, event.motion.x, event.motion.y, strong, r, g, b);
-							send(connect_sock, query, 45, 0);
-						}
+					
 					}
 				}
 				break;
