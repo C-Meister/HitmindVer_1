@@ -897,16 +897,16 @@ restart:
 						goto restart;
 					}
 				}
-				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 0) {
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 0 && i > 3) {
 					b++;
 				}
-				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 0) {
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 0 && i > 3) {
 					b++;
 				}
-				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 1) {
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 1 && i > 3) {
 					break;
 				}
-				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 1) {
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 1 && i > 3) {
 					break;
 				}
 			}
