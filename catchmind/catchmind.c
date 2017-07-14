@@ -564,6 +564,12 @@ int waitroom(void)
 			status[0] = 2;
 			CLS;
 			printf("게임을 시작합니다.");
+			if (lead == true)
+			{
+				signalmode = 3;
+				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+				mysql_query(con, query);
+			}
 			for (int i = 0; i < 3; i++)
 			{
 				cur(0, 1);
@@ -1167,7 +1173,7 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
 	sprintf(query, "player   connect %s", username);
-	send(connect_sock, query, 40, 0);
+	send(connect_sock, query, 45, 0);
 	Sleep(200);
 
 	return waitroom();
@@ -1954,15 +1960,18 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
+				strcpy(querys[v], message);
 
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player %d ready %s",v + 1, friendname[i]);
+				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player %d not ready %s",v + 1,  friendname[i]);
+				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
@@ -1971,6 +1980,7 @@ void Clnt_1(int v)
 				closesocket(Sconnect_sock[v]);
 				SOCKETCOUNT = v;
 				Sconnect_sock[v] = 0;
+				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "game start") == 0)
 			{
@@ -1978,7 +1988,7 @@ void Clnt_1(int v)
 				printf("%s", message);
 				sendall(message);
 			}
-			strcpy(querys[v], message);
+			
 			sendall(message);
 			ZeroMemory(message, sizeof(message));
 		}
