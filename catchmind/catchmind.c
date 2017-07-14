@@ -45,6 +45,7 @@
 
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
 
+
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4101)		//사용하지 않은 지역변수입니다. 경고 무시
