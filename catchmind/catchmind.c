@@ -112,6 +112,7 @@ char signalmode;
 char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
+char clientcatchmind[256];
 MYSQL *con;
 SDL_Window * Window;//SDL 윈도우 선언
 SDL_Renderer * Renderer;// SDL 렌더러 선언
@@ -1026,7 +1027,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
 	while (1) {
 
-		if (recv(connect_sock, message, 40, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+		if (recv(connect_sock, message, 256, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -1107,7 +1108,10 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[0] = 10;
 				ZeroMemory(message, sizeof(message));
 			}
-
+			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
+			{
+				strcpy(clientcatchmind, message);
+			}
 		}
 		Sleep(100);
 	}
@@ -1730,18 +1734,18 @@ void jointema(void) {
 void sendall(char *message) {
 	cur(0, 45);
 	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[0], message, 40, 0);
+		send(Sconnect_sock[0], message, 256, 0);
 //	printf("Client 1 <- Server : %s\n", message);
 	if (Sconnect_sock[1] != 0) {
-		send(Sconnect_sock[1], message, 40, 0);
+		send(Sconnect_sock[1], message, 256, 0);
 //		printf("Client 2 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[2] != 0) {
-		send(Sconnect_sock[2], message, 40, 0);
+		send(Sconnect_sock[2], message, 256, 0);
 //		printf("Client 3 <- Server : %s\n", message);
 	}
 	if (Sconnect_sock[3] != 0) {
-		send(Sconnect_sock[3], message, 40, 0);
+		send(Sconnect_sock[3], message, 256, 0);
 //		printf("Client 4 <- Server : %s\n", message);
 	}
 	ZeroMemory(message, sizeof(message));
@@ -1771,7 +1775,7 @@ void Clnt_1(int v)
 	
 	char message[100];
 	while (1) {
-		if (recv(Sconnect_sock[v], message, 40, 0) > 0) {
+		if (recv(Sconnect_sock[v], message, 256, 0) > 0) {
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
 
