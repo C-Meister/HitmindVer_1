@@ -697,7 +697,7 @@ return 0;// 종료
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
-
+//#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #define nullptr 0
 
@@ -779,7 +779,13 @@ char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
 MYSQL *con;
-
+SDL_Window * Window;//SDL 윈도우 선언
+SDL_Renderer * Renderer;// SDL 렌더러 선언
+SDL_Window * Window2;
+SDL_Renderer * Renderer2;
+char query[500];
+SDL_Window * Window3;
+SDL_Renderer * Renderer3;
 
 //기본 함수들
 void gotoxy(short x, short y);
@@ -796,7 +802,7 @@ int Connect_Server(char *ServerIP);			//서버 연결 해주는 함수
 void recieve(void);								//서버에서 데이터 받아오는 쓰레드용 함수
 void sendall(char *message);					//하나를받으면 전부전송
 int waitroom(void);							//네트워크 대기방
-void Clnt_1(void);								//서버 - 클라이언트 1통신
+void Clnt_1(int v);								//서버 - 클라이언트 1통신
 void Clnt_2(void);								//서버 - 클라이언트 2통신
 void Clnt_3(void);								//서버 - 클라이언트 3통신
 void Clnt_4(void);								//서버 - 클라이언트 4통신
@@ -852,9 +858,11 @@ void numberbaseball();
 
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
+	
 	//SDL_MAIN();
 	//변수 선언
 	int i, j, k, v, result;
+
 	signalall();
 	char mainchoose = 0;
 	char bangchoose;
@@ -1191,7 +1199,7 @@ int waitroom(void)
 		printf("      ■                                                                                            ■\n");
 		printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("      ■                ■                                                        ■                ■\n");		// 4, 40		//11, 40		//42, 40		49, 40
-		if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
+		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
 			printf("      ■     ready      ■                       Start!                           ■     exit       ■\n");
 
 
@@ -1211,7 +1219,6 @@ int waitroom(void)
 				printf("%d초후 시작", 3 - i);
 			}
 			SDL_MAINS();
-
 		}
 		POINT a;
 		GetCursorPos(&a);
@@ -2286,36 +2293,38 @@ void sendall(char *message) {
 void processclnt(void) {
 	
 }
-void Clnt_1(void)
+void Clnt_1(int v)
 {
 	if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[1], querys[1], 40, 0);
+		send(Sconnect_sock[v], querys[1], 40, 0);
 	if (Sconnect_sock[2] != 0)
-		send(Sconnect_sock[1], querys[2], 40, 0);
+		send(Sconnect_sock[v], querys[2], 40, 0);
 	if (Sconnect_sock[3] != 0)
-		send(Sconnect_sock[1], querys[3], 40, 0);
+		send(Sconnect_sock[v], querys[3], 40, 0);
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[v], querys[0], 40, 0);
 	char message[100];
 	while (1) {
-		if (recv(Sconnect_sock[0], message, 40, 0) > 0) {
+		if (recv(Sconnect_sock[v], message, 40, 0) > 0) {
 			if (strncmp(message, "player   connect", 16) == 0) {
-				message[7] = '1';
+				message[7] = v + '0';
 
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 1 ready %s", friendname[0]);
+				sprintf(message, "player %d ready %s",v, friendname[0]);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 1 not ready %s", friendname[0]);
+				sprintf(message, "player %d not ready %s",v,  friendname[0]);
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player 1 exit");
-				closesocket(Sconnect_sock[0]);
-				SOCKETCOUNT = 0;
-				Sconnect_sock[0] = 0;
+				sprintf(message, "player %d exit", v);
+				closesocket(Sconnect_sock[v]);
+				SOCKETCOUNT = v;
+				Sconnect_sock[v] = 0;
 			}
 			else if (strcmp(message, "game start") == 0)
 			{
@@ -2323,7 +2332,7 @@ void Clnt_1(void)
 				printf("%s", message);
 				sendall(message);
 			}
-			strcpy(querys[0], message);
+			strcpy(querys[v], message);
 			sendall(message);
 			ZeroMemory(message, sizeof(message));
 		}
@@ -2466,9 +2475,17 @@ void makeroom(int *count) {
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
 	while (1) {
-		if (Sconnect_sock[SOCKETCOUNT] == 0)
+		if (Sconnect_sock[SOCKETCOUNT] == 0){
 			Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // 접속하면 accept() 해줌
+			threads[SOCKETCOUNT+1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, SOCKETCOUNT, 0, NULL); break;
+		}
 		else {
+			SOCKETCOUNT++;
+			if (SOCKETCOUNT == 4)
+				SOCKETCOUNT = 0;
+			continue;
+		}
+		/*else {
 			SOCKETCOUNT++;
 			if (SOCKETCOUNT == 4)
 				SOCKETCOUNT = 0;
@@ -2482,7 +2499,7 @@ void makeroom(int *count) {
 			case 3:threads[4] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_4, NULL, 0, NULL); break;
 			default: break;
 			}
-		}
+		}*/
 
 		Sleep(100);
 	}
@@ -3174,9 +3191,478 @@ int SDL_MAINS(void)
 		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, Font, strong, r, g, b);
-			//send(connect_sock, , sizeof(Renderer2), 0);
+			send(connect_sock, (char *)Renderer2, sizeof(Renderer2), 0);
+			
 		}
 			happen = false;
+	}
+	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
+	SDL_DestroyTexture(ChaTexture);
+	SDL_DestroyTexture(BoxTexture);
+	SDL_DestroyTexture(TraTexture);
+	SDL_DestroyTexture(EraTexture);
+	SDL_DestroyTexture(PenTexture);
+	SDL_DestroyTexture(NewTexture);
+	IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+	IMG_ExceptionRoutine(Renderer2, Window2);
+	IMG_ExceptionRoutine(Renderer3, Window3);
+	return 0;// 종료
+}
+int SDL_MAINS2(void)
+{
+	
+	SDL_Rect center = { 0 };
+	// 텍스쳐와 사각형 선언
+	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * EraTexture = nullptr;// 지우개 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * NewTexture = nullptr;// 새로만들기 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * TraTexture = nullptr;// 스크롤 트랙 이미지를 담기위한 텍스쳐선언
+	SDL_Texture * BoxTexture = nullptr;// 스크롤 박스 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * ChaTexture = nullptr;// 채팅창 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * StaTexture = nullptr;// 상태창 이미지를 담기위한 텍스쳐 선언
+	SDL_Rect RgbCode = { 0 };// RgbCode 이미지의 정보를 담기위한 사각형변수 선언
+	SDL_Rect Pencil = { 0 }; // Pencil 이미지의 정보를 담기위한 사각형 변수 선언
+	SDL_Rect Eraser = { 0 }; // Eraser 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect New = { 0 }; // New 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Track = { 0 };// Track 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Box = { 0 };//Box 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Chat = { 0 };// Chat 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Status = { 0 };//Status 이미지의 정보를 담기 위한 사각형 변수 선언
+							// 텍스쳐와 사각형 선언 끝
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_Init함수로 SDL 초기화하고 초기화 안되면 if문 실행 SDL_Init의 인수는 다양함(ex : SDL_INIT_VIDEO)
+		SDL_ExceptionRoutine(Renderer, Window, "SDL_Init", 1);//단계1의 예외 처리 루틴실행
+		return 0;// 종료
+	};
+	// 윈도우창 3개로 나누는 기준 x좌표는 1920 - 1310/4-10이고, 1080-900/4-10은 y좌표의 기준이다.
+	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window == nullptr) {// 윈도우 생성 실패시 if문 실행
+		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateWindow", 2);//단계2의 예외처리루틴실행
+		return 0;//종료
+	}
+	Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (Renderer == nullptr) {
+		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateRenderer", 3);
+		return 0;
+	}
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window2 == nullptr) {// 윈도우 생성 실패시 if문 실행
+		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateWindow2", 2);//단계2의 예외처리루틴실행
+		return 0;//종료
+	}
+	Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
+	if (Renderer2 == nullptr) {// 렌더러 생성 실패시 if문 실행
+		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateRenderer2", 3);//단계3의 예외 처리 루틴 실행
+		return 0;// 종료
+	}
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window3 == nullptr) {// 윈도우 생성 실패시 if문 실행
+		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateWindow3", 2);//단계2의 예외처리루틴실행
+		return 0;//종료
+	}
+	Renderer3 = SDL_CreateRenderer(Window3, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
+	if (Renderer3 == nullptr) {// 렌더러 생성 실패시 if문 실행
+		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateRenderer3", 3);//단계3의 예외 처리 루틴 실행
+		return 0;// 종료
+	}
+	// 흰색으로 세팅
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+	SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer2);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+	SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer3);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+							   // 끝
+	SDL_Event event;//SDL_Event 변수 선언
+	const Uint8 * keystate;// Key 상태 배열을 받기 위한 포인터 선언
+						   // RgbCode 이미지
+	RgbTexture = LoadTextureEx(Renderer, "RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (RgbTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode 이미지의 가로세로 읽어오기. 윈도우 창을 3개로 나누는 기준이 되므로 윈도우창 선언전에 읽어옴
+	RgbCode.w /= 4;
+	RgbCode.h /= 4;
+	RgbCode.x = 5;// 이미지의 x,y좌표와 너비와 높이 설정
+	RgbCode.y = 1080 - RgbCode.h - 10;
+	// 끝
+	// Track 이미지
+	TraTexture = LoadTextureEx(Renderer, "Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (TraTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//이미지 정보 불러오기
+	Track.w /= 4;
+	Track.h /= 8;
+	Track.x = RgbCode.x;
+	Track.y = RgbCode.y - Track.h - 25;
+	// 끝
+	// Box 이미지
+	BoxTexture = LoadTextureEx(Renderer, "Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (BoxTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//이미지 정보 불러오기
+	Box.w /= 2;
+	Box.h /= 2;
+	Box.x = Track.x + 50;
+	Box.y = Track.y + Track.h / 2 - Box.h / 2;
+	// 끝
+	// Pencil 이미지
+	PenTexture = LoadTexture(Renderer, "Pencil.jpg"); // 이미지 불러오기
+	if (PenTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
+	Pencil.w /= 15;
+	Pencil.h /= 15;
+	Pencil.x = Track.x + 50 + 40;
+	Pencil.y = Track.y - 30 - Pencil.h;
+	// 끝
+	// Eraser 이미지
+	EraTexture = LoadTexture(Renderer, "Eraser.jpg"); // 이미지 불러오기
+	if (EraTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	Eraser.w = Pencil.w;
+	Eraser.h = Pencil.h;
+	Eraser.x = Pencil.x + 50 + 30;
+	Eraser.y = Pencil.y;
+	// 끝
+	// New 이미지
+	NewTexture = LoadTexture(Renderer, "New.jpg"); // 이미지 불러오기
+	if (NewTexture == nullptr) {// 에러코드 잡기
+		IMG_ExceptionRoutine(Renderer, Window);//IMG예외처리루틴 실행
+		IMG_ExceptionRoutine(Renderer2, Window2);
+		IMG_ExceptionRoutine(Renderer3, Window3);
+		return 0;
+	}
+	while (1)
+	{
+
+		SDL_RenderPresent(Renderer2);
+		Sleep(50);
+	}
+	New.w = Eraser.w;
+	New.h = Eraser.h;
+	New.x = Eraser.x + 50 + 30;
+	New.y = Eraser.y;
+	// 끝
+	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
+	// while문에서 쓸 변수들 선언
+	bool quit = false;//불 변수 선언
+	bool drag = false;// 드래그중인지 확인하는 변수 선언
+	bool happen = true;
+	int alpha;// 명도와 채도를 담기위한 변수 선언
+	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
+	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
+	float i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
+	float xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언
+	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기의 선언
+	SDL_Rect Rect = { 0 }; // 그릴 사각형의 변수를 반복문 밖에서 선언
+	SDL_Rect Font = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// 색깔, 굵기등을 보여주기 위한 사각형 변수 선언
+	SDL_Rect Edge = { 0 };// 테두리를 그리기 위한 사각형 변수 선언
+						  // 끝
+						  // while문에서 쓸 변수의 초기값 설정
+	RenderTexture(Renderer, RgbTexture, &RgbCode);// 렌더러에 저장하기
+												  // 변수 초기값 설정끝
+
+	while (!quit) {// quit가 true가 아닐때 동안 무한반복
+		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
+			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
+			case SDL_WINDOWEVENT://SDL종료 타입일 경우
+				switch (event.window.event) {
+				case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
+					quit = true;// quit를 true로 변경
+					break;// 브레이크
+				case SDL_WINDOWEVENT_ENTER:// 윈도우
+					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
+					break;
+				case SDL_WINDOWEVENT_LEAVE:
+					drag = false;//마우스가 창에서 나갔으므로 드래그 기능을 중지시킴
+					break;
+				case SDL_WINDOWEVENT_FOCUS_GAINED:
+					break;
+				}
+			case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
+				if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
+					if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
+						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
+							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+							SDL_RenderFillRect(Renderer, &Box);// 지우개같이 흰색으로 칠함
+							Box.x = event.motion.x;// 박스의 x좌표를 클릭한곳의 x좌표로 바꿈 == 이동시킴
+							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
+							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+							SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+							Font.x = Track.x + 35 - strong / 2;// 왼쪽 꼭짓점 좌표를 다시설정
+							Font.y = Track.y - 50 - strong / 2;// 오른쪽 꼭짓점 좌표를 다시설정
+							Font.h = Font.w = strong;// 굵기 다시설정
+							SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+							SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+							if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+								SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+								SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+							}
+							happen = true;
+							break;// 이 구문을 탈출함
+						}
+					}
+					else if (event.motion.windowID == SDL_GetWindowID(Window2)) {// 마우스가 움직인 곳이 두번째 윈도우 창일 경우
+						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+						if (length == 0) break;
+						if (clicks.pencil == true) {// 펜슬일 경우
+							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+							k = 0;// while문안에 쓸 변수 초기화.
+							xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+							ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+							Rect.w = Rect.h = strong;// 굵기설정
+							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+								Rect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정
+								Rect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+								SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
+							}
+						}
+						else if (clicks.eraser == true) {// 지우개 경우
+							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+							i = (event.motion.x - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+							j = (event.motion.y - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+							k = 0;// while문안에 쓸 변수 초기화.
+							xpos = Rect.x;// 전에찍은점 x좌표를 따로 저장
+							ypos = Rect.y;// 전에찍은점 y좌표를 따로 저장
+							Rect.w = Rect.h = strong;// 굵기설정
+							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+								Rect.x = xpos + k*i;// 찍을 점의 중심 점 x좌표를 설정
+								Rect.y = ypos + k*j;// 찍을 점의 중심 점 y좌표를 설정
+								int x1, y1, x2, y2;
+								for (l = 0; l < 180; l++) {
+									x1 = sin(3.14 / 180 * l)*strong / 2;
+									y1 = cos(3.14 / 180 * l)*strong / 2;
+									x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+									y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+								}
+							}
+						}
+						happen = true;
+					}
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.button.button == 1) {
+					if (event.button.windowID == SDL_GetWindowID(Window)) {
+						if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
+							alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
+							switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
+							case 0:// 색 설정 코드
+								r = 255; g = 0; b = 0;
+								break;
+							case 1:
+								r = 255; g = 128; b = 0;
+								break;
+							case 2:
+								r = 255; g = 255; b = 0;
+								break;
+							case 3:
+								r = 128; g = 255; b = 0;
+								break;
+							case 4:
+								r = 0; g = 255; b = 0;
+								break;
+							case 5:
+								r = 0; g = 255; b = 128;
+								break;
+							case 6:
+								r = 0; g = 255; b = 255;
+								break;
+							case 7:
+								r = 0; g = 128; b = 255;
+								break;
+							case 8:
+								r = 0; g = 0; b = 255;
+								break;
+							case 9:
+								r = 127; g = 0; b = 255;
+								break;
+							case 10:
+								r = 255; g = 0; b = 255;
+								break;
+							case 11:
+								r = 255; g = 0; b = 127;
+								break;
+							case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
+								r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
+								alpha = 4;
+								break;
+							}
+							// 수식으로 rgb값 설정
+							if (alpha <= 4) {
+								r = r + r / 5 * (alpha - 4);
+								g = g + g / 5 * (alpha - 4);
+								b = b + b / 5 * (alpha - 4);
+								// 폰트 출력 부분
+								if (clicks.pencil == true || clicks.eraser == true) {
+									SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+									SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+									SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+									SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+									SDL_Delay(300);
+									if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+										SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+										SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+									}
+								}
+								// 폰트 출력 끝
+								happen = true;
+								break;
+							}
+							else {
+								r = r + (255 - r) / 5 * (alpha - 4);
+								g = g + (255 - g) / 5 * (alpha - 4);
+								b = b + (255 - b) / 5 * (alpha - 4);
+								// 폰트 출력 부분
+								if (clicks.pencil == true || clicks.eraser == true) {
+									SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+									SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+									SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+									SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+									if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+										SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+										SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+									}
+								}
+								// 폰트 출력 끝
+								happen = true;
+								break;
+
+							}
+						}
+						else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
+							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
+							SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
+							Box.x = event.button.x;//스크롤 박스를 이동시킴
+							drag = true; //드래그로 조정이 가능하게 설정
+							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
+																							 // 폰트 출력 부분
+							if (clicks.pencil == true || clicks.eraser == true) {
+								SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 정함
+								SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								Font.x = Track.x + 35 - strong / 2;// 왼쪽 꼭짓점 좌표를 다시설정
+								Font.y = Track.y - 50 - strong / 2;// 오른쪽 꼭짓점 좌표를 다시설정
+								Font.h = Font.w = strong;// 굵기 다시설정
+								SDL_SetRenderDrawColor(Renderer, r, g, b, 0);//색깔을 얻어옴
+								SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함
+								if (strong > 5) {// if문에 굵기가 5초과인 경우만 이라고 한이유는 굵기가 5이하이면 테두리때문에 검은색으로 보일수도 있기 때문
+									SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 0);// 검은색으로 설정
+									SDL_RenderDrawRect(Renderer, &Font);// 테두리를 그려줌
+								}
+							}
+							// 폰트 출력 끝
+							happen = true;
+							break;
+						}
+						else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
+							clicks.eraser = true;
+							clicks.pencil = false;
+							happen = true;
+						}
+						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {
+							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+							SDL_RenderClear(Renderer2);
+							SDL_RenderFillRect(Renderer, &Font);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+							clicks.eraser = false;
+							clicks.pencil = false;
+							happen = true;
+						}
+						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
+							clicks.eraser = false;
+							clicks.pencil = true;
+							happen = true;
+						}
+					}
+					else if (event.button.windowID == SDL_GetWindowID(Window2)) {
+						if (clicks.pencil == true) {
+							Rect.x = event.button.x - strong / 2;
+							Rect.y = event.button.y - strong / 2;// 굵기만큼의 사각형을 만듬
+							Rect.w = Rect.h = strong;// 굵기 설정
+							SDL_RenderFillRect(Renderer2, &Rect);// 렌더러에 그림
+							drag = true; //드래그로 그릴수 있게 설정
+							happen = true;
+							break;
+						}
+						else if (clicks.eraser == true) {
+							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+							int x1, y1, x2, y2;
+							Rect.x = event.button.x;
+							Rect.y = event.button.y;// 굵기만큼의 사각형을 만듬
+							for (l = 0; l < 180; l++) {
+								x1 = sin(3.14 / 180 * l)*strong / 2;
+								y1 = cos(3.14 / 180 * l)*strong / 2;
+								x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+								y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+								SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+							}
+							drag = true;
+							happen = true;
+							break;
+						}
+					}
+				}
+			case SDL_MOUSEBUTTONUP: // 마우스 버튼이 떼졌을때
+				if (event.button.button == SDL_BUTTON_LEFT) // 떼진 버튼이 왼쪽버튼이라면
+					drag = false;// 드래그로 하는 모든 것을 불가능하게 만듦
+			}
+		}
+		SDL_GetMouseState(&x, &y);
+		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {
+			on.eraser = true;
+			happen = true;
+		}
+		else {
+			if (on.eraser == true)
+				happen = true;
+			on.eraser = false;
+			if ((x >= Pencil.x - 10 && x <= Pencil.x + Pencil.w + 10) && (y >= Pencil.y - 10 && y <= Pencil.y + Pencil.h + 10)) {
+				on.pencil = true;
+				happen = true;
+			}
+			else {
+				if (on.pencil == true)
+					happen = true;
+				on.pencil = false;
+				if ((x >= New.x - 10 && x <= New.x + New.w + 10) && (y >= New.y - 10 && y <= New.y + New.h + 10)) {
+					on.new = true;
+					happen = true;
+				}
+				else {
+					if (on.new == true) {
+						happen = true;
+					}
+					on.new = false;
+				}
+			}
+		}
+		if (happen == true) {
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, Font, strong, r, g, b);
+			send(connect_sock, (char *)Renderer2, sizeof(Renderer2), 0);
+
+		}
+		happen = false;
 	}
 	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
 	SDL_DestroyTexture(ChaTexture);
