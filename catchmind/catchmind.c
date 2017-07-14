@@ -1254,7 +1254,6 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				
 
 				strcpy(clientcatchmind, message);
-				printf("receivd : %s     \n", clientcatchmind);
 				ZeroMemory(message, sizeof(message));
 				SDLCLOCK++;
 			}
@@ -2093,7 +2092,6 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 	}
 	else {
 		if (pencil == true && drag == false) {//eraser 상태에서 클릭한 경우
-			printf("펜슬로 점찍음 !! eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f   \n ", eraser, pencil, drag, x, y, strong, r, g, b);
 			ReceiveRect.x = x - strong / 2;
 			ReceiveRect.y = y - strong / 2;// 굵기만큼의 사각형을 만듬
 			ReceiveRect.w = ReceiveRect.h = strong;// 굵기 설정
@@ -2103,7 +2101,6 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			return;
 		}
 		else if (eraser == true && drag == false) {
-			printf("지우개로 점찍음 ! eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f   \n ", eraser, pencil, drag, x, y, strong, r, g, b);
 			strong *= 80 / 50.0;
 			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 			int x1, y1, x2, y2, l;
@@ -2139,7 +2136,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			return;
 		}
 		else if (eraser == true && drag == true) {
-			printf("지우개로 드래그함!! eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f   \n ", eraser, pencil, drag, x, y, strong, r, g, b);
+		
 			strong *= 80 / 50.0;
 			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
@@ -2390,10 +2387,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		while (1) {
 			if (buff < SDLCLOCK) {
 				buff++;
-				printf("sdlmain_clientcatchmind : %s & clock = %d\n", clientcatchmind, buff);
 				sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &rr, &gg, &bb);
 				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-				printf("sscanf : %d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
 				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, (float)rr, (float)gg, (float)bb);
 			}
 
