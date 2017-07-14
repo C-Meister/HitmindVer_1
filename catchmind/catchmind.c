@@ -2321,11 +2321,11 @@ void Clnt_1(int v)
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d ready %s",v + 1, friendname[0]);
+				sprintf(message, "player %d ready %s",v + 1, friendname[i]);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d not ready %s",v + 1,  friendname[0]);
+				sprintf(message, "player %d not ready %s",v + 1,  friendname[i]);
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
