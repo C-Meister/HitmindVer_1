@@ -2366,6 +2366,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderFillRect(Renderer2, &Rect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+							if (connect_sock != 0) {
+								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 						}
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
 							strong *= 80 / 50.0;
@@ -2391,7 +2395,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							strong *= 50 / 80.0;
 						}
 						happen = true;
+						send(connect_sock, "clear", 45, 0);
 						//¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+						if (connect_sock != 0) {
+							sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+							send(connect_sock, query, 45, 0);
+						}
 					}
 				}
 				break;
@@ -2481,6 +2490,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							Font.h += 2;
 							newclick = 1;
 							//¿©±â~~~~~~~~~~~~~~~~~~
+							if (connect_sock != 0) {
+								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = false;
@@ -2521,6 +2534,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
 							}
 							// ¿©±â~~~~~~~~~~~~~~
+							if (connect_sock != 0) {
+								sprintf(query, "%d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, x, y, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 							strong *= 50.0 / 80;
 							drag = true;
 							happen = true;
@@ -2567,12 +2584,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 			printf("happen is true!!!\n");
-			if (connect_sock != 0) {
-				sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser,clicks.pencil, newclick, x, y, strong, r, g, b);
-				if (newclick == 1)
-					newclick = 0;
-				send(connect_sock, query, 45, 0);
-			}
+			
 		}
 		happen = false;
 		
