@@ -936,9 +936,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 						if (serverreturn == 1)												//리턴값 1이면 start
 						{
 							CLS;
-							printf("시작!");
-							Sleep(1000);
-							getchar();
+							continue;
 						}
 						break;
 					}
@@ -1216,13 +1214,14 @@ int waitroom(void)
 				printf("%d초후 시작", 3 - i);
 			}
 			SDL_MAINS();
+			return 1;
 		}
 		POINT a;
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
 		click(&xx, &yy, &lr);
 		if (lr == 1) {
-			if (lead == true && status[0] == 2 && status[1] == 2 && status[2] == 2 && status[3] == 2) {
+			if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
 				if (xx > 13 && xx < 41 && yy < 43 && yy > 39) {
 					send(connect_sock, "game start", 40, 0);
 					xx = 0; yy = 0;
