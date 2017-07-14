@@ -220,9 +220,10 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
 	con = cons;
-	mainchoose = maintitle();				//main 화면
+	
 	disablecursor(1);
 	while (1) {								//로그인 반복문
+		mainchoose = maintitle();				//main 화면
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			ConsoleL(30, 30);
@@ -312,9 +313,9 @@ void inserttopic(MYSQL *cons)
 		getchar();
 		CLS;
 		printf("\n주제를 입력해 주세요. 나가려면 p를 입력해주세요\n-> %d : ", num);
-		fgets(topic, sizeof(query), stdin);
+		fgets(topic, sizeof(topic), stdin);
 		CHOP(topic);
-		if (strcmp(topic, "p"))
+		if (strcmp(topic, "p") == 0)
 		{
 			return;
 		}
