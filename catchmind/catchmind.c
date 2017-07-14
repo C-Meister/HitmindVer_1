@@ -1259,7 +1259,6 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
-				
 				SDL_Clear = true;
 				SDLCLOCK++;
 			}
