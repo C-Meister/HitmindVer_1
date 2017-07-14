@@ -1904,7 +1904,7 @@ void gotoxy(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-//void rooprender(SDL_Renderer *Renderer2)
+/*void rooprender(SDL_Renderer *Renderer2)
 {
 	char click_eraser, click_pencil;
 	char dragging;
@@ -1923,7 +1923,7 @@ void gotoxy(short x, short y)
 
 	}
 
-}
+}*/
 void cur(short x, short y)
 {
 	COORD pos = { x, y };
