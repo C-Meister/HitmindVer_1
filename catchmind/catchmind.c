@@ -2281,8 +2281,8 @@ void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, 
 			ReceiveRect.x = x - strong / 2;
 			ReceiveRect.y = y - strong / 2;// 굵기만큼의 사각형을 만듬
 			ReceiveRect.w = ReceiveRect.h = strong;// 굵기 설정
-			SDL_SetRendererDrawColor(Renderer4, r, g, b, 0);
-			SDL_RenderFillReceiveRect(Renderer4, &ReceiveRect);// 렌더러에 그림
+			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
+			SDL_RenderFillRect(Renderer4, &ReceiveRect);// 렌더러에 그림
 			return;
 		}
 		else if (eraser == true && drag == false) {
@@ -2315,7 +2315,7 @@ void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, 
 				for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
 					ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
 					ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
-					SDL_RenderFillReceiveRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
+					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 				}
 			}
 			return;
