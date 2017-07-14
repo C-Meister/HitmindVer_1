@@ -1259,7 +1259,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				SDLCLOCK++;
 				cur(0, 0);
-				printf("%s                    ", message);
+			//	printf("%s                    ", message);
 				strcpy(clientcatchmind, message);
 			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
@@ -2264,7 +2264,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	return;
 }
 void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
-	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f\n", eraser, pencil, drag, x, y, strong, r, g, b);
+	cur(0, 0);
+	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f       \n", eraser, pencil, drag, x, y, strong, r, g, b);
 	if (SDL_Clear == true) {
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
