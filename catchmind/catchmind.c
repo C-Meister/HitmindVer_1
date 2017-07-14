@@ -218,7 +218,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
 	memset(&connect_addr, 0, sizeof(connect_addr));
-	SDL_MAINS();
+	//SDL_MAINS();
 	// 초기화 끝
 
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
@@ -233,8 +233,9 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 			
+			ConsoleL(50, 20);
 			while (1) {						//방 반복문
-				ConsoleL(50, 20);
+				gotoxy(0, 0);
 				bangchoose = bangchose(cons);	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
 					sqlmakeroom(cons);
@@ -249,7 +250,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					chooseroomcount = chooseroom(bangchoose);
 					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
 					{
-						CLS;
 						continue;
 					}
 					if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
@@ -257,6 +257,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 						cur(14, 1);
 						printf("(비밀번호가 틀렸습니다)");
 						_getch();
+						CLS;
 						fflush(stdin);
 						continue;
 					}
@@ -459,7 +460,7 @@ int waitroom(void)
 	disablecursor(1);
 	int xx = 0, yy = 0, lr = 0;
 	int togl = -1;
-	ConsoleL(100, 50);
+	ConsoleL(54, 50);
 	char query[100] = { 0, };
 	int mode = 0;
 	if (lead == true)
@@ -1142,7 +1143,7 @@ int sqllogin(MYSQL *cons) {
 				}
 				else {
 					strcpy(username, sql_row[1]);
-					sprintf(query, "title %s님 캐치마인드에 오신것을 환영합니다!", username);
+					sprintf(query, "title %s님 히트마인드에 오신것을 환영합니다!", username);
 					system(query);
 					return 1; //로그인 성공
 				}
@@ -1303,6 +1304,24 @@ void banglist(MYSQL *cons, int j) {
 	sql_result = mysql_store_result(cons);
 
 	memset(connectroom, 0, sizeof(connectroom));
+
+	while (i < 6) {
+
+		if (i % 2 == 0)
+			cur(25, 6 + (i * 2));
+		else
+			cur(55, 6 + ((i / 2) * 4));
+		printf("                 ");
+
+		if (i % 2 == 0)
+			cur(25, 7 + (i * 2));
+		else
+			cur(55, 7 + ((i / 2) * 4));
+		printf("                 ");
+
+		i++;
+	}
+	i = 0;
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
 
@@ -1310,6 +1329,7 @@ void banglist(MYSQL *cons, int j) {
 			cur(25, 6 + (i * 2));
 		else
 			cur(55, 6 + ((i / 2) * 4));
+
 		if (j == i) {
 			HIGH_GREEN printf("%s", sql_row[0]);
 		}
@@ -1682,7 +1702,7 @@ void logintema(void) {
 	WHITE
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
-	printf("■            캐치마인드 서버에 로그인          ■\n");
+	printf("■            히트마인드 서버에 로그인          ■\n");
 	printf("■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■     ID     □                    □          ■\n");
