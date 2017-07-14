@@ -2264,6 +2264,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 	if (SDL_Clear == true) {
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
+		SDL_RenderPresent(Renderer4);
 		SDL_Clear = false;
 	}
 	else {
@@ -2273,6 +2274,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			ReceiveRect.w = ReceiveRect.h = strong;// 굵기 설정
 			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 			SDL_RenderFillRect(Renderer4, &ReceiveRect);// 렌더러에 그림
+			SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == false) {
@@ -2289,6 +2291,8 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 				SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
 			}
 			strong *= 50.0 / 80;
+
+			SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (pencil == true && drag == true) {
@@ -2308,6 +2312,8 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 				}
 			}
+
+			SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == true) {
@@ -2334,6 +2340,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 				}
 			}
 			strong *= 50 / 80.0;
+			SDL_RenderPresent(Renderer4);
 			return;
 		}
 	}
@@ -2376,8 +2383,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Renderer * Renderer2;
 	SDL_Window * Window3;
 	SDL_Renderer * Renderer3;
-	SDL_Window * Window4;
-	SDL_Renderer * Renderer4;
 	SDL_Rect center = { 0 };
 	char query[256];
 	// 텍스쳐와 사각형 선언
@@ -2433,16 +2438,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateRenderer3", 3);//단계3의 예외 처리 루틴 실행
 		return 0;// 종료
 	}
-	Window4 = SDL_CreateWindow("HIT MIND WITH C 4", 0, 0, (1920 - 1310 / 4 - 10)*(1), (1080 - 900 / 4 - 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
-	if (Window4 == nullptr) {// 윈도우 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer3, Window4, "SDL_CreateWindow4", 2);//단계2의 예외처리루틴실행
-		return 0;//종료
-	}
-	Renderer4 = SDL_CreateRenderer(Window4, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
-	if (Renderer4 == nullptr) {// 렌더러 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer4, Window4, "SDL_CreateRenderer4", 3);//단계3의 예외 처리 루틴 실행
-		return 0;// 종료
-	}
+
 	// 흰색으로 세팅
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 그리기 색깔 설정
 	SDL_RenderClear(Renderer);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
