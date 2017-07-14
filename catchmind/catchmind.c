@@ -466,122 +466,101 @@ int waitroom(void)
 	waitroomtema();
 	while (1) { //받아온 데이터 처리
 		
-		
+	
 		cur(11, 5);
-		printf("[ %s ]", friendname[0]);
+		printf("[ %s ]             ", friendname[0]);
 		if (status[0] == 0) {
 
 			GRAY
-				gotoxy(24, 7);
-			printf("                   ");
 			gotoxy(24, 7);
-			printf("DISCONNECTED");
+			printf("DISCONNECTED            ");
 			WHITE
 		}
 		else if (status[0] == 1) {
 			HIGH_GREEN
-				gotoxy(24, 7);
-			printf("                   ");
 			gotoxy(24, 7);
-			printf("JOIN           ");
+			printf("JOIN               ");
 			WHITE
 		}
 		if (status[0] == 2) {
 			SKY_BLUE
-				gotoxy(24, 7);
-			printf("                   ");
 			gotoxy(24, 7);
-			printf("READY");
+			printf("READY             ");
 			WHITE
 		}
 		
+
 		cur(11, 14);
-		printf("[ %s ]", friendname[1]);
+		printf("[ %s ]             ", friendname[1]);
 		if (status[1] == 0) {
 			GRAY
-				gotoxy(24, 16);
-			printf("                   ");
+
 			gotoxy(24, 16);
-			printf("DISCONNECTED");
+			printf("DISCONNECTED                  ");
 			WHITE
 		}
 		else if (status[1] == 1) {
 			HIGH_GREEN
-				gotoxy(24, 16);
-			printf("                   ");
+
 			gotoxy(24, 16);
-			printf("JOIN");
+			printf("JOIN                 ");
 			WHITE
 		}
 		if (status[1] == 2) {
 			SKY_BLUE
-				gotoxy(24, 16);
-			printf("                   ");
 			gotoxy(24, 16);
-			printf("READY");
+			printf("READY                ");
 			WHITE
 		}
-		
+
 		cur(11, 23);
-		printf("[ %s ]", friendname[2]);
+		printf("[ %s ]          ", friendname[2]);
 		if (status[2] == 0) {
 			GRAY
-				gotoxy(24, 25);
-			printf("                   ");
 			gotoxy(24, 25);
-			printf("DISCONNECTED");
+			printf("DISCONNECTED              ");
 			WHITE
 		}
 		else if (status[2] == 1) {
 			HIGH_GREEN
-				gotoxy(24, 25);
-			printf("                   ");
 			gotoxy(24, 25);
-			printf("JOIN");
+			printf("JOIN                  ");
 			WHITE
 		}
 		if (status[2] == 2) {
 			SKY_BLUE
-				gotoxy(24, 25);
-			printf("                   ");
 			gotoxy(24, 25);
-			printf("READY");
+			printf("READY              ");
 			WHITE
 		}
 		
 		cur(11, 32);
-		printf("[ %s ]", friendname[3]);
+		printf("[ %s ]             ", friendname[3]);
 		if (status[3] == 0) {
 			GRAY
-				gotoxy(24, 34);
-			printf("                   ");
 			gotoxy(24, 34);
-			printf("DISCONNECTED");
+			printf("DISCONNECTED        ");
 			WHITE
 		}
 		else if (status[3] == 1) {
 			HIGH_GREEN
-				gotoxy(24, 34);
-			printf("                   ");
 			gotoxy(24, 34);
-			printf("JOIN");
+			printf("JOIN                 ");
 			WHITE
 		}
 		if (status[3] == 2) {
 			SKY_BLUE
-				gotoxy(24, 34);
-			printf("                   ");
 			gotoxy(24, 34);
-			printf("READY");
+			printf("READY                ");
 			WHITE
 		}
 		
-		
-		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1) {
-			printf("      ■     ready      ■                       Start!                           ■     exit       ■\n");
-		}
+		gotoxy(51, 41);
+		if (lead == true && status[0] != 1 && status[1] != 1 && status[2] != 1 && status[3] != 1)
+			printf("start!");
 		else
-			printf("      ■     ready      ■                                                        ■     exit       ■\n");
+			printf("          ");
+			
 		
 		
 		if (status[0] == 10)
