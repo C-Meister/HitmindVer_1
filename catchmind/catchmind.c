@@ -1904,7 +1904,7 @@ void gotoxy(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-void rooprender(SDL_Renderer *Renderer2)
+//void rooprender(SDL_Renderer *Renderer2)
 {
 	char click_eraser, click_pencil;
 	char dragging;
@@ -2378,8 +2378,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	char click_eraser, click_pencil;
 	char dragging;
 	int xxx, yyy;
-	float strong;
-	int rr, gg, bb;
+	float sstrong;
+	float rr, gg, bb;
 	int buff = 0;		  // 끝
 						  // while문에서 쓸 변수의 초기값 설정
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// 렌더러에 저장하기
@@ -2388,13 +2388,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 		
-		CLS;
+	//	CLS;
 	
 			if (buff < SDLCLOCK) {
 				buff++;
-				sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &strong, &rr, &gg, &bb);
+				sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, strong, (float)rr, (float)gg, (float)bb);
+				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			}
 
 		
