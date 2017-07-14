@@ -305,18 +305,20 @@ void inserttopic(MYSQL *cons)
 		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 		{
 			printf("%s : %s\n", sql_row[0], sql_row[1]);
-			num = atoi(sql_row[1]);
-			getchar();
+			num = atoi(sql_row[0]);
+			
 		}
+		num++;
+		getchar();
 		CLS;
 		printf("\n주제를 입력해 주세요. 나가려면 p를 입력해주세요\n-> %d : ", num);
-		fgets(query, sizeof(query), stdin);
-		CHOP(query);
-		if (strcmp(query, "p"))
+		fgets(topic, sizeof(query), stdin);
+		CHOP(topic);
+		if (strcmp(topic, "p"))
 		{
 			return;
 		}
-		sprintf(query, "insert into catchmind.topic (top) values ('%s')", query);
+		sprintf(query, "insert into catchmind.topic (top) values ('%s')", topic);
 		mysql_query(cons, query);
 	}
 
