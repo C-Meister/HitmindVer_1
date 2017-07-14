@@ -2571,7 +2571,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		while (1) {
 			if (buff <= SDLCLOCK) {
 				buff++;
-				sscanf(clientcatchmind, "%hhd %hhd %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y,  &strong, &r, &g, &b);
+				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &x, &y,  &strong, &r, &g, &b);
 				printf("%d %d %d %d %d %f %f %f %f\n", click_eraser, click_pencil, dragging, x, y, strong, r, g, b);
 				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, r, g, b);
 			}
