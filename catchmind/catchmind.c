@@ -167,7 +167,7 @@ int SDL_MAINS(void);
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
-void banglist(MYSQL *cons);						//게임 방 출력
+void banglist(MYSQL *cons,int j);						//게임 방 출력
 int bangchose(MYSQL *cons);						//게임 방 출력및 선택
 int chooseroom(int roomnum);
 void logintema(void);							//로그인 디자인
@@ -648,6 +648,7 @@ void usermain(void) {
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 	int to = -1;
+	int b = 0;
 	int n = 0;
 restart:
 
@@ -799,10 +800,16 @@ restart:
 						goto restart;
 					}
 				}
-				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 0) {
+					b++;
+				}
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 0) {
+					b++;
+				}
+				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7 && b == 1) {
 					break;
 				}
-				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7 && b == 1) {
 					break;
 				}
 			}
@@ -1305,7 +1312,7 @@ void bangtema() {
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 
 }
-void banglist(MYSQL *cons) {
+void banglist(MYSQL *cons, int j) {
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	short i = 0;
@@ -1318,8 +1325,12 @@ void banglist(MYSQL *cons) {
 			cur(25, 6 + (i * 2));
 		else
 			cur(55, 6 + ((i / 2) * 4));
-		printf("%s", sql_row[0]);
-
+		if (j == i) {
+			HIGH_GREEN printf("%s", sql_row[0]);
+		}
+		else {
+			WHITE printf("%s", sql_row[0]);
+		}
 		/*for (short j = 0; sql_row[1][j] != 0; j++) {
 			if (i % 2 == 0 && j < 10)
 				cur(25 + j, 7 + (i * 2));
@@ -1335,7 +1346,13 @@ void banglist(MYSQL *cons) {
 			cur(25, 7 + (i * 2));
 		else
 			cur(55, 7 + ((i / 2) * 4));
-		printf("%-7s", sql_row[1]);
+		
+		if (j == i) {
+			HIGH_GREEN printf("%-7s", sql_row[1]);
+		}
+		else {
+			WHITE printf("%-7s", sql_row[1]);
+		}
 		strcpy(connectroom[i].ip, sql_row[0]);
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
@@ -1349,10 +1366,12 @@ void banglist(MYSQL *cons) {
 int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0, lr = 0;
+	int j = 0;
 	POINT a;
 	bangtema();
+	j = -1;
 	while (1) {
-		banglist(cons);
+		banglist(cons, j);
 		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
 
@@ -1377,6 +1396,44 @@ int bangchose(MYSQL *cons) {
 				return 6;
 			else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//방 6
 				return 7;
+		}
+		else if (lr == 0) {
+			if (9 <= xx && xx <= 22 && 2 == yy) {			//방만들기
+				gotoxy(28, 2);
+				HIGH_GREEN printf("방만들기");
+				WHITE
+					gotoxy(58, 2);
+				printf("빠른시작");
+			}
+
+			else if (24 <= xx && xx <= 37 && 2 == yy) {		//빠른시작
+				gotoxy(58, 2);
+				HIGH_GREEN printf("빠른시작");
+				WHITE
+					gotoxy(28, 2);
+				printf("방만들기");
+			}
+
+			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
+				j = 0;
+			else if (24 <= xx && xx <= 34 && 6 <= yy && yy <= 8)	//방 2
+				j = 1;
+			else if (9 <= xx && xx <= 22 && 10 <= yy && yy <= 12)	//방 3
+				j = 2;
+			else if (24 <= xx && xx <= 34 && 10 <= yy && yy <= 12)	//방 4
+				j = 3;
+			else if (9 <= xx && xx <= 22 && 14 <= yy && yy <= 16)	//방 5
+				j = 4;
+			else if (24 <= xx && xx <= 34 && 14 <= yy && yy <= 16)	//방 6
+				j = 5;
+			else {
+				WHITE
+				gotoxy(28, 2);
+				printf("방만들기");
+				gotoxy(58, 2);
+				printf("빠른시작");
+			}
+			
 		}
 		Sleep(50);
 
