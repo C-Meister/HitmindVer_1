@@ -1811,33 +1811,24 @@ int sqlsignup(MYSQL *cons) {
 
 }
 void mainatitleimage(void) {
+	WHITE
 	gotoxy(6, 3);
-	printf("■■■■■  ■  ■      ■■■    ■    ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");
-	gotoxy(6, 4);
-	printf("        ■  ■  ■                ■    ■      ■  ■      ■      ■  ■      ■                                                 ■      ■");
-	gotoxy(6, 5);
-	printf("  ■■■■  ■  ■    ■■■■■  ■    ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■");
-	gotoxy(6, 6);
-	printf("      ■    ■■■        ■      ■    ■      ■  ■■      ■■■    ■      ■■■■■      ■      ■       ■■■  ■      ■");
-	gotoxy(6, 7);
-	printf("    ■      ■  ■      ■  ■    ■    ■      ■  ■                                          ■  ■  ■   ■    ■    ■■    ■");
-	gotoxy(6, 8);
-	printf("  ■        ■  ■    ■      ■  ■    ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■");
-	gotoxy(6, 9);
-	printf("■          ■  ■    ■      ■  ■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
+	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■");gotoxy(6, 4);
+	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■");gotoxy(6, 5);
+	printf("                ■      ■■■■■      ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■");gotoxy(6, 6);
+	printf("      ■■■    ■      ■              ■      ■  ■■      ■■■    ■      ■■■■■      ■      ■       ■■■  ■      ■");gotoxy(6, 7);
+	printf("    ■      ■  ■      ■■■■■      ■      ■  ■                                          ■  ■  ■   ■    ■    ■■    ■");gotoxy(6, 8);
+	printf("    ■      ■  ■                      ■      ■  ■        ■                                ■  ■  ■   ■    ■    ■  ■    ■      ■");gotoxy(6, 9);
+	printf("      ■■■    ■    ■■■■■■■    ■■■■■  ■        ■■■■■■    ■■■■■■■      ■  ■     ■    ■    ■  ■      ■■■");
+	
+	
 	gotoxy(12, 20);
-	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
-	gotoxy(12, 21);
-	printf("■              ■                      ■              ■                      ■              ■");
-	gotoxy(12, 22);
-	printf("■              ■                      ■              ■                      ■              ■");
-	gotoxy(12, 23);
-	printf("■  게임 시작   ■                      ■              ■                      ■              ■");
-	gotoxy(12, 24);
-	printf("■              ■                      ■              ■                      ■              ■");
-	gotoxy(12, 25);
-	printf("■              ■                      ■              ■                      ■              ■");
-	gotoxy(12, 26);
+	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");gotoxy(12, 21);
+	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 22);
+	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 23);
+	printf("■  게임 시작   ■                      ■              ■                      ■              ■");gotoxy(12, 24);
+	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 25);
+	printf("■              ■                      ■              ■                      ■              ■");gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
 int maintitle(void) { //게임 메인타이틀 출력
@@ -1850,8 +1841,16 @@ int maintitle(void) { //게임 메인타이틀 출력
 
 		click(&xx, &yy, &lr);
 
-		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr ==1)
+		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
+			gotoxy(16, 23);
+			HIGH_GREEN printf("게임 시작");
+		}
+		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr ==1)
 			return 1;
+		else {
+			gotoxy(16, 23);
+			WHITE printf("게임 시작");
+		}
 
 		gotoxy(0, 0);
 	}
@@ -1888,11 +1887,8 @@ void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 
 
 }
-void banglist(MYSQL *cons) {
-	gotoxy(0, 0);
-	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
-	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
-	short i = 0;
+void bangtema() {
+	WHITE
 	printf("\n"); //좌표값때문에 한칸 밀어냄
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
 	printf("                □          방만들기          □          빠른시작          □\n"); //빠른시작 24 ~ 37 , 2
@@ -1912,6 +1908,11 @@ void banglist(MYSQL *cons) {
 	printf("                ■                            ■                            ■\n");
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 
+}
+void banglist(MYSQL *cons) {
+	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
+	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
+	short i = 0;
 	mysql_query(cons, "select ip, name, password from catchmind.room");
 	sql_result = mysql_store_result(cons);
 	while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
@@ -1953,6 +1954,7 @@ int bangchose(MYSQL *cons) {
 
 	int xx = 0, yy = 0, lr = 0;
 	POINT a;
+	bangtema();
 	while (1) {
 		banglist(cons);
 		gotoxy(0, 0);
@@ -2235,6 +2237,7 @@ void aicheck(int(*aiall)[10][10], int(*aire)[100], int t) {
 	}
 }
 void logintema(void) {
+	WHITE
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
 	printf("■            캐치마인드 서버에 로그인          ■\n");
@@ -2252,6 +2255,7 @@ void logintema(void) {
 	printf("■");
 }
 void jointema(void) {
+	WHITE
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■  회원가입 : 닉네임은 공백 특수문자 안됩니다  ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
