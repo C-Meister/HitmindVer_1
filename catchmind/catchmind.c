@@ -1249,7 +1249,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
-				ZeroMemory(message, sizeof(message));
+				ZeroMemory(message, sizeof(message)); 
 			}
 			else if (strcmp("game start", message) == 0) {
 				status[0] = 10;
