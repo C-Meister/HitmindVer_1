@@ -1265,7 +1265,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
 				SDLCLOCK++;
-				SDL_Clear = false;
+				SDL_Clear = true;
 			}
 		}
 		//	Sleep(100);
@@ -2656,7 +2656,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							strong *= 50 / 80.0;
 						}
 						happen = true;
-						send(connect_sock, "SDLCLEAR", 45, 0);
+				//		send(connect_sock, "", 45, 0);
 						//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 					
 					}
