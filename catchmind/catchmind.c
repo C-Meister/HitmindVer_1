@@ -2267,6 +2267,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 	cur(0, 0);
 //	printf("eraser: %d pencil: %d drag: %d x: %d y: %d strong: %f r: %f g: %f b: %f       \n", eraser, pencil, drag, x, y, strong, r, g, b);
 	if (SDL_Clear == true) {
+		printf("clear문 실행할게슴\n");
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
 		SDL_RenderPresent(Renderer4);
@@ -2300,6 +2301,8 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			return;
 		}
 		else if (pencil == true && drag == true) {
+
+			printf("pencil 드래그문 실행할게슴\n");
 			float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
 			if (length == 0) return;
