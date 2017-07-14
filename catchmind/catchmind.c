@@ -2101,6 +2101,8 @@ int SDL_MAINS(int mode)
 	SDL_Renderer * Renderer2;
 	SDL_Window * Window3;
 	SDL_Renderer * Renderer3;
+	char query[100];
+	char writemode = 0;
 	SDL_Rect center = { 0 };
 	// 텍스쳐와 사각형 선언
 	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
@@ -2543,7 +2545,8 @@ int SDL_MAINS(int mode)
 		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, Font, strong, r, g, b);
-			send(connect_sock, (char *)Renderer2, sizeof(Renderer2), 0);
+			sprintf(query, "%d %d %d %d %d %d %d %d %d", on.eraser, on.pencil, on.new, x, y, strong, r, g, b);
+			send(connect_sock, query, 256, 0);
 			
 		}
 			happen = false;
