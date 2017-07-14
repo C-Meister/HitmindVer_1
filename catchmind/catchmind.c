@@ -118,7 +118,6 @@ SDL_Window * Window;//SDL 윈도우 선언
 SDL_Renderer * Renderer;// SDL 렌더러 선언
 SDL_Window * Window2;
 SDL_Renderer * Renderer2;
-char query[500];
 SDL_Window * Window3;
 SDL_Renderer * Renderer3;
 
@@ -216,7 +215,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
 	memset(&connect_addr, 0, sizeof(connect_addr));
-	
+	SDL_MAINS();
 	// 초기화 끝
 
 	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
@@ -623,7 +622,7 @@ int waitroom(void)
 					mode = 0;
 					send(connect_sock, "player not ready", 40, 0);
 				}
-				Sleep(100);
+
 				xx = 0;
 				yy = 0;
 			}
@@ -635,7 +634,7 @@ int waitroom(void)
 			yy = 0;
 		}
 	}
-	Sleep(100);
+	Sleep(50);
 
 }
 void usermain(void) {
@@ -2118,6 +2117,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Window * Window3;
 	SDL_Renderer * Renderer3;
 	SDL_Rect center = { 0 };
+	char query[256];
 	// 텍스쳐와 사각형 선언
 	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
 	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
@@ -2519,10 +2519,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
 			printf("happen is true!!!\n");
-			sprintf(query, "%d %d %d %d %d %d %d %d %d", on.eraser, on.pencil, on.new, x, y, strong, r, g, b);
-			send(connect_sock, query, 256, 0);
+			if (connect_sock != 0) {
+				sprintf(query, "%d %d %d %d %d %d %d %d %d", on.eraser, on.pencil, on.new, x, y, strong, r, g, b);
+				send(connect_sock, query, 256, 0);
+			}
 		}
 		happen = false;
+		
 	}
 	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
 	SDL_DestroyTexture(ChaTexture);
