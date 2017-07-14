@@ -118,6 +118,7 @@ char SOCKETCOUNT = 0;
 char clientcatchmind[256];
 MYSQL *con;
 bool SDL_Clear = false;
+SDL_Rect ReceiveRect = { 0 };
 //±âº» ÇÔ¼öµé
 void gotoxy(short x, short y);
 void cur(short x, short y);
@@ -2141,8 +2142,8 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
 	getchar();//¿¡·¯ÄÚµå È®ÀÎÇÏ±â À§ÇØ ÄÜ¼ÖÃ¢ ´ë±â
 	return;
 }
-void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool click) {
-	if (click == true)
+void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks) {
+	if (clicks== true)
 		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 64);// Å¬¸¯ÇßÀ» °æ¿ì´Â ´õÁøÇÑ ÆÄ¶û
 	else
 		SDL_SetRenderDrawColor(Renderer, 0, 0, 255, 8);// ¸¶¿ì½º°¡ ¿Ã·ÁÁ® ÀÖÀ» °æ¿ì´Â Á» ¿¬ÇÑ ÆÄ¶û
@@ -2269,6 +2270,84 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//SrcÀÇ Á¤º¸¸¦ °¡Áö°í ÀÖ´Â Texture¸¦ DstÀÇ Á¤º¸¸¦ °¡Áø Texture ·Î º¯È¯ÇÏ¿© ·»´õ·¯¿¡ ÀúÀå
 	return;
 }
+void ReceiveRender(SDL_Renderer* Renderer4,bool eraser, bool pencil, bool drag, int x, int y, float strong, int r, int g, int b) {
+	if (SDL_Clear == true) {
+		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
+		SDL_RenderClear(Renderer4);
+		SDL_Clear = false;
+	}
+	else {
+		if (pencil == true && drag == false) {//eraser »óÅÂ¿¡¼­ Å¬¸¯ÇÑ °æ¿ì
+			ReceiveRect.x = x - strong / 2;
+			ReceiveRect.y = y - strong / 2;// ±½±â¸¸Å­ÀÇ »ç°¢ÇüÀ» ¸¸µë
+			ReceiveRect.w = ReceiveRect.h = strong;// ±½±â ¼³Á¤
+			SDL_SetRendererDrawColor(Renderer4, r, g, b, 0);
+			SDL_RenderFillReceiveRect(Renderer4, &ReceiveRect);// ·»´õ·¯¿¡ ±×¸²
+			return;
+		}
+		else if (eraser == true && drag == false) {
+			strong *= 80 / 50.0;
+			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
+			int x1, y1, x2, y2,l;
+			ReceiveRect.x = x;
+			ReceiveRect.y = y;// ±½±â¸¸Å­ÀÇ »ç°¢ÇüÀ» ¸¸µë
+			for (l = 0; l < 180; l++) {
+				x1 = sin(3.14 / 180 * l)*strong / 2;
+				y1 = cos(3.14 / 180 * l)*strong / 2;
+				x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+				y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+				SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
+			}
+			strong *= 50.0 / 80;
+			return;
+		}
+		else if (pencil == true && drag == true) {
+			float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
+			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
+			if (length == 0) return;
+			if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
+				i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
+				j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
+				k = 0;// while¹®¾È¿¡ ¾µ º¯¼ö ÃÊ±âÈ­.
+				xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ xÁÂÇ¥¸¦ µû·Î ÀúÀå
+				ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ yÁÂÇ¥¸¦ µû·Î ÀúÀå
+				ReceiveRect.w = ReceiveRect.h = strong;// ±½±â¼³Á¤
+				for (k = 0; k < length; k++) {// µÎ Á¡»çÀÌÀÇ °ø¹éÀ» ÀüºÎ »ç°¢ÇüÀ¸·Î Ã¤¿ì´Â ¹Ýº¹¹®ÀÓ
+					ReceiveRect.x = xpos + k*i;// ÂïÀ» Á¡ÀÇ ¿ÞÂÊÀ§ ²ÀÁþÁ¡ÀÇ xÁÂÇ¥¸¦ ¼³Á¤ 
+					ReceiveRect.y = ypos + k*j;// ÂïÀ» Á¡ÀÇ ¿ÞÂÊÀ§ ²ÀÁþÁ¡ÀÇ yÁÂÇ¥¸¦ ¼³Á¤
+					SDL_RenderFillReceiveRect(Renderer4, &ReceiveRect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
+				}
+			}
+			return;
+		}
+		else if (eraser == true && drag == true){
+			strong *= 80 / 50.0;
+			float i = 0, j = 0, k = 0,l=0, xpos = 0, ypos = 0;
+			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
+			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
+			i = (x - ReceiveRect.x) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
+			j = (y - ReceiveRect.y) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
+			k = 0;// while¹®¾È¿¡ ¾µ º¯¼ö ÃÊ±âÈ­.
+			xpos = ReceiveRect.x;// Àü¿¡ÂïÀºÁ¡ xÁÂÇ¥¸¦ µû·Î ÀúÀå
+			ypos = ReceiveRect.y;// Àü¿¡ÂïÀºÁ¡ yÁÂÇ¥¸¦ µû·Î ÀúÀå
+			ReceiveRect.w = ReceiveRect.h = strong;// ±½±â¼³Á¤
+			for (k = 0; k < length; k++) {// µÎ Á¡»çÀÌÀÇ °ø¹éÀ» ÀüºÎ »ç°¢ÇüÀ¸·Î Ã¤¿ì´Â ¹Ýº¹¹®ÀÓ
+				ReceiveRect.x = xpos + k*i;// ÂïÀ» Á¡ÀÇ Áß½É Á¡ xÁÂÇ¥¸¦ ¼³Á¤ 
+				ReceiveRect.y = ypos + k*j;// ÂïÀ» Á¡ÀÇ Áß½É Á¡ yÁÂÇ¥¸¦ ¼³Á¤
+				int x1, y1, x2, y2;
+				for (l = 0; l < 180; l++) {
+					x1 = sin(3.14 / 180 * l)*strong / 2;
+					y1 = cos(3.14 / 180 * l)*strong / 2;
+					x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+					y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+					SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
+				}
+			}
+			strong *= 50 / 80.0;
+			return;
+		}
+	}
+}
 void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, float strong, int r, int g, int b) {
 	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// »ö±ò¼³Á¤
 	RenderTexture(Renderer, TraTexture, &Track);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
@@ -2307,6 +2386,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Renderer * Renderer2;
 	SDL_Window * Window3;
 	SDL_Renderer * Renderer3;
+	SDL_Window * Window4;
+	SDL_Renderer * Renderer4;
 	SDL_Rect center = { 0 };
 	char query[256];
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð
@@ -2332,7 +2413,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		return 0;// Á¾·á
 	};
 	// À©µµ¿ìÃ¢ 3°³·Î ³ª´©´Â ±âÁØ xÁÂÇ¥´Â 1920 - 1310/4-10ÀÌ°í, 1080-900/4-10Àº yÁÂÇ¥ÀÇ ±âÁØÀÌ´Ù.
-	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
+	Window = SDL_CreateWindow("HIT MIND WITH C", (1920 - 1310 / 4 - 10)*(1), 0, (1310 / 4 + 10)*(1), 1080 * (1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateWindow", 2);//´Ü°è2ÀÇ ¿¹¿ÜÃ³¸®·çÆ¾½ÇÇà
 		return 0;//Á¾·á
@@ -2342,7 +2423,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateRenderer", 3);
 		return 0;
 	}
-	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, 1920 - 1310 / 4 - 10, 1080 - 900 / 4 - 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, (1920 - 1310 / 4 - 10)*(1), (1080 - 900 / 4 - 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window2 == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateWindow2", 2);//´Ü°è2ÀÇ ¿¹¿ÜÃ³¸®·çÆ¾½ÇÇà
 		return 0;//Á¾·á
@@ -2352,7 +2433,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateRenderer2", 3);//´Ü°è3ÀÇ ¿¹¿Ü Ã³¸® ·çÆ¾ ½ÇÇà
 		return 0;// Á¾·á
 	}
-	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, (1080 - 900 / 4 - 10)*(1), (1920 - 1310 / 4 - 10)*(1), (900 / 4 + 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window3 == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateWindow3", 2);//´Ü°è2ÀÇ ¿¹¿ÜÃ³¸®·çÆ¾½ÇÇà
 		return 0;//Á¾·á
@@ -2360,6 +2441,16 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Renderer3 = SDL_CreateRenderer(Window3, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer ÇÔ¼ö·Î SDL Renderer »ý¼º ÇÔ¼ö È£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â SDL_Window *, µå¶óÀÌ¹ö ¼³Á¤(-1ÀÌ¸é ¾Ë¾Æ¼­ ¸ÂÃçÁÜ), ÇÃ·¡±×(Áö±ÝÀº ÇÏµå¿þ¾î°¡¼Ó°ú ¼öÁ÷µ¿±âÈ­ »ç¿ëÀ» Çã¿ëÇÔ)
 	if (Renderer3 == nullptr) {// ·»´õ·¯ »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateRenderer3", 3);//´Ü°è3ÀÇ ¿¹¿Ü Ã³¸® ·çÆ¾ ½ÇÇà
+		return 0;// Á¾·á
+	}
+	Window4 = SDL_CreateWindow("HIT MIND WITH C 4", 0, 0, (1920 - 1310 / 4 - 10)*(1), (1080 - 900 / 4 - 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
+	if (Window4 == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
+		SDL_ExceptionRoutine(Renderer3, Window4, "SDL_CreateWindow4", 2);//´Ü°è2ÀÇ ¿¹¿ÜÃ³¸®·çÆ¾½ÇÇà
+		return 0;//Á¾·á
+	}
+	Renderer4 = SDL_CreateRenderer(Window4, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer ÇÔ¼ö·Î SDL Renderer »ý¼º ÇÔ¼ö È£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â SDL_Window *, µå¶óÀÌ¹ö ¼³Á¤(-1ÀÌ¸é ¾Ë¾Æ¼­ ¸ÂÃçÁÜ), ÇÃ·¡±×(Áö±ÝÀº ÇÏµå¿þ¾î°¡¼Ó°ú ¼öÁ÷µ¿±âÈ­ »ç¿ëÀ» Çã¿ëÇÔ)
+	if (Renderer4 == nullptr) {// ·»´õ·¯ »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
+		SDL_ExceptionRoutine(Renderer4, Window4, "SDL_CreateRenderer4", 3);//´Ü°è3ÀÇ ¿¹¿Ü Ã³¸® ·çÆ¾ ½ÇÇà
 		return 0;// Á¾·á
 	}
 	// Èò»öÀ¸·Î ¼¼ÆÃ
@@ -2382,9 +2473,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}
 	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode ÀÌ¹ÌÁöÀÇ °¡·Î¼¼·Î ÀÐ¾î¿À±â. À©µµ¿ì Ã¢À» 3°³·Î ³ª´©´Â ±âÁØÀÌ µÇ¹Ç·Î À©µµ¿ìÃ¢ ¼±¾ðÀü¿¡ ÀÐ¾î¿È
 	RgbCode.w /= 4;
+	RgbCode.w *= (1);
 	RgbCode.h /= 4;
-	RgbCode.x = 5;// ÀÌ¹ÌÁöÀÇ x,yÁÂÇ¥¿Í ³Êºñ¿Í ³ôÀÌ ¼³Á¤
-	RgbCode.y = 1080 - RgbCode.h - 10;
+	RgbCode.h *= (1);
+	RgbCode.x = 5 * (1);// ÀÌ¹ÌÁöÀÇ x,yÁÂÇ¥¿Í ³Êºñ¿Í ³ôÀÌ ¼³Á¤
+	RgbCode.y = 1080 * (1) - RgbCode.h - 10* (1);
 	// ³¡
 	// Track ÀÌ¹ÌÁö
 	TraTexture = LoadTextureEx(Renderer, "Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
@@ -2397,9 +2490,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
 	Track.w /= 4;
+	Track.w *= (1);
 	Track.h /= 8;
+	Track.h *= (1);
 	Track.x = RgbCode.x;
-	Track.y = RgbCode.y - Track.h - 25;
+	Track.y = RgbCode.y - Track.h - 25 * (1);
 	// ³¡
 	// Box ÀÌ¹ÌÁö
 	BoxTexture = LoadTextureEx(Renderer, "Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
@@ -2411,8 +2506,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}
 	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
 	Box.w /= 2;
+	Box.w *= (1);
 	Box.h /= 2;
-	Box.x = Track.x + 50;
+	Box.h *= (1);
+	Box.x = Track.x + 50 * (1);
 	Box.y = Track.y + Track.h / 2 - Box.h / 2;
 	// ³¡
 	// Pencil ÀÌ¹ÌÁö
@@ -2426,8 +2523,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
 	Pencil.w /= 15;
 	Pencil.h /= 15;
-	Pencil.x = Track.x + 50 + 40;
-	Pencil.y = Track.y - 30 - Pencil.h;
+	Pencil.x = Track.x + 50  + 40;
+	Pencil.y = Track.y - 30-Pencil.h;
 	// ³¡
 	// Eraser ÀÌ¹ÌÁö
 	EraTexture = LoadTexture(Renderer, "Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
@@ -2439,7 +2536,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}
 	Eraser.w = Pencil.w;
 	Eraser.h = Pencil.h;
-	Eraser.x = Pencil.x + 50 + 30;
+	Eraser.x =Pencil.x + 50 * (1) + 30*(1);;
 	Eraser.y = Pencil.y;
 	// ³¡
 	// New ÀÌ¹ÌÁö
@@ -2452,7 +2549,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}
 	New.w = Eraser.w;
 	New.h = Eraser.h;
-	New.x = Eraser.x + 50 + 30;
+	New.x = Eraser.x + 50 * (1) + 30 * (1);
 	New.y = Eraser.y;
 	
 	// ³¡
