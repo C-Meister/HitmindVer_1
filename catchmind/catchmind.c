@@ -241,8 +241,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				}
 				else                            //방 선택 접속
 				{
-					
-
 					if (connectroom[bangchoose - 2].people == 4)  //4명일떄
 						chooseroomcount = -1;
 					else if (connectroom[bangchoose - 2].password[0] == 0) //비밀번호 없을경우 건너띔
@@ -252,6 +250,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					
 					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
 					{
+						CLS;
 						continue;
 					}
 					else if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
