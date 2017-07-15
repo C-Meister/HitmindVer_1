@@ -2210,6 +2210,8 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
 	switch (step) {
+	case 10:
+		SDL_StopTextInput();
 	case 9:
 		SDL_DestroyRenderer(Renderer3);// SDL ·»´õ·¯ ÆÄ±«
 	case 8:
@@ -2445,7 +2447,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 	}
 }
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, float strong, int r, int g, int b) {
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font,TTF_Font* Fonts,char* inputText, float strong, int r, int g, int b) {
 	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// »ö±ò¼³Á¤
 	RenderTexture(Renderer, TraTexture, &Track);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 	RenderTexture(Renderer, BoxTexture, &Box);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
@@ -2469,6 +2471,13 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	}
 	if (clicks.eraser == true || clicks.pencil == true)
 		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
+	SDL_Rect Rect = { 0,0,1310 / 4 + 10,New.h - 10 };
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+	SDL_RenderFillRect(Renderer, &Rect);
+	if (strcmp(inputText, "") != 0)
+		TTF_DrawText(Renderer, Fonts, inputText, 0, 0);
+	else
+		TTF_DrawText(Renderer, Fonts, " ", 0, 0);
 	SDL_RenderPresent(Renderer);// ·»´õ·¯ Ãâ·Â
 	SDL_RenderPresent(Renderer2);
 	SDL_RenderPresent(Renderer3);
@@ -2709,6 +2718,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 	SDL_RenderPresent(Renderer);
 	SDL_Delay(500);
+	SDL_StartTextInput();
+	char inputText[128] = "";
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 
 	//	CLS;
@@ -2736,6 +2747,24 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_WINDOWEVENT://SDLÁ¾·á Å¸ÀÔÀÏ °æ¿ì
 				switch (event.window.event) {
+				case SDL_TEXTINPUT:
+					if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
+						strcat(inputText, event.text.text);// ÀÌ¾î ºÙÀÓ 
+					happen = true;
+					break;
+				case SDL_KEYDOWN:
+					//Handle backspace
+					if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0)// Å°º¸µå ¹é½ºÆäÀÌ½º°í ¹è¿­ÀÇ ±æÀÌ°¡ 1ÀÌ»óÀÏ¶§
+					{
+						inputText[strlen(inputText) - 1] = '\0';// ¸¶Áö¸·¹®ÀÚ¸¦ ³Î¹®ÀÚ·Î ¹Ù²Þ
+						happen = true;
+					}
+					else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í c¸¦ ´­·¶´Ù¸é
+						SDL_SetClipboardText(inputText);// Å¬¸³º¸µå¿¡ ³ÖÀ½
+					else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í v¸¦ ´­·¶´Ù¸é
+						strcpy(inputText, SDL_GetClipboardText());// Å¬¸³º¸µå¿¡¼­ °¡Á®¿È
+					happen = true;
+					break;
 				case SDL_WINDOWEVENT_CLOSE:// ´Ù¼ö Ã¢¿¡¼­ÀÇ ´Ý±âÀÌº¥Æ®°¡ ¹ß»ýÇÒ°æ¿ì
 					quit = true;// quit¸¦ true·Î º¯°æ
 					break;// ºê·¹ÀÌÅ©
@@ -3015,8 +3044,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			CHATHAPPEN = false;
 		}
 		if (happen == true) {
-
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, strong, r, g, b);
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText,strong, r, g, b);
 
 		}
 		happen = false;
@@ -3029,7 +3057,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(EraTexture);
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
-	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,10);
 	return 0;// Á¾·á
 }
 HWND GetConsoleHwnd(void)
