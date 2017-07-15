@@ -238,18 +238,18 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					sqlmakeroom();
 					break;
 				}
-				else if (bangchoose == 1)		//방 빠른 접속 -추후추가
-				{
-
-				}
 				else                            //방 선택 접속
 				{
-					chooseroomcount = chooseroom(bangchoose);
+					if (connectroom[bangchoose - 2].password[0] == 0) //비밀번호 없을경우 건너띔
+						chooseroomcount = 1;
+					else
+						chooseroomcount = chooseroom(bangchoose);
+					
 					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
 					{
 						continue;
 					}
-					if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
+					else if (chooseroomcount == 0)		//return 0은 비밀번호가 틀릴때
 					{
 						cur(14, 1);
 						printf("(비밀번호가 틀렸습니다)");
@@ -258,7 +258,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 						fflush(stdin);
 						continue;
 					}
-					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
+					else if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
 						CHOOSEROOM = bangchoose - 2;
 						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);		//서버 대기방 접속
@@ -1423,7 +1423,7 @@ void mainatitleimage(void) {
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 }
 int maintitle(void) { //게임 메인타이틀 출력
-	ConsoleL(100, 60);
+	ConsoleL(80, 30);
 	disablecursor(true);
 	int xx = 0, yy = 0, lr = 0;
 	mainatitleimage();
@@ -1566,7 +1566,7 @@ void banglist(int j) {
 
 	memset(connectroom, 0, sizeof(connectroom));
 
-	while (i < 6) {
+	while (i < 6) { //화면지우기
 
 		if (i % 2 == 0)
 			cur(25, 6 + (i * 2));
@@ -1652,6 +1652,8 @@ int bangchose(void) {
 
 	int xx = 0, yy = 0, lr = 0;
 	int j = 0;
+	int b = 0, c = 0;
+
 	POINT a;
 	bangtema();
 	j = -1;
@@ -1667,8 +1669,12 @@ int bangchose(void) {
 		if (lr == 1) {
 			if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 				return 0;
-			else if (24 <= xx && xx <= 37 && 2 == yy)		//빠른시작
-				return 1;
+			else if (24 <= xx && xx <= 37 && 2 == yy) {//빠른시작
+				for (c = 3; c >= 0; c--) 
+					for (b = 0; b < 6; b++) 
+						if (connectroom[b].people == c)
+							return b+2;
+			}
 			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
 				return 2;
 			else if (24 <= xx && xx <= 37 && 6 <= yy && yy <= 8)	//방 2
