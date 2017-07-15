@@ -421,6 +421,7 @@ void sqlmakeroom(void) {
 		}
 		disablecursor(1);
 		CLS;
+		ConsoleL(54, 50);
 		strcpy(connectroom[0].roomname, myroom.roomname);
 		strcpy(connectroom[0].password, myroom.password);
 		strcpy(connectroom[0].ip, myip);
@@ -489,10 +490,11 @@ void waitroomtema() {
 }
 int waitroom(void)
 {
+	ConsoleL(54, 50);
 	disablecursor(1);
 	int xx = 0, yy = 0, lr = 0;
 	int togl = -1;
-	ConsoleL(54, 50);
+	CLS;
 	char query[100] = { 0, };
 	int mode = 0;
 	if (lead == true)
