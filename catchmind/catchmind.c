@@ -31,7 +31,10 @@
 //특수 헤더파일 (따로 설치) 
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
-#include "SDL/sdl_ttf.h"
+#include "SDL/SDL_ttf.h"
+#include "han2unicode.h"
+//추가//추가
+//#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #include "SDL/SDL_mixer.h"
 #define nullptr 0
@@ -2050,6 +2053,10 @@ void IMG_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, IMG_GetError());
 	return;
 }
+void TTF_ErrorLog(const char * msg) {
+	printf("%s Error: %s\n", msg, TTF_GetError());
+	return;
+}
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step) {// 예외 처리 함수
 	SDL_ErrorLog(msg);//에러코드 출력
 	switch (step) {
@@ -2063,11 +2070,26 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 		return;
 	}
 }
-void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window) {
-	SDL_DestroyRenderer(Renderer);// SDL 렌더러 파괴
-	SDL_DestroyWindow(Window);//SDL 윈도우 파괴
-	SDL_Quit();//SDL 종료
-	getchar();//에러코드 확인하기 위해 콘솔창 대기
+
+void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, int step) {
+	switch (step) {
+	case 8:
+		SDL_DestroyRenderer(Renderer3);// SDL 렌더러 파괴
+	case 7:
+		SDL_DestroyWindow(Window3);
+	case 6:
+		SDL_DestroyRenderer(Renderer2);
+	case 5:
+		SDL_DestroyWindow(Window2);//SDL 윈도우 파괴
+	case 4:
+		SDL_DestroyRenderer(Renderer);
+	case 3:
+		SDL_DestroyWindow(Window);
+	case 2:
+		TTF_Quit();//TTF 종료
+	case 1:
+		SDL_Quit();
+	}
 	return;
 }
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks) {
@@ -2313,6 +2335,19 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
+SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, SDL_Color Color, const char* sentence, int x, int y) {
+	unsigned short unicode[128];// 유니코드 배열을 만든다
+	han2unicode(sentence, unicode);// 문장을 유니코드로 바꿔서 유니코드 배열에 넣는다
+	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, unicode, Color);// 폰트의 종류,문자열, 색깔을 보내서 유니코드로 렌더한다음 서피스에 저장한다
+	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// 서피스로부터 텍스쳐를 생성한다
+	SDL_FreeSurface(Surface);//서피스 메모리를 해제 해준다.
+	SDL_Rect Src;
+	Src.x = x;
+	Src.y = y;
+	SDL_QueryTexture(Texture, NULL, NULL, &Src.w, &Src.h);
+	SDL_RenderCopy(Renderer, Texture, &Src, &Src); //그대로 렌더러에 저장한다
+	return;
+}
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	
 	SDL_Window * Window;//SDL 윈도우 선언
@@ -2341,39 +2376,64 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Rect Chat = { 0 };// Chat 이미지의 정보를 담기 위한 사각형 변수 선언
 	SDL_Rect Status = { 0 };//Status 이미지의 정보를 담기 위한 사각형 변수 선언
 							// 텍스쳐와 사각형 선언 끝
+	float fontsize = 20.0;
+	TTF_Font * Font;
+	SDL_Color Color = { 0,0,0 };
+	SDL_Surface *Text;
+	SDL_Rect  Word = { 0 };
+	unsigned short unicode[128];
+	//
+
+	// 추가
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_Init함수로 SDL 초기화하고 초기화 안되면 if문 실행 SDL_Init의 인수는 다양함(ex : SDL_INIT_VIDEO)
-		SDL_ExceptionRoutine(Renderer, Window, "SDL_Init", 1);//단계1의 예외 처리 루틴실행
+		SDL_ErrorLog("SDL_Init");
 		return 0;// 종료
 	};
+	//추가
+	if (TTF_Init() != 0) {
+		TTF_ErrorLog("TTF_Init");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 1);
+		return 0;
+	}
+	Font = TTF_OpenFont("NanumGothic.ttf", fontsize);
+	if (Font == nullptr) {
+		TTF_ErrorLog("TTF_OpenFont");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 2);
+		return 0;
+	}
 	// 윈도우창 3개로 나누는 기준 x좌표는 1920 - 1310/4-10이고, 1080-900/4-10은 y좌표의 기준이다.
-	Window = SDL_CreateWindow("HIT MIND WITH C", (1920 - 1310 / 4 - 10)*(1), 0, (1310 / 4 + 10)*(1), 1080 * (1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window == nullptr) {// 윈도우 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateWindow", 2);//단계2의 예외처리루틴실행
+		SDL_ErrorLog("SDL_CreateWindow");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 2);
 		return 0;//종료
 	}
 	Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (Renderer == nullptr) {
-		SDL_ExceptionRoutine(Renderer, Window, "SDL_CreateRenderer", 3);
+		SDL_ErrorLog("SDL_CreateRenderer");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 3);
 		return 0;
 	}
-	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, (1920 - 1310 / 4 - 10)*(1), (1080 - 900 / 4 - 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, (1920 - 1310 / 4 - 10), (1080 - 900 / 4 - 10), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window2 == nullptr) {// 윈도우 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateWindow2", 2);//단계2의 예외처리루틴실행
+		SDL_ErrorLog("CreateWindow2");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 4);
 		return 0;//종료
 	}
 	Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
 	if (Renderer2 == nullptr) {// 렌더러 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer2, Window2, "SDL_CreateRenderer2", 3);//단계3의 예외 처리 루틴 실행
+		SDL_ErrorLog("CreateRenderer2");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 5);
 		return 0;// 종료
 	}
-	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, (1080 - 900 / 4 - 10)*(1), (1920 - 1310 / 4 - 10)*(1), (900 / 4 + 10)*(1), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
 	if (Window3 == nullptr) {// 윈도우 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateWindow3", 2);//단계2의 예외처리루틴실행
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 6);
 		return 0;//종료
 	}
 	Renderer3 = SDL_CreateRenderer(Window3, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
 	if (Renderer3 == nullptr) {// 렌더러 생성 실패시 if문 실행
-		SDL_ExceptionRoutine(Renderer3, Window3, "SDL_CreateRenderer3", 3);//단계3의 예외 처리 루틴 실행
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 7);
 		return 0;// 종료
 	}
 	// 흰색으로 세팅
