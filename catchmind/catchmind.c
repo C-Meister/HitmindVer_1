@@ -126,7 +126,7 @@ int SDLCLOCK = 0;
 
 
 
-//기본 함수들
+//기본 함수들pppppppppp2gp44444p
 void gotoxy(short x, short y);
 void cur(short x, short y);
 void exitsignal(void);
@@ -195,7 +195,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	//SDL_MAIN();
 	//변수 선언
-	//int i, j, k, v, result;
+	//int i, j, k, v, result;	
 
 	
 	char mainchoose = 0;
