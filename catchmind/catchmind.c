@@ -123,6 +123,7 @@ char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
 char clientcatchmind[50];
+char topics[4][30];
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
@@ -1431,9 +1432,29 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				SDL_Clear = true;
 				SDLCLOCK++;
 			}
-			else {
-				
-				SetWindowPos(GetConsoleHwnd(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE);
+			else if (strncmp(message, "topic 1", 7) == 0)
+			{
+				sscanf(message, "topic 1 %s", topics[0]);
+				cur(0, 8);
+				printf("1번 사람 주제 : %s", topics[0]);
+			}
+			else if (strncmp(message, "topic 2", 7) == 0)
+			{
+				sscanf(message, "topic 2 %s", topics[1]);
+				cur(0, 9);
+				printf("2번 사람 주제 : %s", topics[1]);
+			}
+			else if (strncmp(message, "topic 3", 7) == 0)
+			{
+				sscanf(message, "topic 3 %s", topics[2]);
+				cur(0, 10);
+				printf("3번 사람 주제 : %s", topics[2]);
+			}
+			else if (strncmp(message, "topic 4", 7) == 4)
+			{
+				sscanf(message, "topic 4 %s", topics[3]);
+				cur(0, 11);
+				printf("4번 사람 주제 : %s", topics[3]);
 			}
 		}
 		//	Sleep(100);
@@ -2000,7 +2021,11 @@ void Clnt_1(int v)
 				printf("%s", message);
 				sendall(message);
 			}
-
+			else if (strncmp(message, "topic", 5) == 0)
+			{
+				message[6] = v + '0' + 1;
+			
+			}
 			sendall(message);
 			ZeroMemory(message, sizeof(message));
 		}
@@ -2661,7 +2686,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		{
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
-			TTF_DrawText(Renderer3, topicFont, sql_row[0], 0, 0);
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//화면지우기
+			SDL_Rect Rect = { 0,0,1310 / 4 + 10,300 };
+			SDL_RenderFillRect(Renderer, &Rect);
+			TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 0);
+			sprintf(query, "topic   %s", sql_row[0]);
+			send(connect_sock, query, 45, 0);
 			Gametopic++;
 		}
 		if (buff < SDLCLOCK) {
@@ -2954,6 +2984,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			CHATHAPPEN = false;
 		}
 		if (happen == true) {
+		
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, strong, r, g, b);
 
 		}
