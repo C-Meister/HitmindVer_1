@@ -26,6 +26,8 @@
 #include <stdbool.h>
 #include <signal.h>
 #include <stdint.h>
+#include <Digitalv.h>
+#include <mmsystem.h>
 //#include <WinSock2.h>		//소켓프로그래밍
 
 //특수 헤더파일 (따로 설치) 
@@ -48,7 +50,7 @@
 #pragma comment (lib,"SDL2_ttf")
 #pragma comment (lib, "SDL2_mixer.lib")	//그래픽 사운드 라이브러리 4
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
-
+#pragma comment (lib, "winmm.lib")		//사운드 라이브러리
 
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
@@ -107,7 +109,6 @@ struct on {
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
-//char message[100];		//소켓 프로그래밍 문자열
 char status[4];			//소켓용
 char username[30];		//사용자 이름
 char friendname[4][30] = { "Player 1", "Player 2", "Player 3", "Player 4" };
@@ -127,10 +128,9 @@ char CHOOSEROOM = 0;
 bool SDL_Clear = false;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
+bool CHATHAPPEN = false;
 
-
-
-//기본 함수들pppppppppp2gp44444p
+//기본 함수들
 void gotoxy(short x, short y);
 void cur(short x, short y);
 void exitsignal(void);
@@ -164,7 +164,6 @@ void sqlmakeroom(void);					//방을 만드는 함수
 void SDL_ErrorLog(const char * msg);//에러코드 출력 함수			//그래픽에러코드 출력 함수
 void IMG_ErrorLog(const char * msg);			//이미지에러코드 출력 함수
 void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg, int step);	 // 그래픽예외 처리 함수
-void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 이미지예외 처리 함수
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//텍스쳐를 출력하는 함수 선언
@@ -173,7 +172,8 @@ void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, flo
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 int SDL_MAINS(void);
-void SDL_PlayMusic(Mix_Music *bgm, const char * musicname);
+void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step);
+void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x, int y);
 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
@@ -190,6 +190,7 @@ char checkkeyborad(char n, int togl);
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
+HWND GetConsoleHwnd(void);
 
 //--------------------------미니게임 숫자야구 함수들----------------------
 
@@ -215,17 +216,33 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
-	char serverreturn = 0;
-	mysql_query(cons, "use catchmind");
+	char serverreturn = 0;					//Connect_Server가 반환한 값을 저장하는곳
+	loadmysql(mysqlip);
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
 	memset(&connect_addr, 0, sizeof(connect_addr));
+	srand((unsigned int)time(NULL));
 	//SDL_MAINS();
 	// 초기화 끝
-
-	loadmysql(mysqlip);				//mysql 서버 불러오기
-
 	signalall();
+	
+	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+	{
+		printf("초기화 실패");
+		Sleep(5000);
+	}
+	
+
+	// load the MP3 file "music.mp3" to play as music
+	Mix_Music *music;
+	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
+	music = Mix_LoadMUS(query);
+	if (!music) {
+		printf("Mix_LoadMUS(\"titlemusic.mp3\"): %s\n", Mix_GetError());
+		Sleep(5000);
+		// this might be a critical error...
+	}
+	Mix_PlayMusic(music, -1);
 	disablecursor(1);
 	while (1) {								//로그인 반복문
 		mainchoose = maintitle();				//main 화면
@@ -595,12 +612,13 @@ int waitroom(void)
 				cur(0, 1);
 				printf("%d초후 시작", 3 - i);
 			}
+			_beginthreadex(0, 0, (_beginthreadex_proc_type)readchating, 0, 0, 0);
 			SDL_MAINS();
 			return 1;
 		}
 		if (status[0] == -1)
 		{
-
+			
 			CLS;
 			closesocket(connect_sock);
 			printf("서버가 닫혔습니다.");
@@ -1184,24 +1202,27 @@ void writechating(void)
 	}
 }
 void readchating(void) {
+	Sleep(1000);
 	int v = 0;
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	while (1) {
 
-		v = 0;
-		mysql_query(cons, "select * from catchmind.chating order by time desc limit 10");
+		
+		mysql_query(cons, "select * from catchmind.chating");
 		sql_result = mysql_store_result(cons);
-		while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+		while ((sql_row = mysql_fetch_row(sql_result)) != NULL && CHATHAPPEN == false)
 		{
-			EnterCriticalSection(&cs);
-			cur(10, 20 - (short)v);
-			printf("%s : %s", sql_row[2], sql_row[3]);
-			v++;
-			LeaveCriticalSection(&cs);
-
+			cur(0, 11);
+			printf("readchating : %s", sql_row[2]);
+			cur(0, 13);
+			printf("readchating : %s", sql_row[3]);
+		
+			strcpy(querys[7], sql_row[2]);
+			strcpy(querys[8], sql_row[3]);
+			CHATHAPPEN = true;
 		}
-		Sleep(500);
+		Sleep(100);
 	}
 
 }
@@ -1231,6 +1252,7 @@ void loadmysql(char mysqlip[])	//MYSQL 서버 불러오기
 		printf("\n성공");
 		mysql_set_character_set(cons, "euckr");
 		CLS;
+		mysql_select_db(cons, "catchmind");
 	}
 
 	return;
@@ -1397,11 +1419,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[0] = -1;
 				ZeroMemory(message, sizeof(message));
 			}
-			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
+			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-
-
-
 				strcpy(clientcatchmind, message);
 				ZeroMemory(message, sizeof(message));
 				SDLCLOCK++;
@@ -1410,6 +1429,10 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				SDL_Clear = true;
 				SDLCLOCK++;
+			}
+			else {
+				
+				SetWindowPos(GetConsoleHwnd(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE);
 			}
 		}
 		//	Sleep(100);
@@ -1949,12 +1972,12 @@ void Clnt_1(int v)
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d ready %s", v + 1, friendname[i]);
+				sprintf(message, "player %d ready %s", v + 1, friendname[v]);
 				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d not ready %s", v + 1, friendname[i]);
+				sprintf(message, "player %d not ready %s", v + 1, friendname[v]);
 				strcpy(querys[v], message);
 			}
 			else if (strcmp(message, "exit") == 0)
@@ -2104,12 +2127,7 @@ void cur(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-void SDL_PlayMusic(Mix_Music *bgm, const char * musicname)
-{
-	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	bgm = Mix_LoadMUS(musicname);
-	Mix_PlayMusic(bgm, -1);
-}
+
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, SDL_GetError());
 	return;
@@ -2401,8 +2419,9 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Eraser);
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
+	
 }
-SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, const char* sentence, int x, int y) {
+void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x, int y) {
 	unsigned short unicode[128];// 유니코드 배열을 만든다
 	han2unicode(sentence, unicode);// 문장을 유니코드로 바꿔서 유니코드 배열에 넣는다
 	SDL_Color Color = {0,0,0};
@@ -2427,6 +2446,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Renderer * Renderer3=nullptr;
 	SDL_Rect center = { 0 };
 	char query[256];
+	int chaty = 0;
 	// 텍스쳐와 사각형 선언
 	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
 	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
@@ -2616,11 +2636,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// 렌더러에 저장하기
 												  // 변수 초기값 설정끝
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
-
+	TTF_DrawText(Renderer, Font, "ㅇㅇㅇ", 100, 0);
+	SDL_RenderPresent(Renderer);
+	SDL_Delay(500);
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
-
+		
 	//	CLS;
-
+		
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
@@ -2896,6 +2918,18 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			happen = true;
 			on.new = false;
 		}
+		if (CHATHAPPEN == true)
+		{
+			happen = true;
+			cur(0, 8);
+			printf("누가 : %s", querys[7]);
+			cur(0, 9);
+			printf("내용 : %s", querys[8]);
+			TTF_DrawText(Renderer, Font, querys[7], 0, chaty);
+			TTF_DrawText(Renderer, Font, querys[8], 0, chaty+50);
+			chaty += 100;
+			CHATHAPPEN = false;
+		}
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, strong, r, g, b);
 
@@ -2912,4 +2946,41 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_DestroyTexture(NewTexture);
 	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
 	return 0;// 종료
+}
+HWND GetConsoleHwnd(void)
+{
+#define MY_BUFSIZE 1024 // Buffer size for console window titles.
+	HWND hwndFound;         // This is what is returned to the caller.
+	WCHAR pszNewWindowTitle[MY_BUFSIZE]; // Contains fabricated
+										 // WindowTitle.
+	WCHAR pszOldWindowTitle[MY_BUFSIZE]; // Contains original
+										 // WindowTitle.
+
+										 // Fetch current window title.
+
+	GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
+
+	// Format a "unique" NewWindowTitle.
+
+	wsprintf(pszNewWindowTitle, L"%d/%d",
+		GetTickCount(),
+		GetCurrentProcessId());
+
+	// Change current window title.
+
+	SetConsoleTitle(pszNewWindowTitle);
+
+	// Ensure window title has been updated.
+
+	Sleep(40);
+
+	// Look for NewWindowTitle.
+
+	hwndFound = FindWindow(NULL, pszNewWindowTitle);
+
+	// Restore original window title.
+
+	SetConsoleTitle(pszOldWindowTitle);
+
+	return(hwndFound);
 }

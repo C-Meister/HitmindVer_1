@@ -1139,7 +1139,7 @@ static unsigned short convert_char_ksc5601_to_ucs2(unsigned char byte1, unsigned
 
     if (tab_idx >= 0 && tab_idx < ksc5601max) {
         code_ucs2 = tabksc5601[tab_idx];
-        if (code_ucs2 != -1) return code_ucs2;
+        if (code_ucs2 != -1) return (unsigned short)code_ucs2;
     }
 	return 0;
 }
