@@ -33,6 +33,7 @@
 #include "SDL/SDL_image.h"
 #include "SDL/sdl_ttf.h"
 #include "mysql/mysql.h"
+#include "SDL/SDL_mixer.h"
 #define nullptr 0
 
 // ¶óÀÌºê·¯¸® ¼±¾ð¹® ¶óÀÌºê·¯¸®ÆÄÀÏÀº µû·Î Ãß°¡¾ÈÇØµµ µË´Ï´Ù.
@@ -41,7 +42,7 @@
 #pragma comment (lib, "SDL2")			//±×·¡ÇÈ ¶óÀÌºê·¯¸® 1
 #pragma comment (lib, "SDL2main")		//±×·¡ÇÈ ¶óÀÌºê·¯¸® 2
 #pragma comment (lib, "SDL2_image")		//±×·¡ÇÈ ¶óÀÌºê·¯¸® 3
-
+#pragma comment (lib, "SDL2_mixer.lib")	//±×·¡ÇÈ »ç¿îµå ¶óÀÌºê·¯¸® 4
 #pragma comment (lib, "ws2_32.lib")		//¼ÒÄÏ(³×Æ®¿öÅ©)¶óÀÌºê·¯¸®
 
 
@@ -761,9 +762,9 @@ LOG login(int m) { // 1ÀÌ¸é ·Î±×ÀÎ 2ÀÌ¸é È¸¿ø°¡ÀÔ ÇÊ¼ö!!
 	int to = -1;
 	int b = 0;
 	int n = 0;
-restart:
-
 	POINT a;
+restart:
+	
 	gotoxy(0, 0);
 	if (m == 1)
 		logintema();
@@ -2018,6 +2019,12 @@ void cur(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
+void SDL_PlayMusic(Mix_Music *bgm, const char * musicname)
+{
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	bgm = Mix_LoadMUS(musicname);
+	Mix_PlayMusic(bgm, -1);
+}
 void SDL_ErrorLog(const char * msg) {//¿¡·¯ÄÚµå Ãâ·Â ÇÔ¼ö
 	printf("%s Error: %s\n", msg, SDL_GetError());
 	return;
@@ -2085,7 +2092,7 @@ void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, flo
 		}
 	}
 	else if (clicks.eraser == true) {
-		strong *= 80 / 50.0;
+		strong *= 80 / (float)50.0;
 		int l;
 		int x1 = sin(3.14 / 180 * 0)*strong / 2, y1 = cos(3.14 / 180 * 0)*strong / 2, x2, y2;// ¿øÀ» Ãâ·ÂÇÏ±â À§ÇÑ º¯¼öµé ¼±¾ð
 		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// Èò»öÀ¸·Î Á¤ÇÔ
@@ -2193,7 +2200,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			return;
 		}
 		else if (eraser == true && drag == false) {
-			strong *= 80 / 50.0;
+			strong *= 80 / (float)50.0;
 			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 			int x1, y1, x2, y2, l;
 			ReceiveRect.x = x;
@@ -2229,7 +2236,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 		else if (eraser == true && drag == true) {
 
-			strong *= 80 / 50.0;
+			strong *= 80 / (float)50.0;
 			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
 			SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î	
@@ -2482,7 +2489,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 		if (buff < SDLCLOCK) {
 			buff++;
-			sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 		}
@@ -2540,7 +2547,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 						}
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
-							strong *= 80 / 50.0;
+							strong *= 80 / (float)50.0;
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
@@ -2695,7 +2702,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							break;
 						}
 						else if (clicks.eraser == true) {
-							strong *= 80 / 50.0;
+							strong *= 80 / (float)50.0;
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 							int x1, y1, x2, y2;
 							Rect.x = event.button.x;// ¿øÀÌ¶ó¼­ ²ÀÁþÁ¡ÀÇ ÁÂÇ¥°¡¾Æ´Ñ Áß½ÉÁÂÇ¥¸¦ Âï¾îÁà¾ßÇÔ
