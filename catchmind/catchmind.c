@@ -87,6 +87,7 @@ typedef struct {
 	char roomname[30];
 	char password[30];
 	char ip[20];
+	int people;
 }ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
@@ -117,7 +118,8 @@ char querys[10][100];
 bool lead = false;
 char SOCKETCOUNT = 0;
 char clientcatchmind[50];
-MYSQL *con;
+MYSQL *cons;
+char CHOOSEROOM = 0;
 bool SDL_Clear = false;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
@@ -145,14 +147,14 @@ IN_ADDR GetDefaultMyIP(void);					//내 ip 얻기
 bool exitallthread(void);
 
 //--------------------- MySQL 함수들 --------------------------------------
-int sqllogin(MYSQL *cons);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
-int sqlsignup(MYSQL *cons);						//mysql에 유저데이터를 추가하는 함수
-void loadmysql(MYSQL *cons, char mysqlip[]);	//mysql에 연결하는 함수
-char **onemysqlquery(MYSQL *cons, char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
-void writechating(MYSQL *cons);					//mysql에 채팅을 입력하는 함수
-void readchating(MYSQL *cons);					//mysql의 채팅을 읽는 함수
-void inserttopic(MYSQL *cons);
-void sqlmakeroom(MYSQL *cons);					//방을 만드는 함수
+int sqllogin(void);						//mysql에 저장된 데이터를 비교해 로그인을 하는 함수
+int sqlsignup(void);						//mysql에 유저데이터를 추가하는 함수
+void loadmysql(char mysqlip[]);	//mysql에 연결하는 함수
+char **onemysqlquery(char *query); //mysql명령어의 결과하나를 바로 반환해주는 함수
+void writechating(void);					//mysql에 채팅을 입력하는 함수
+void readchating(void);					//mysql의 채팅을 읽는 함수
+void inserttopic(void);
+void sqlmakeroom(void);					//방을 만드는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);//에러코드 출력 함수			//그래픽에러코드 출력 함수
@@ -170,8 +172,8 @@ int SDL_MAINS(void);
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
-void banglist(MYSQL *cons, int j);						//게임 방 출력
-int bangchose(MYSQL *cons);						//게임 방 출력및 선택
+void banglist(int j);						//게임 방 출력
+int bangchose(void);						//게임 방 출력및 선택
 int chooseroom(int roomnum);
 void waitroomtema();
 void logintema(void);							//로그인 디자인
@@ -198,7 +200,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char bangchoose;
 	char chooseroomcount;
 	//POINT pos;							//x, y좌표 표현 )pos.x, pos.y
-	MYSQL *cons = mysql_init(NULL);			//mysql 초기화
+	cons = mysql_init(NULL);			//mysql 초기화
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
@@ -216,8 +218,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//SDL_MAINS();
 	// 초기화 끝
 
-	loadmysql(cons, mysqlip);				//mysql 서버 불러오기
-	con = cons;
+	loadmysql(mysqlip);				//mysql 서버 불러오기
+	
 
 	disablecursor(1);
 	while (1) {								//로그인 반복문
@@ -225,15 +227,15 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
 			ConsoleL(30, 30);
-			if (sqllogin(cons) != 1)		//로그인에 성공하지 못하면 처음으로
+			if (sqllogin() != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 
 			ConsoleL(50, 20);
 			while (1) {						//방 반복문
 				gotoxy(0, 0);
-				bangchoose = bangchose(cons);	//방을 고름	
+				bangchoose = bangchose();	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
-					sqlmakeroom(cons);
+					sqlmakeroom();
 					break;
 				}
 				else if (bangchoose == 1)		//방 빠른 접속 -추후추가
@@ -258,7 +260,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					}
 					if (chooseroomcount == 1)		//return 1 은 비밀번호까지 맞을때
 					{
-
+						CHOOSEROOM = bangchoose - 2;
 						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);		//서버 대기방 접속
 						if (serverreturn == 3) {											//return값 3이면 종료 버튼
 							exitallthread();
@@ -281,7 +283,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		}
 		if (mainchoose == 2)
 		{
-			inserttopic(cons);
+			inserttopic();
 			continue;
 		}
 	}return 0;
@@ -290,7 +292,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 
-void inserttopic(MYSQL *cons)
+void inserttopic(void)
 {
 	char topic[50];
 	char query[100];
@@ -324,7 +326,7 @@ void inserttopic(MYSQL *cons)
 	}
 
 }
-void sqlmakeroom(MYSQL *cons) {
+void sqlmakeroom(void) {
 	while (1) {
 		CLS;
 		int count = 0;
@@ -389,6 +391,11 @@ void sqlmakeroom(MYSQL *cons) {
 		}
 		disablecursor(1);
 		CLS;
+		strcpy(connectroom[0].roomname, myroom.roomname);
+		strcpy(connectroom[0].password, myroom.password);
+		strcpy(connectroom[0].ip, myip);
+		connectroom[0].people = 0;
+		CHOOSEROOM = 0;
 		printf("방 제작중....");
 		threads[5] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)makeroom, &count, 0, 0);
 		while (1) {
@@ -569,7 +576,7 @@ int waitroom(void)
 			{
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
-				mysql_query(con, query);
+				mysql_query(cons, query);
 
 			}
 			for (int i = 0; i < 3; i++)
@@ -998,7 +1005,7 @@ void checkword(char*nowword, char*scanword) {
 	}
 	printf("끝");
 } //알아서 비교해줌
-void writechating(MYSQL *cons)
+void writechating(void)
 {
 	char query[300];
 	int i = 0;
@@ -1046,7 +1053,7 @@ void writechating(MYSQL *cons)
 		memset(buffer, 0, sizeof(buffer));
 	}
 }
-void readchating(MYSQL *cons) {
+void readchating(void) {
 	int v = 0;
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
@@ -1068,7 +1075,7 @@ void readchating(MYSQL *cons) {
 	}
 
 }
-void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
+void loadmysql(char mysqlip[])	//MYSQL 서버 불러오기
 {
 	CLS;
 	printf("데이터베이스 불러오기 시도중...");
@@ -1087,7 +1094,7 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 		fprintf(stderr, "%s\n", mysql_error(cons));
 		printf("새로운 ip를 설정해 주세요.\n->");
 		scanf("%s", mysqlip);
-		loadmysql(cons, mysqlip);					//재귀함수 호출
+		loadmysql(mysqlip);					//재귀함수 호출
 	}
 	else {
 		printf("\b2");
@@ -1098,7 +1105,7 @@ void loadmysql(MYSQL *cons, char mysqlip[])	//MYSQL 서버 불러오기
 
 	return;
 }
-char **onemysqlquery(MYSQL *cons, char *query) {		//mysql 명령어의 결과하나를 바로 반환해주는 함수
+char **onemysqlquery(char *query) {		//mysql 명령어의 결과하나를 바로 반환해주는 함수
 	mysql_query(cons, query);
 	return mysql_fetch_row(mysql_store_result(cons));
 
@@ -1153,6 +1160,7 @@ void ErrorHandling(char *Message) {
 }
 int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	char query[100];
+	printf("%s로 호스팅\n", ServerIP);
 	connect_sock = socket(PF_INET, SOCK_STREAM, 0);	//connect_sock변수에 소켓 할당
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
 	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
@@ -1161,6 +1169,10 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 		ErrorHandling("connect() error");
 	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
+	
+	sprintf(query, "update catchmind.room set people = people + 1 where ip = '%s'", ServerIP);
+	printf("%s", query);
+	mysql_query(cons, query);
 	sprintf(query, "player   connect %s", username);
 	send(connect_sock, query, 45, 0);
 	Sleep(200);
@@ -1271,7 +1283,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	}
 
 }
-int sqllogin(MYSQL *cons) {
+int sqllogin(void) {
 	char query[100];
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
@@ -1284,7 +1296,7 @@ int sqllogin(MYSQL *cons) {
 		if (user.id[0] == 0)
 		{
 			fflush(stdin);
-			check = sqlsignup(cons);
+			check = sqlsignup();
 			gotoxy(2, 3);
 			if (check == 1)
 				printf("               (회원가입 성공)           ");
@@ -1330,7 +1342,7 @@ int sqllogin(MYSQL *cons) {
 
 
 }
-int sqlsignup(MYSQL *cons) {
+int sqlsignup(void) {
 	LOG user;
 	char query3[100];
 	char query2[100];
@@ -1361,6 +1373,9 @@ int sqlsignup(MYSQL *cons) {
 }
 void mainatitleimage(void) {
 	WHITE
+		cur(6, 1);
+	printf("MySQL Ping : %dms", mysql_ping(cons));
+	mysql_select_db(cons, "catchmind");
 		gotoxy(6, 3);
 	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
 	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■"); gotoxy(6, 5);
@@ -1515,11 +1530,11 @@ void bangtema() {
 	printf("                ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 
 }
-void banglist(MYSQL *cons, int j) {
+void banglist(int j) {
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	short i = 0;
-	mysql_query(cons, "select ip, name, password from catchmind.room");
+	mysql_query(cons, "select ip, name, password, people from catchmind.room");
 	sql_result = mysql_store_result(cons);
 
 	memset(connectroom, 0, sizeof(connectroom));
@@ -1577,10 +1592,22 @@ void banglist(MYSQL *cons, int j) {
 		else {
 			WHITE printf("%-7s", sql_row[1]);
 		}
+		if (i % 2 == 0)
+			cur(25, 8 + (i * 2));
+		else
+			cur(55, 8 + ((i / 2) * 4));
+
+		if (j == i) {
+			HIGH_GREEN printf("%5s/4", sql_row[3]);
+		}
+		else {
+			WHITE printf("%5s/4", sql_row[3]);
+		}
 
 		strcpy(connectroom[i].ip, sql_row[0]);
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
+		connectroom[i].people = atoi(sql_row[3]);
 		i++;
 
 	}
@@ -1588,7 +1615,7 @@ void banglist(MYSQL *cons, int j) {
 	i = 0;
 
 }
-int bangchose(MYSQL *cons) {
+int bangchose(void) {
 
 	int xx = 0, yy = 0, lr = 0;
 	int j = 0;
@@ -1596,7 +1623,7 @@ int bangchose(MYSQL *cons) {
 	bangtema();
 	j = -1;
 	while (1) {
-		banglist(cons, j);
+		banglist(j);
 		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
 
@@ -1777,9 +1804,6 @@ void sendall(char *message) {
 	ZeroMemory(message, sizeof(message));
 
 }
-void processclnt(void) {
-
-}
 void Clnt_1(int v)
 {
 	int i;
@@ -1937,14 +1961,16 @@ void exitsignal(void)
 	if (signalmode == 1)
 	{
 		send(connect_sock, "exit", 40, 0);
+		sprintf(query, "update catchmind.room set people = people - 1 where ip = '%s'", connectroom[CHOOSEROOM].ip);
+		mysql_query(cons, query);
 	}
 	if (signalmode == 2)
 	{
 		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
-		mysql_query(con, query);
+		mysql_query(cons, query);
 
 	}
-	mysql_close(con);
+	mysql_close(cons);
 
 }
 void gotoxy(short x, short y)
@@ -1952,26 +1978,7 @@ void gotoxy(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-/*void rooprender(SDL_Renderer *Renderer2)
-{
-	char click_eraser, click_pencil;
-	char dragging;
-	int x, y;
-	float strong;
-	int rr, gg, bb;
-	int buff = 0;
-	CLS;
-	while (1) {
-		if (buff < SDLCLOCK) {
-			buff++;
-			sscanf(clientcatchmind, "%d %d %d %d %d %f %d %d %d", &click_eraser, &click_pencil, &dragging, &x, &y, &strong, &rr, &gg, &bb);
-			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, x, y, strong, (float)rr, (float)gg, (float)bb);
-		}
 
-	}
-
-}*/
 void cur(short x, short y)
 {
 	COORD pos = { x, y };
