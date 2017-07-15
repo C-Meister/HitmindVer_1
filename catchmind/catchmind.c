@@ -2336,9 +2336,10 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
-SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, SDL_Color Color, const char* sentence, int x, int y) {
+SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, const char* sentence, int x, int y) {
 	unsigned short unicode[128];// 유니코드 배열을 만든다
 	han2unicode(sentence, unicode);// 문장을 유니코드로 바꿔서 유니코드 배열에 넣는다
+	SDL_Color Color = {0,0,0};
 	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, unicode, Color);// 폰트의 종류,문자열, 색깔을 보내서 유니코드로 렌더한다음 서피스에 저장한다
 	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// 서피스로부터 텍스쳐를 생성한다
 	SDL_FreeSurface(Surface);//서피스 메모리를 해제 해준다.
@@ -2349,6 +2350,7 @@ SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, SDL_Color Col
 	SDL_RenderCopy(Renderer, Texture, &Src, &Src); //그대로 렌더러에 저장한다
 	return;
 }
+
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	
 	SDL_Window * Window=nullptr;//SDL 윈도우 선언
@@ -2379,7 +2381,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							// 텍스쳐와 사각형 선언 끝
 	float fontsize = 20.0;
 	TTF_Font * Font;
-	SDL_Color Color = { 0,0,0 };
 	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
