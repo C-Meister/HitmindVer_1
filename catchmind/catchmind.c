@@ -195,7 +195,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 	//int i, j, k, v, result;
 
-	signalall();
+	
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
@@ -205,7 +205,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
 	char mysqlip[30] = "10.80.162.92";		//mysql ip 상희ip입니다	지금 윈도우7버전 : 10.80.162.92 윈도우10버전 : 10.80.161.182
-//	char *ServerIP = "10.80.162.41";		//소켓 ip 상호ip임
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
@@ -220,7 +219,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 	loadmysql(mysqlip);				//mysql 서버 불러오기
 	
-
+	signalall();
 	disablecursor(1);
 	while (1) {								//로그인 반복문
 		mainchoose = maintitle();				//main 화면
@@ -596,13 +595,6 @@ int waitroom(void)
 			CLS;
 			closesocket(connect_sock);
 			printf("서버가 닫혔습니다.");
-			if (lead == true)
-			{
-				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
-				mysql_query(cons, query);
-				
-			}
-			exitallthread();
 			return 3;
 		}
 		POINT a;
