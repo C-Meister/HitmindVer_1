@@ -146,7 +146,7 @@ void usermain(void);
 void ErrorHandling(char *Message);				//¼ÒÄÏ ¿¡·¯ Ãâ·Â ÇÏ´Â ÇÔ¼ö
 int Connect_Server(char *ServerIP);			//¼­¹ö ¿¬°á ÇØÁÖ´Â ÇÔ¼ö
 void recieve(void);								//¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
-void sendall(char *message);					//ÇÏ³ª¸¦¹ÞÀ¸¸é ÀüºÎÀü¼Û
+void sendall(char *message, int c);					//ÇÏ³ª¸¦¹ÞÀ¸¸é ÀüºÎÀü¼Û
 int waitroom(void);							//³×Æ®¿öÅ© ´ë±â¹æ
 void Clnt_1(int v);								//¼­¹ö - Å¬¶óÀÌ¾ðÆ® 1Åë½Å
 void makeroom(int *count);							//¹æ¸¸µé±â(³×Æ®¿öÅ©)
@@ -228,13 +228,13 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	//SDL_MAINS();
 	// ÃÊ±âÈ­ ³¡
 	signalall();
-	
+
 	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
 	{
 		printf("ÃÊ±âÈ­ ½ÇÆÐ");
 		Sleep(5000);
 	}
-	
+
 
 	// load the MP3 file "music.mp3" to play as music
 	Mix_Music *music;
@@ -623,7 +623,7 @@ int waitroom(void)
 		}
 		if (status[0] == -1)
 		{
-			
+
 			CLS;
 			closesocket(connect_sock);
 			printf("¼­¹ö°¡ ´ÝÇû½À´Ï´Ù.");
@@ -881,7 +881,7 @@ restart:
 			buff++;
 			continue;
 		}
-			
+
 
 		if (user.id[i] == 1) {
 			togl *= -1;
@@ -1551,7 +1551,7 @@ int sqlsignup(void) {
 }
 void mainatitleimage(void) {
 	WHITE
-	gotoxy(6, 3);
+		gotoxy(6, 3);
 	printf("        ¡á              ¡á¡á¡á¡á¡á      ¡á¡á¡á¡á¡á  ¡á        ¡á¡á¡á    ¡á      ¡á¡á¡á¡á¡á                                           ¡á¡á¡á"); gotoxy(6, 4);
 	printf("    ¡á¡á¡á¡á¡á  ¡á      ¡á              ¡á      ¡á  ¡á      ¡á      ¡á  ¡á      ¡á                                                 ¡á      ¡á"); gotoxy(6, 5);
 	printf("                ¡á      ¡á¡á¡á¡á¡á      ¡á      ¡á  ¡á      ¡á      ¡á  ¡á      ¡á              ¡á      ¡á   ¡á    ¡á    ¡á      ¡á"); gotoxy(6, 6);
@@ -1581,7 +1581,7 @@ int maintitle(void) { //°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â
 		WHITE
 			click(&xx, &yy, &lr);
 
-			cur(6, 1);
+		cur(6, 1);
 		printf("MySQL Ping : %dms", mysql_ping(cons));
 		mysql_select_db(cons, "catchmind");
 
@@ -1609,7 +1609,7 @@ int maintitle(void) { //°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â
 			WHITE printf("ÁÖÁ¦ Ãß°¡");
 		}
 
-		
+
 	}
 	CLS;
 }
@@ -1946,23 +1946,15 @@ void jointema(void) {
 	printf("¡á              ¡á              ¡á              ¡á\n");
 	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 }
-void sendall(char *message) {
-	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[0], message, 45, 0);
-	//	printf("Client 1 <- Server : %s\n", message);
-	if (Sconnect_sock[1] != 0) {
-		send(Sconnect_sock[1], message, 45, 0);
-		//		printf("Client 2 <- Server : %s\n", message);
+void sendall(char *message, int c) {
+	for (int i = 0; i < 4; i++)
+	{
+		if (i == c)
+			continue;
+		if (Sconnect_sock[i] != 0)
+			send(Sconnect_sock[i], message, 45, 0);
 	}
-	if (Sconnect_sock[2] != 0) {
-		send(Sconnect_sock[2], message, 45, 0);
-		//		printf("Client 3 <- Server : %s\n", message);
-	}
-	if (Sconnect_sock[3] != 0) {
-		send(Sconnect_sock[3], message, 45, 0);
-		//		printf("Client 4 <- Server : %s\n", message);
-	}
-	ZeroMemory(message, sizeof(message));
+
 
 }
 void Clnt_1(int v)
@@ -1990,23 +1982,26 @@ void Clnt_1(int v)
 			if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
 				strcpy(querys[v], message);
+				sendall(message, 5);
 
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player %d ready %s", v + 1, friendname[v]);
 				strcpy(querys[v], message);
+				sendall(message, 5);
 			}
 			else if (strcmp(message, "player not ready") == 0) {
 				ZeroMemory(message, sizeof(message));
 				sprintf(message, "player %d not ready %s", v + 1, friendname[v]);
 				strcpy(querys[v], message);
+				sendall(message, 5);
 			}
 			else if (strcmp(message, "exit") == 0)
 			{
 				ZeroMemory(message, sizeof(message));
 				if (v == 0)
-					sendall("server close");
+					sendall("server close", 5);
 				else {
 					sprintf(message, "player %d exit", v + 1);
 					closesocket(Sconnect_sock[v]);
@@ -2014,19 +2009,23 @@ void Clnt_1(int v)
 					Sconnect_sock[v] = 0;
 					strcpy(querys[v], message);
 				}
+				sendall(message, 5);
 			}
 			else if (strcmp(message, "game start") == 0)
 			{
 				cur(0, 0);
 				printf("%s", message);
-				sendall(message);
+				sendall(message, 5);
 			}
 			else if (strncmp(message, "topic", 5) == 0)
 			{
 				message[6] = v + '0' + 1;
-			
+				sendall(message, 5);
 			}
-			sendall(message);
+			else
+			{
+				sendall(message, v);
+			}
 			ZeroMemory(message, sizeof(message));
 		}
 		//	Sleep(100);
@@ -2180,7 +2179,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 	}
 }
 
-void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3,TTF_Font * Font ,int step) {
+void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
 	switch (step) {
 	case 9:
 		SDL_DestroyRenderer(Renderer3);// SDL ·»´õ·¯ ÆÄ±«
@@ -2445,12 +2444,12 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &Eraser);
 	SDL_RenderRemoveEdge(Renderer, &Pencil);
 	SDL_RenderRemoveEdge(Renderer, &New);
-	
+
 }
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x, int y) {
 	unsigned short unicode[128];// À¯´ÏÄÚµå ¹è¿­À» ¸¸µç´Ù
 	han2unicode(sentence, unicode);// ¹®ÀåÀ» À¯´ÏÄÚµå·Î ¹Ù²ã¼­ À¯´ÏÄÚµå ¹è¿­¿¡ ³Ö´Â´Ù
-	SDL_Color Color = {0,0,0};
+	SDL_Color Color = { 0,0,0 };
 	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, unicode, Color);// ÆùÆ®ÀÇ Á¾·ù,¹®ÀÚ¿­, »ö±òÀ» º¸³»¼­ À¯´ÏÄÚµå·Î ·»´õÇÑ´ÙÀ½ ¼­ÇÇ½º¿¡ ÀúÀåÇÑ´Ù
 	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// ¼­ÇÇ½º·ÎºÎÅÍ ÅØ½ºÃÄ¸¦ »ý¼ºÇÑ´Ù
 	SDL_FreeSurface(Surface);//¼­ÇÇ½º ¸Þ¸ð¸®¸¦ ÇØÁ¦ ÇØÁØ´Ù.
@@ -2468,13 +2467,13 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x,
 }
 
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
-	
-	SDL_Window * Window=nullptr;//SDL À©µµ¿ì ¼±¾ð
-	SDL_Renderer * Renderer=nullptr;// SDL ·»´õ·¯ ¼±¾ð 
-	SDL_Window * Window2=nullptr;
-	SDL_Renderer * Renderer2=nullptr;
-	SDL_Window * Window3=nullptr;
-	SDL_Renderer * Renderer3=nullptr;
+
+	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
+	SDL_Renderer * Renderer = nullptr;// SDL ·»´õ·¯ ¼±¾ð 
+	SDL_Window * Window2 = nullptr;
+	SDL_Renderer * Renderer2 = nullptr;
+	SDL_Window * Window3 = nullptr;
+	SDL_Renderer * Renderer3 = nullptr;
 	SDL_Rect center = { 0 };
 	char query[256];
 	int chaty = 0;
@@ -2577,7 +2576,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						   // RgbCode ÀÌ¹ÌÁö
 	RgbTexture = LoadTextureEx(Renderer, "image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (RgbTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode ÀÌ¹ÌÁöÀÇ °¡·Î¼¼·Î ÀÐ¾î¿À±â. À©µµ¿ì Ã¢À» 3°³·Î ³ª´©´Â ±âÁØÀÌ µÇ¹Ç·Î À©µµ¿ìÃ¢ ¼±¾ðÀü¿¡ ÀÐ¾î¿È
@@ -2591,7 +2590,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Track ÀÌ¹ÌÁö
 	TraTexture = LoadTextureEx(Renderer, "image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (TraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -2605,7 +2604,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Box ÀÌ¹ÌÁö
 	BoxTexture = LoadTextureEx(Renderer, "image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (BoxTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -2619,7 +2618,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Pencil ÀÌ¹ÌÁö
 	PenTexture = LoadTexture(Renderer, "image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (PenTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
@@ -2631,7 +2630,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Eraser ÀÌ¹ÌÁö
 	EraTexture = LoadTexture(Renderer, "image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (EraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	Eraser.w = Pencil.w;
@@ -2642,7 +2641,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// New ÀÌ¹ÌÁö
 	NewTexture = LoadTexture(Renderer, "image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (NewTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
 	}
 	New.w = Eraser.w;
@@ -2676,11 +2675,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 												  // º¯¼ö ÃÊ±â°ª ¼³Á¤³¡
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
-	
+
 	SDL_RenderPresent(Renderer);
 	SDL_Delay(500);
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
-		
+
 	//	CLS;
 		if (Gametopic == 0)
 		{
@@ -2974,17 +2973,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			chaty = 0;
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
-			SDL_Rect Rect = { 0,300,1310/4+10,640 };
-			SDL_RenderFillRect(Renderer,&Rect);
+			SDL_Rect Rect = { 0,300,1310 / 4 + 10,640 };
+			SDL_RenderFillRect(Renderer, &Rect);
 			for (int i = 0; i < 10; i++) {
 				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 				chaty += 30;
-				
+
 			}
 			CHATHAPPEN = false;
 		}
 		if (happen == true) {
-		
+
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, strong, r, g, b);
 
 		}
@@ -2998,7 +2997,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(EraTexture);
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
-	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,9);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 	return 0;// Á¾·á
 }
 HWND GetConsoleHwnd(void)
