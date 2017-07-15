@@ -191,18 +191,18 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 
 	//SDL_MAIN();
 	//º¯¼ö ¼±¾ð
-	int i, j, k, v, result;
+	//int i, j, k, v, result;
 
 	signalall();
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
-	POINT pos;								//x, yÁÂÇ¥ Ç¥Çö )pos.x, pos.y
+	//POINT pos;							//x, yÁÂÇ¥ Ç¥Çö )pos.x, pos.y
 	MYSQL *cons = mysql_init(NULL);			//mysql ÃÊ±âÈ­
 	MYSQL_RES *sql_result;					//mysql °á°úÀÇ ÇÑÁÙÀ» ÀúÀåÇÏ´Â º¯¼ö
 	MYSQL_ROW sql_row;						//mysql °á°úÀÇ µ¥ÀÌÅÍ ÇÏ³ª¸¦ ÀúÀåÇÏ´Â º¯¼ö
 	char query[400];						//mysql ¸í·É¾î¸¦ ÀúÀåÇÔ
-	char mysqlip[30] = "10.80.161.182";		//mysql ip »óÈñipÀÔ´Ï´Ù	Áö±Ý À©µµ¿ì7¹öÀü
+	char mysqlip[30] = "10.80.162.92";		//mysql ip »óÈñipÀÔ´Ï´Ù	Áö±Ý À©µµ¿ì7¹öÀü : 10.80.162.92 À©µµ¿ì10¹öÀü : 10.80.161.182
 //	char *ServerIP = "10.80.162.41";		//¼ÒÄÏ ip »óÈ£ipÀÓ
 	char data[1000][30] = { 0, };           //´Ü¾îµ¥ÀÌÅÍ
 	char nowword[30] = { 0, };              //·£´ý¼±ÅÃ ´Ü¾î
@@ -2273,7 +2273,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Event event;//SDL_Event º¯¼ö ¼±¾ð
 	const Uint8 * keystate;// Key »óÅÂ ¹è¿­À» ¹Þ±â À§ÇÑ Æ÷ÀÎÅÍ ¼±¾ð
 						   // RgbCode ÀÌ¹ÌÁö
-	RgbTexture = LoadTextureEx(Renderer, "RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	RgbTexture = LoadTextureEx(Renderer, "image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (RgbTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
@@ -2289,7 +2289,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RgbCode.y = 1080 * (1) - RgbCode.h - 10 * (1);
 	// ³¡
 	// Track ÀÌ¹ÌÁö
-	TraTexture = LoadTextureEx(Renderer, "Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	TraTexture = LoadTextureEx(Renderer, "image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (TraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
@@ -2305,7 +2305,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Track.y = RgbCode.y - Track.h - 25 * (1);
 	// ³¡
 	// Box ÀÌ¹ÌÁö
-	BoxTexture = LoadTextureEx(Renderer, "Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	BoxTexture = LoadTextureEx(Renderer, "image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (BoxTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
@@ -2321,7 +2321,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Box.y = Track.y + Track.h / 2 - Box.h / 2;
 	// ³¡
 	// Pencil ÀÌ¹ÌÁö
-	PenTexture = LoadTexture(Renderer, "Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	PenTexture = LoadTexture(Renderer, "image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (PenTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
@@ -2335,7 +2335,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Pencil.y = Track.y - 30 - Pencil.h;
 	// ³¡
 	// Eraser ÀÌ¹ÌÁö
-	EraTexture = LoadTexture(Renderer, "Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	EraTexture = LoadTexture(Renderer, "image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (EraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
@@ -2348,7 +2348,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Eraser.y = Pencil.y;
 	// ³¡
 	// New ÀÌ¹ÌÁö
-	NewTexture = LoadTexture(Renderer, "New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	NewTexture = LoadTexture(Renderer, "image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (NewTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
 		IMG_ExceptionRoutine(Renderer2, Window2);
