@@ -32,7 +32,7 @@
 #include "SDL/SDL.h"			//SDL - ±×·¡ÇÈ Çì´õÆÄÀÏ
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
-#include "han2unicode.h"
+#include "SDL/han2unicode.h"
 //Ãß°¡//Ãß°¡
 //#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
@@ -45,6 +45,7 @@
 #pragma comment (lib, "SDL2")			//±×·¡ÇÈ ¶óÀÌºê·¯¸® 1
 #pragma comment (lib, "SDL2main")		//±×·¡ÇÈ ¶óÀÌºê·¯¸® 2
 #pragma comment (lib, "SDL2_image")		//±×·¡ÇÈ ¶óÀÌºê·¯¸® 3
+#pragma comment (lib,"SDL2_ttf")
 #pragma comment (lib, "SDL2_mixer.lib")	//±×·¡ÇÈ »ç¿îµå ¶óÀÌºê·¯¸® 4
 #pragma comment (lib, "ws2_32.lib")		//¼ÒÄÏ(³×Æ®¿öÅ©)¶óÀÌºê·¯¸®
 
@@ -2449,9 +2450,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						   // RgbCode ÀÌ¹ÌÁö
 	RgbTexture = LoadTextureEx(Renderer, "image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (RgbTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode ÀÌ¹ÌÁöÀÇ °¡·Î¼¼·Î ÀÐ¾î¿À±â. À©µµ¿ì Ã¢À» 3°³·Î ³ª´©´Â ±âÁØÀÌ µÇ¹Ç·Î À©µµ¿ìÃ¢ ¼±¾ðÀü¿¡ ÀÐ¾î¿È
@@ -2465,9 +2464,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Track ÀÌ¹ÌÁö
 	TraTexture = LoadTextureEx(Renderer, "image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (TraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -2481,9 +2478,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Box ÀÌ¹ÌÁö
 	BoxTexture = LoadTextureEx(Renderer, "image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (BoxTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -2497,9 +2492,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Pencil ÀÌ¹ÌÁö
 	PenTexture = LoadTexture(Renderer, "image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (PenTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
@@ -2511,9 +2504,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Eraser ÀÌ¹ÌÁö
 	EraTexture = LoadTexture(Renderer, "image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (EraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	Eraser.w = Pencil.w;
@@ -2524,9 +2515,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// New ÀÌ¹ÌÁö
 	NewTexture = LoadTexture(Renderer, "image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (NewTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-		IMG_ExceptionRoutine(Renderer2, Window2);
-		IMG_ExceptionRoutine(Renderer3, Window3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 		return 0;
 	}
 	New.w = Eraser.w;
@@ -2547,7 +2536,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	float xpos = 0, ypos = 0;// ¸¶¿ì½º xÁÂÇ¥ yÁÂÇ¥¸¦ ÀúÀåÇÏ´Â º¯¼ö¼±¾ð 
 	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// ±½±âÀÇ ¼±¾ð
 	SDL_Rect Rect = { 0 }; // ±×¸± »ç°¢ÇüÀÇ º¯¼ö¸¦ ¹Ýº¹¹® ¹Û¿¡¼­ ¼±¾ð
-	SDL_Rect Font = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// »ö±ò, ±½±âµîÀ» º¸¿©ÁÖ±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
+	SDL_Rect Fonts = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// »ö±ò, ±½±âµîÀ» º¸¿©ÁÖ±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Edge = { 0 };// Å×µÎ¸®¸¦ ±×¸®±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð 
 	char click_eraser, click_pencil;
 	char dragging;
@@ -2731,7 +2720,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							break;
 						}
 						else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
-							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
+							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = true;
 							clicks.pencil = false;
 							happen = true;
@@ -2739,23 +2728,23 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 							SDL_RenderClear(Renderer2);
-							Font.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
-							Font.h += 2;
+							Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
+							Fonts.h += 2;
 							newclick = 1;
 							//¿©±â~~~~~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
 								send(connect_sock, "SDLCLEAR", 45, 0);
 							}
-							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
+							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = false;
 							happen = true;
 						}
 
 						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
-							Font.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
-							Font.h += 2;
-							SDL_RenderFillRect(Renderer, &Font);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
+							Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
+							Fonts.h += 2;
+							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = true;
 							happen = true;
@@ -2840,7 +2829,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			on.new = false;
 		}
 		if (happen == true) {
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Font, strong, r, g, b);
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, strong, r, g, b);
 
 		}
 		happen = false;
@@ -2853,8 +2842,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(EraTexture);
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
-	IMG_ExceptionRoutine(Renderer, Window);//IMG¿¹¿ÜÃ³¸®·çÆ¾ ½ÇÇà
-	IMG_ExceptionRoutine(Renderer2, Window2);
-	IMG_ExceptionRoutine(Renderer3, Window3);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, 8);
 	return 0;// Á¾·á
 }
