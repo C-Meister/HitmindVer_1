@@ -872,12 +872,7 @@ restart:
 			else if (togl == 1 && 'A' <= user.id[i] && 'Z' >= user.id[i])
 				user.id[i] += 32;
 		}
-		else {
-			if (togl == 1 && 'A' <= user.id[i] && 'Z' >= user.id[i])
-				user.id[i] += 32;
-			else if (togl == -1 && 'a' <= user.id[i] && 'z' >= user.id[i])
-				user.id[i] -= 32;
-		}
+
 
 
 		if (user.id[i])
@@ -972,16 +967,10 @@ restart:
 		}
 
 		if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
-			if (togl == -1 && 'a' <= user.pass[i] && 'z' >= user.pass[i])
-				user.pass[i] -= 32;
-			else if (togl == 1 && 'A' <= user.pass[i] && 'Z' >= user.pass[i])
-				user.pass[i] += 32;
-		}
-		else {
-			if (togl == 1 && 'A' <= user.pass[i] && 'Z' >= user.pass[i])
-				user.pass[i] += 32;
-			else if (togl == -1 && 'a' <= user.pass[i] && 'z' >= user.pass[i])
-				user.pass[i] -= 32;
+			if (togl == -1 && 'a' <= user.id[i] && 'z' >= user.id[i])
+				user.id[i] -= 32;
+			else if (togl == 1 && 'A' <= user.id[i] && 'Z' >= user.id[i])
+				user.id[i] += 32;
 		}
 
 		if (user.pass[i])
@@ -1743,7 +1732,7 @@ int bangchose(void) {
 			if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 				return 0;
 			else if (24 <= xx && xx <= 37 && 2 == yy) {//빠른시작
-				for (c = 3; c >= 0; c--)
+				for (c = 3; c > 0; c--)
 					for (b = 0; b < 6; b++)
 						if (connectroom[b].people == c)
 							return b + 2;
