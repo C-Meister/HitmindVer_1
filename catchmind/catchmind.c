@@ -336,7 +336,7 @@ void sqlmakeroom(void) {
 		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
 		char * myip = inet_ntoa(addr);
 		ROOM myroom = { 0, 0, 0 };
-		disablecursor(0);
+		
 		WHITE
 			printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■                                              ■\n");
@@ -350,6 +350,7 @@ void sqlmakeroom(void) {
 		gotoxy(48, 3);
 		printf("■");
 		cur(16, 5);
+		disablecursor(0);
 		scanf("%[^\n]s", myroom.roomname);
 		getchar();
 		cur(16, 7);
@@ -1978,7 +1979,6 @@ void gotoxy(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-
 void cur(short x, short y)
 {
 	COORD pos = { x, y };
