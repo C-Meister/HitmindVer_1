@@ -2429,10 +2429,15 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x,
 	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// 서피스로부터 텍스쳐를 생성한다
 	SDL_FreeSurface(Surface);//서피스 메모리를 해제 해준다.
 	SDL_Rect Src;
-	Src.x = x;
-	Src.y = y;
+	Src.x = 0;
+	Src.y = 0;
 	SDL_QueryTexture(Texture, NULL, NULL, &Src.w, &Src.h);
-	SDL_RenderCopy(Renderer, Texture, &Src, &Src); //그대로 렌더러에 저장한다
+	SDL_Rect Dst;
+	Dst.x = x;
+	Dst.y = y;
+	Dst.w = Src.w;
+	Dst.h = Src.h;
+	SDL_RenderCopy(Renderer, Texture, &Src, &Dst); //그대로 렌더러에 저장한다
 	return;
 }
 
