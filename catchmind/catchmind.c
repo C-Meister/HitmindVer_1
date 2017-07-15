@@ -1554,6 +1554,12 @@ void banglist(int j) {
 			cur(55, 7 + ((i / 2) * 4));
 		printf("                 ");
 
+		if (i % 2 == 0)
+			cur(25, 8 + (i * 2));
+		else
+			cur(55, 8 + ((i / 2) * 4));
+
+		printf("                 ");
 		i++;
 	}
 	i = 0;
@@ -1565,7 +1571,7 @@ void banglist(int j) {
 		else
 			cur(55, 6 + ((i / 2) * 4));
 
-		if (j == i) {
+		if (j == i) {     //유저아이피
 			HIGH_GREEN printf("%s", sql_row[0]);
 		}
 		else {
@@ -1587,7 +1593,7 @@ void banglist(int j) {
 		else
 			cur(55, 7 + ((i / 2) * 4));
 
-		if (j == i) {
+		if (j == i) {  //방제목
 			HIGH_GREEN printf("%-7s", sql_row[1]);
 		}
 		else {
@@ -1598,7 +1604,7 @@ void banglist(int j) {
 		else
 			cur(55, 8 + ((i / 2) * 4));
 
-		if (j == i) {
+		if (j == i) {   //인원수
 			HIGH_GREEN printf("%5s/4", sql_row[3]);
 		}
 		else {
