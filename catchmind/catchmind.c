@@ -186,7 +186,7 @@ void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
 void zeroprint(int xx, int yy, int lr, int m);  //디자인
-void click3(int *xx, int *yy, int *lr, int x, int y);
+char checkkeyborad(char n, int togl);
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
@@ -201,7 +201,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 	//int i, j, k, v, result;	
 
-	
+
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
@@ -224,7 +224,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	// 초기화 끝
 
 	loadmysql(mysqlip);				//mysql 서버 불러오기
-	
+
 	signalall();
 	disablecursor(1);
 	while (1) {								//로그인 반복문
@@ -251,7 +251,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 						chooseroomcount = 1;
 					else
 						chooseroomcount = chooseroom(bangchoose);
-					
+
 					if (chooseroomcount == -1)		//return -1은 해당 방이없을때
 					{
 						CLS;
@@ -346,7 +346,7 @@ void sqlmakeroom(void) {
 		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
 		char * myip = inet_ntoa(addr);
 		ROOM myroom = { 0, 0, 0 };
-		
+
 		WHITE
 			printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■                                              ■\n");
@@ -766,20 +766,73 @@ void zeroprint(int xx, int yy, int lr, int m) {
 		printf("초기화");
 	}
 }
+char checkkeyborad(char n, int togl) {
+
+	int k = 0;
+
+
+
+	if (GetAsyncKeyState(VK_NUMPAD0) & 0x0001)
+		return '0';
+	else if (GetAsyncKeyState(VK_NUMPAD1) & 0x0001)
+		return '1';
+	else if (GetAsyncKeyState(VK_NUMPAD2) & 0x0001)
+		return '2';
+	else if (GetAsyncKeyState(VK_NUMPAD3) & 0x0001)
+		return '3';
+	else if (GetAsyncKeyState(VK_NUMPAD4) & 0x0001)
+		return '4';
+	else if (GetAsyncKeyState(VK_NUMPAD5) & 0x0001)
+		return '5';
+	else if (GetAsyncKeyState(VK_NUMPAD6) & 0x0001)
+		return '6';
+	else if (GetAsyncKeyState(VK_NUMPAD7) & 0x0001)
+		return '7';
+	else if (GetAsyncKeyState(VK_NUMPAD8) & 0x0001)
+		return '8';
+	else if (GetAsyncKeyState(VK_NUMPAD9) & 0x0001)
+		return '9';
+	else if (GetAsyncKeyState(VK_BACK) & 0x0001)
+		return 8;
+	else if (GetAsyncKeyState(VK_RETURN) & 0x0001)
+		return 13;
+	else if (GetAsyncKeyState(VK_CAPITAL) & 0x0001) {
+		return 1;
+	}
+
+
+	for (k = 65; k <= 90; k++)
+		if (GetAsyncKeyState(k) & 0x0001)
+			if (togl == -1)
+				return k + 32;
+			else
+				return k;
+
+	for (k = 48; k <= 57; k++)
+		if (GetAsyncKeyState(k) & 0x0001)
+			return k;
+
+	return 0;
+
+}
 LOG login(int m) { // 1이면 로그인 2이면 회원가입 필수!!
 				   //오류 없는 코드니까 회원가입이랑 로그인에 잘 적으시길
 	int to = -1;
 	int b = 0;
 	int n = 0;
+	int keybit = 0;
+	int togl = -1;
+	int shift = 0;
 	POINT a;
 restart:
-	
+
 	gotoxy(0, 0);
 	if (m == 1)
 		logintema();
 
 	LOG user = { 0, 0, 0 };
 	int i = 0, j = 0;
+	int buff = 0;
 	int cnt = 0;
 	int xx = 0, yy = 0, lr = 0;
 	/*닉네임 생성*/
@@ -796,10 +849,44 @@ restart:
 		printf("                                       ");
 	}
 	gotoxy(16, 5);
+	buff = 0;
 	while (1) {
-		if (_kbhit()) {
 
-			user.id[i] = _getch();
+		user.id[i] = checkkeyborad(user.id[i], togl);
+
+		if (buff < 20) {
+			buff++;
+			continue;
+		}
+			
+
+		if (user.id[i] == 1) {
+			togl *= -1;
+			user.id[i] = 0;
+			continue;
+		}
+
+		if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+			if (togl == -1 && 'a' <= user.id[i] && 'z' >= user.id[i])
+				user.id[i] -= 32;
+			else if (togl == 1 && 'A' <= user.id[i] && 'Z' >= user.id[i])
+				user.id[i] += 32;
+		}
+		else {
+			if (togl == 1 && 'A' <= user.id[i] && 'Z' >= user.id[i])
+				user.id[i] += 32;
+			else if (togl == -1 && 'a' <= user.id[i] && 'z' >= user.id[i])
+				user.id[i] -= 32;
+		}
+
+
+		if (user.id[i])
+			keybit = 1;
+		else
+			keybit = 0;
+
+		if (keybit) {
+
 			if (user.id[i] == 8) {
 				if (i == 0) {
 					user.id[0] = 0;
@@ -809,7 +896,7 @@ restart:
 				user.id[i - 1] = 0;
 				user.id[i--] = 0;
 			}
-			else if ((user.id[i] == 9 || user.id[i] == 13) && i > 3) {
+			else if ((user.id[i] == 8 || user.id[i] == 13) && i > 3) {
 				user.id[i] = 0;
 				break;
 			}
@@ -828,7 +915,7 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click3(&xx, &yy, &lr, a.x, a.y);
+			click(&xx, &yy, &lr);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
 			if (lr == 1) {
@@ -866,13 +953,43 @@ restart:
 		Sleep(20);
 	}
 	i = 0;
-
+	buff = 0;
 	/*비밀번호 암호화 구현*/
 	gotoxy(16, 7);
 	while (1) {
 
-		if (_kbhit()) {
-			user.pass[i] = _getch();
+		user.pass[i] = checkkeyborad(user.pass[i], togl);
+
+		if (buff < 20) {
+			buff++;
+			continue;
+		}
+
+		if (user.pass[i] == 1) {
+			togl *= -1;
+			user.pass[i] = 0;
+			continue;
+		}
+
+		if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+			if (togl == -1 && 'a' <= user.pass[i] && 'z' >= user.pass[i])
+				user.pass[i] -= 32;
+			else if (togl == 1 && 'A' <= user.pass[i] && 'Z' >= user.pass[i])
+				user.pass[i] += 32;
+		}
+		else {
+			if (togl == 1 && 'A' <= user.pass[i] && 'Z' >= user.pass[i])
+				user.pass[i] += 32;
+			else if (togl == -1 && 'a' <= user.pass[i] && 'z' >= user.pass[i])
+				user.pass[i] -= 32;
+		}
+
+		if (user.pass[i])
+			keybit = 1;
+		else
+			keybit = 0;
+
+		if (keybit) {
 			if (user.pass[i] == 8) {
 				if (i == 0) {
 					user.pass[0] = 0;
@@ -903,7 +1020,7 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click3(&xx, &yy, &lr, a.x, a.y);
+			click(&xx, &yy, &lr);
 
 			if (lr == 1) {
 				if (9 <= yy && yy <= 11) {
@@ -1193,7 +1310,7 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 		ErrorHandling("connect() error");
 	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
-	
+
 	sprintf(query, "update catchmind.room set people = people + 1 where ip = '%s'", ServerIP);
 	mysql_query(cons, query);
 	sprintf(query, "player   connect %s", username);
@@ -1403,7 +1520,7 @@ void mainatitleimage(void) {
 		cur(6, 1);
 	printf("MySQL Ping : %dms", mysql_ping(cons));
 	mysql_select_db(cons, "catchmind");
-		gotoxy(6, 3);
+	gotoxy(6, 3);
 	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
 	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■"); gotoxy(6, 5);
 	printf("                ■      ■■■■■      ■      ■  ■      ■      ■  ■      ■              ■      ■   ■    ■    ■      ■"); gotoxy(6, 6);
@@ -1480,50 +1597,6 @@ void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 		*xx = mouse_x / 2;
 		*yy = mouse_y;
 
-		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
-			*lr = 1;
-			Sleep(100);
-		}
-		else {
-			*lr = 0;
-		}
-	}
-
-
-}
-void click3(int *xx, int *yy, int *lr, int x, int y) {//마우스에서 2를 나눈값을 받는다
-
-	HANDLE       hIn, hOut;
-	DWORD        dwNOER;
-	INPUT_RECORD rec;
-
-
-	hIn = GetStdHandle(STD_INPUT_HANDLE);
-	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
-	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
-
-	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
-	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
-		int mouse_x = rec.Event.MouseEvent.dwMousePosition.X; // X값 받아옴
-		int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y; // Y값 받아옴
-
-		*xx = mouse_x / 2;
-		*yy = mouse_y;
-
-		if (*xx == 0) {
-			SetCursorPos(x + 30, y);
-		}
-		else if (*xx >= 25) {
-			SetCursorPos(x - 30, y);
-		}
-
-		if (*yy <= 0) {
-			SetCursorPos(x, y + 30);
-		}
-		else if (*yy >= 20) {
-			SetCursorPos(x, y - 30);
-		}
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
 			*lr = 1;
 			Sleep(100);
@@ -1670,10 +1743,10 @@ int bangchose(void) {
 			if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 				return 0;
 			else if (24 <= xx && xx <= 37 && 2 == yy) {//빠른시작
-				for (c = 3; c >= 0; c--) 
-					for (b = 0; b < 6; b++) 
+				for (c = 3; c >= 0; c--)
+					for (b = 0; b < 6; b++)
 						if (connectroom[b].people == c)
-							return b+2;
+							return b + 2;
 			}
 			else if (9 <= xx && xx <= 22 && 6 <= yy && yy <= 8)	//방 1
 				return 2;
@@ -1741,7 +1814,7 @@ int chooseroom(int roomnum) {
 
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
-	
+
 	CLS;
 	WHITE
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
