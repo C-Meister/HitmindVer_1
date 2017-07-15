@@ -169,6 +169,8 @@ void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, flo
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 int SDL_MAINS(void);
+void SDL_PlayMusic(Mix_Music *bgm, const char * musicname);
+
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
