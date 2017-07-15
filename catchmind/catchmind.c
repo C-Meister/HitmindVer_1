@@ -170,7 +170,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // ÅØ½ºÃÄ¿¡ ÀÌ¹ÌÁöÆÄÀÏ ·ÎµåÇÏ´Â ÇÔ¼ö ¼±¾ð
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // ÅØ½ºÃÄ¿¡ ÀÌ¹ÌÁöÆÄÀÏ ´Ù¾çÇÏ°Ô ·ÎµåÇÏ´Â ÇÔ¼ö ¼±¾ð
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//ÅØ½ºÃÄ¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö ¼±¾ð
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, float strong, int r, int g, int b);
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, TTF_Font* Fonts, char* inputText, float strong, int r, int g, int b);
 void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
@@ -1981,7 +1981,7 @@ void sendall(char *message, int c) {
 		if (i == c)
 			continue;
 		if (Sconnect_sock[i] != 0)
-			send(Sconnect_sock[i], message, 45, 0);					//º¯¼ö c ¹ø ¼ÒÄÏÀ» Á¦¿ÜÇÑ ´Ù¸¥ »ç¶÷µé¿¡°Ô ÀüºÎ º¸³¿
+			send(Sconnect_sock[i], message, 45, 0);
 	}
 
 
@@ -2008,11 +2008,9 @@ void Clnt_1(int v)
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
-			if (message[1] = ' '&&(message[0] == 0 || message[0] == 1))
+			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 				sendall(message, v);
-				ZeroMemory(message, sizeof(message));
-				continue;
 			}
 			else if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
@@ -2734,9 +2732,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
-			SDL_Rect Rect = { 0,0,1310 / 4 + 10,300 };
+			SDL_Rect Rect = { 0,0,1310 / 4 + 10,200 };
 			SDL_RenderFillRect(Renderer, &Rect);
-			TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 0);
+			TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 100);
+			happen = true;
 			sprintf(query, "topic   %s", sql_row[0]);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
@@ -2944,7 +2943,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							}
 							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
-							clicks.pencil = false;
+							clicks.pencil = true;
 							happen = true;
 						}
 
@@ -3040,7 +3039,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			chaty = 0;
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
-			SDL_Rect Rect = { 0,300,1310 / 4 + 10,640 };
+			SDL_Rect Rect = { 0,300,1310 / 4 + 10,400 };
 			SDL_RenderFillRect(Renderer, &Rect);
 			for (int i = 0; i < 10; i++) {
 				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
