@@ -910,9 +910,11 @@ restart:
 				}
 			}
 			else if (lr == 0) {
+				
 				if (9 <= yy && yy <= 11)
 					zeroprint(xx, yy, lr, m);
 				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
+					disablecursor(1);
 					HIGH_GREEN
 						gotoxy(41, 6);
 					printf("login");
@@ -927,6 +929,7 @@ restart:
 					printf("초기화");
 				}
 				else if (m == 2 && 19 <= xx && xx <= 23 && 3 <= yy && yy <= 7) {
+					disablecursor(1);
 					HIGH_GREEN
 						gotoxy(39, 5);
 					printf("회원가입");
@@ -939,6 +942,7 @@ restart:
 					printf("초기화");
 				}
 				else {
+					disablecursor(1);
 					WHITE
 						gotoxy(3, 10);
 					printf("개발자사이트");
