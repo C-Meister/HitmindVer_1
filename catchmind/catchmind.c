@@ -275,6 +275,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 							CLS;
 							continue;
 						}
+						if (serverreturn == 3)
+							continue;
 						break;
 					}
 				}
@@ -588,6 +590,21 @@ int waitroom(void)
 			SDL_MAINS();
 			return 1;
 		}
+		if (status[0] == -1)
+		{
+
+			CLS;
+			closesocket(connect_sock);
+			printf("서버가 닫혔습니다.");
+			if (lead == true)
+			{
+				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+				mysql_query(cons, query);
+				
+			}
+			exitallthread();
+			return 3;
+		}
 		POINT a;
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
@@ -618,7 +635,12 @@ int waitroom(void)
 				yy = 0;
 			}
 			if (xx > 42 && xx < 49 && yy < 43 && yy > 39) {
-				send(connect_sock, "player exit", 45, 0);
+				if (lead == true)
+				{
+					sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+					mysql_query(cons, query);
+				}
+				send(connect_sock, "exit", 45, 0);
 				return 3;
 			}
 			xx = 0;
@@ -1265,6 +1287,10 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[0] = 10;
 				ZeroMemory(message, sizeof(message));
 			}
+			else if (strcmp("server close", message) == 0) {
+				status[0] = -1;
+				ZeroMemory(message, sizeof(message));
+			}
 			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 
@@ -1851,11 +1877,15 @@ void Clnt_1(int v)
 			else if (strcmp(message, "exit") == 0)
 			{
 				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d exit", v + 1);
-				closesocket(Sconnect_sock[v]);
-				SOCKETCOUNT = v;
-				Sconnect_sock[v] = 0;
-				strcpy(querys[v], message);
+				if (v == 0)
+					sendall("server close");
+				else {
+					sprintf(message, "player %d exit", v + 1);
+					closesocket(Sconnect_sock[v]);
+					SOCKETCOUNT = v;
+					Sconnect_sock[v] = 0;
+					strcpy(querys[v], message);
+				}
 			}
 			else if (strcmp(message, "game start") == 0)
 			{
@@ -1977,6 +2007,7 @@ void exitsignal(void)
 		mysql_query(cons, query);
 
 	}
+	Sleep(100);
 	mysql_close(cons);
 
 }
