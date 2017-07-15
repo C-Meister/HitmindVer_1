@@ -206,7 +206,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	char query[400];						//mysql 명령어를 저장함
-	char mysqlip[30] = "10.80.162.92";		//mysql ip 상희ip입니다	지금 윈도우7버전 : 10.80.162.92 윈도우10버전 : 10.80.161.182
+	char mysqlip[30] = "10.80.161.182";		//mysql ip 상희ip입니다	지금 윈도우7버전 : 10.80.162.92 윈도우10버전 : 10.80.161.182
 	char data[1000][30] = { 0, };           //단어데이터
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
