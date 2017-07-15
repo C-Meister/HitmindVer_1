@@ -1506,9 +1506,6 @@ int sqlsignup(void) {
 }
 void mainatitleimage(void) {
 	WHITE
-		cur(6, 1);
-	printf("MySQL Ping : %dms", mysql_ping(cons));
-	mysql_select_db(cons, "catchmind");
 	gotoxy(6, 3);
 	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
 	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■"); gotoxy(6, 5);
@@ -1534,9 +1531,14 @@ int maintitle(void) { //게임 메인타이틀 출력
 	int xx = 0, yy = 0, lr = 0;
 	mainatitleimage();
 	while (1) {
+		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
 		WHITE
 			click(&xx, &yy, &lr);
+
+			cur(6, 1);
+		printf("MySQL Ping : %dms", mysql_ping(cons));
+		mysql_select_db(cons, "catchmind");
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
 			gotoxy(16, 23);
@@ -1562,7 +1564,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 			WHITE printf("주제 추가");
 		}
 
-		gotoxy(0, 0);
+		
 	}
 	CLS;
 }
