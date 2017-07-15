@@ -32,7 +32,6 @@
 #include "SDL/SDL.h"			//SDL - 그래픽 헤더파일
 #include "SDL/SDL_image.h"
 #include "SDL/sdl_ttf.h"
-//#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #define nullptr 0
 
@@ -2291,6 +2290,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &New);
 }
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
+	
 	SDL_Window * Window;//SDL 윈도우 선언
 	SDL_Renderer * Renderer;// SDL 렌더러 선언 
 	SDL_Window * Window2;
