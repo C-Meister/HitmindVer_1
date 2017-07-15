@@ -635,7 +635,7 @@ int waitroom(void)
 				}
 
 			}
-			else if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
+			if (xx > 3 && xx < 12 && yy < 43 && yy > 39) {
 				gotoxy(13, 41);
 				HIGH_GREEN printf("ready");
 				gotoxy(89, 41);
