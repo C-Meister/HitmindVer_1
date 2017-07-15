@@ -126,9 +126,11 @@ char clientcatchmind[50];
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
+int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
+char chatquery[10][50];
 
 //±âº» ÇÔ¼öµé
 void gotoxy(short x, short y);
@@ -1207,22 +1209,19 @@ void readchating(void) {
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
 	while (1) {
-
-		
-		mysql_query(cons, "select * from catchmind.chating");
-		sql_result = mysql_store_result(cons);
-		while ((sql_row = mysql_fetch_row(sql_result)) != NULL && CHATHAPPEN == false)
-		{
-			cur(0, 11);
-			printf("readchating : %s", sql_row[2]);
-			cur(0, 13);
-			printf("readchating : %s", sql_row[3]);
-		
-			strcpy(querys[7], sql_row[2]);
-			strcpy(querys[8], sql_row[3]);
-			CHATHAPPEN = true;
+		ZeroMemory(chatquery, sizeof(chatquery));
+		v = 9;
+		if (CHATHAPPEN == false) {
+			mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+			sql_result = mysql_store_result(cons);
+			while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+			{
+				sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
+				v--;
+			}
 		}
-		Sleep(100);
+		CHATHAPPEN = true;
+		Sleep(50);
 	}
 
 }
@@ -2471,7 +2470,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Status = { 0 };//Status ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 	float fontsize = 20.0;
+	float fontsize2 = 40.0;
 	TTF_Font * Font;
+	TTF_Font * topicFont;
 	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
@@ -2489,6 +2490,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		return 0;
 	}
 	Font = TTF_OpenFont("NanumGothic.ttf", fontsize);
+	if (Font == nullptr) {
+		TTF_ErrorLog("TTF_OpenFont");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
+		return 0;
+	}
+	topicFont = TTF_OpenFont("NanumGothic.ttf", fontsize2);
 	if (Font == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
@@ -2633,6 +2640,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Edge = { 0 };// Å×µÎ¸®¸¦ ±×¸®±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð 
 	char click_eraser, click_pencil;
 	char dragging;
+	MYSQL_ROW sql_row;
 	int xxx, yyy;
 	float sstrong;
 	float rr, gg, bb;
@@ -2641,13 +2649,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 												  // º¯¼ö ÃÊ±â°ª ¼³Á¤³¡
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
-	TTF_DrawText(Renderer, Font, "¤·¤·¤·", 100, 0);
+	
 	SDL_RenderPresent(Renderer);
 	SDL_Delay(500);
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 		
 	//	CLS;
-		
+		if (Gametopic == 0)
+		{
+			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+			TTF_DrawText(Renderer3, topicFont, sql_row[0], 0, 0);
+			Gametopic++;
+		}
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
@@ -2923,16 +2937,18 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			on.new = false;
 		}
-		if (CHATHAPPEN == true)
+		if (CHATHAPPEN == true)													//Ã¤ÆÃÃ¢
 		{
 			happen = true;
-			cur(0, 8);
-			printf("´©°¡ : %s", querys[7]);
-			cur(0, 9);
-			printf("³»¿ë : %s", querys[8]);
-			TTF_DrawText(Renderer, Font, querys[7], 0, chaty);
-			TTF_DrawText(Renderer, Font, querys[8], 0, chaty+50);
-			chaty += 100;
+			chaty = 0;
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
+			SDL_Rect Rect = { 0,300,1310/4+10,640 };
+			SDL_RenderFillRect(Renderer,&Rect);
+			for (int i = 0; i < 10; i++) {
+				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+				chaty += 30;
+				
+			}
 			CHATHAPPEN = false;
 		}
 		if (happen == true) {
