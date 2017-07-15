@@ -1981,7 +1981,7 @@ void sendall(char *message, int c) {
 		if (i == c)
 			continue;
 		if (Sconnect_sock[i] != 0)
-			send(Sconnect_sock[i], message, 45, 0);
+			send(Sconnect_sock[i], message, 45, 0);					//변수 c 번 소켓을 제외한 다른 사람들에게 전부 보냄
 	}
 
 
@@ -2008,7 +2008,13 @@ void Clnt_1(int v)
 	char message[100];
 	while (1) {
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
-			if (strncmp(message, "player   connect", 16) == 0) {
+			if (message[1] = ' '&&(message[0] == 0 || message[0] == 1))
+			{
+				sendall(message, v);
+				ZeroMemory(message, sizeof(message));
+				continue;
+			}
+			else if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
 				strcpy(querys[v], message);
 				sendall(message, 5);
