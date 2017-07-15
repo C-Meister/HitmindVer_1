@@ -2351,12 +2351,12 @@ SDL_Texture * TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, SDL_Color Col
 }
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	
-	SDL_Window * Window;//SDL 윈도우 선언
-	SDL_Renderer * Renderer;// SDL 렌더러 선언 
-	SDL_Window * Window2;
-	SDL_Renderer * Renderer2;
-	SDL_Window * Window3;
-	SDL_Renderer * Renderer3;
+	SDL_Window * Window=nullptr;//SDL 윈도우 선언
+	SDL_Renderer * Renderer=nullptr;// SDL 렌더러 선언 
+	SDL_Window * Window2=nullptr;
+	SDL_Renderer * Renderer2=nullptr;
+	SDL_Window * Window3=nullptr;
+	SDL_Renderer * Renderer3=nullptr;
 	SDL_Rect center = { 0 };
 	char query[256];
 	// 텍스쳐와 사각형 선언
