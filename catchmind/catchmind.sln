@@ -9,22 +9,30 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "HitMind Setup", "..\HitMind
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Default = Release|Default
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|Default.ActiveCfg = Debug|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x64.ActiveCfg = Debug|x64
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x64.Build.0 = Debug|x64
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.ActiveCfg = Debug|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.Build.0 = Debug|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|Default.ActiveCfg = Release|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.ActiveCfg = Release|x64
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.Build.0 = Release|x64
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.ActiveCfg = Release|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.Build.0 = Release|Win32
+		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Debug|Default.ActiveCfg = Debug
+		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Debug|Default.Build.0 = Debug
 		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Debug|x64.ActiveCfg = Debug
 		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Debug|x86.ActiveCfg = Debug
+		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Release|Default.ActiveCfg = Release
+		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Release|Default.Build.0 = Release
 		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Release|x64.ActiveCfg = Release
 		{32C413A4-603C-4C6C-B5CD-29283563FB30}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
@@ -40,22 +48,6 @@ Global
 		SccAuxPath0 = https://tbvajos510.visualstudio.com
 		SccLocalPath0 = .
 		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-	EndGlobalSection
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Default = Debug|Default
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Default = Release|Default
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Default = Debug|Default
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Default = Release|Default
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Default = Debug|Default

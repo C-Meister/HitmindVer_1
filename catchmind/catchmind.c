@@ -162,8 +162,8 @@ void IMG_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window);						 // 
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//텍스쳐를 출력하는 함수 선언
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect Font, float strong, int r, int g, int b);	//랜더러를 올리는 함수
-void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect Font, SDL_Rect Track, float strong, int r, int g, int b);
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, float strong, int r, int g, int b);
+void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 int SDL_MAINS(void);
