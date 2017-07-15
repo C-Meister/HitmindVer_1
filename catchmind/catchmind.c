@@ -361,6 +361,7 @@ void sqlmakeroom(void) {
 		CLS;
 		int count = 0;
 		int i = 0;
+		int a = 0;
 		IN_ADDR addr;
 
 		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
@@ -379,11 +380,35 @@ void sqlmakeroom(void) {
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		gotoxy(48, 3);
 		printf("■");
-		cur(16, 5);
 		disablecursor(0);
-		scanf("%[^\n]s", myroom.roomname);
-		getchar();
+		while (1) {
+			a = 0; 
+			i = 0;
+			for (i = 0; i<30 ; i++)
+				myroom.roomname[i] = 0;
+
+			cur(16, 5);
+			printf("                           ");
+			cur(16, 5);
+			scanf("%[^\n]s", myroom.roomname);
+			getchar();
+			for (i = 0; myroom.roomname[i] != 0; i++) {
+				if (myroom.roomname[i] >= 0)
+					if (!((myroom.roomname[i] >= '0' && myroom.roomname[i] <= '9') || (myroom.roomname[i] >= 'a' && myroom.roomname[i] <= 'z') || (myroom.roomname[i] >= 'A' && myroom.roomname[i] <= 'Z')))
+						a++;
+			}
+			if(a==0)
+				break;
+			gotoxy(10, 9);
+			printf("영어,숫자로만 입력해 주세요");
+			fflush(stdin);
+		}
+
+		gotoxy(10, 9);
+		printf("                                ");
+		
 		cur(16, 7);
+		i = 0;
 		while (1) {
 
 
@@ -1648,6 +1673,7 @@ void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 
 }
 void bangtema() {
+	ConsoleL(50, 20);
 	WHITE
 		printf("\n"); //좌표값때문에 한칸 밀어냄
 	printf("                □□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□\n"); //방만들기 9 ~ 22 , 2
