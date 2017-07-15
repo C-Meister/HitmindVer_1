@@ -1337,6 +1337,13 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	while (1) {
 
 		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
+			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
+			{
+				strcpy(clientcatchmind, message);
+				ZeroMemory(message, sizeof(message));
+				SDLCLOCK++;
+				continue;
+			}
 			if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -1421,16 +1428,12 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[0] = -1;
 				ZeroMemory(message, sizeof(message));
 			}
-			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
-			{
-				strcpy(clientcatchmind, message);
-				ZeroMemory(message, sizeof(message));
-				SDLCLOCK++;
-			}
+			
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
 				SDL_Clear = true;
 				SDLCLOCK++;
+				continue;
 			}
 			else if (strncmp(message, "topic 1", 7) == 0)
 			{
