@@ -1186,7 +1186,6 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	CLS;
 	
 	sprintf(query, "update catchmind.room set people = people + 1 where ip = '%s'", ServerIP);
-	printf("%s", query);
 	mysql_query(cons, query);
 	sprintf(query, "player   connect %s", username);
 	send(connect_sock, query, 45, 0);
