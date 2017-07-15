@@ -2378,6 +2378,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
 				ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
 				ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+				SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 				SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 			}
 			SDL_RenderPresent(Renderer4);
