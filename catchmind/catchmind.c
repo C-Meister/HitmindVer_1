@@ -241,7 +241,11 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				}
 				else                            //방 선택 접속
 				{
-					if (connectroom[bangchoose - 2].password[0] == 0) //비밀번호 없을경우 건너띔
+					
+
+					if (connectroom[bangchoose - 2].people == 4)  //4명일떄
+						chooseroomcount = -1;
+					else if (connectroom[bangchoose - 2].password[0] == 0) //비밀번호 없을경우 건너띔
 						chooseroomcount = 1;
 					else
 						chooseroomcount = chooseroom(bangchoose);
@@ -1729,8 +1733,12 @@ int chooseroom(int roomnum) {
 	roomnum -= 2;
 	char roompassword[30] = { 0, };
 	int i = 0;
+	char query[100];
+	MYSQL_ROW sql_row;
+
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
+	
 	CLS;
 	WHITE
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
@@ -1776,6 +1784,15 @@ int chooseroom(int roomnum) {
 		}
 	}
 	disablecursor(1);
+
+	sprintf(query, "select people from catchmind.room where ip = '%s'", connectroom[roomnum].ip);
+	mysql_query(cons, query);
+	sql_row = mysql_fetch_row(mysql_store_result(cons));
+	connectroom[roomnum].people = atoi(sql_row[0]);
+
+	if (connectroom[roomnum].people == 4)
+		return -1;
+
 	if (!(strcmp(connectroom[roomnum].password, roompassword)))
 	{
 		return 1;
