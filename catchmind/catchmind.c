@@ -178,7 +178,7 @@ void logintema(void);							//로그인 디자인
 void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
 void zeroprint(int xx, int yy, int lr, int m);  //디자인
-
+void click3(int *xx, int *yy, int *lr, int x, int y);
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
@@ -797,7 +797,7 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click(&xx, &yy, &lr);
+			click3(&xx, &yy, &lr, a.x, a.y);
 			//gotoxy(20,20);
 			//printf("%3d %3d", xx, yy); //login 19~23 5~7      개발자 사이트 1~7 9~11    회원가입 9~15      초기화 17~23
 			if (lr == 1) {
@@ -872,7 +872,7 @@ restart:
 		else {
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
-			click(&xx, &yy, &lr);
+			click3(&xx, &yy, &lr, a.x, a.y);
 
 			if (lr == 1) {
 				if (9 <= yy && yy <= 11) {
@@ -910,7 +910,7 @@ restart:
 				}
 			}
 			else if (lr == 0) {
-				
+
 				if (9 <= yy && yy <= 11)
 					zeroprint(xx, yy, lr, m);
 				else if (m == 1 && 19 <= xx && xx <= 23 && 5 <= yy && yy <= 7) {
@@ -1254,8 +1254,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				
-				
+
+
 
 				strcpy(clientcatchmind, message);
 				ZeroMemory(message, sizeof(message));
@@ -1438,6 +1438,50 @@ void click(int *xx, int *yy, int *lr) {//마우스에서 2를 나눈값을 받는다
 		*xx = mouse_x / 2;
 		*yy = mouse_y;
 
+		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
+			*lr = 1;
+			Sleep(100);
+		}
+		else {
+			*lr = 0;
+		}
+	}
+
+
+}
+void click3(int *xx, int *yy, int *lr, int x, int y) {//마우스에서 2를 나눈값을 받는다
+
+	HANDLE       hIn, hOut;
+	DWORD        dwNOER;
+	INPUT_RECORD rec;
+
+
+	hIn = GetStdHandle(STD_INPUT_HANDLE);
+	hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleMode(hIn, ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_PROCESSED_INPUT | ENABLE_MOUSE_INPUT);
+
+	ReadConsoleInput(GetStdHandle(STD_INPUT_HANDLE), &rec, 1, &dwNOER); // 콘솔창 입력을 받아들임.
+	if (rec.EventType == MOUSE_EVENT) {// 마우스 이벤트일 경우
+		int mouse_x = rec.Event.MouseEvent.dwMousePosition.X; // X값 받아옴
+		int mouse_y = rec.Event.MouseEvent.dwMousePosition.Y; // Y값 받아옴
+
+		*xx = mouse_x / 2;
+		*yy = mouse_y;
+
+		if (*xx == 0) {
+			SetCursorPos(x + 30, y);
+		}
+		else if (*xx >= 25) {
+			SetCursorPos(x - 30, y);
+		}
+
+		if (*yy <= 0) {
+			SetCursorPos(x, y + 30);
+		}
+		else if (*yy >= 20) {
+			SetCursorPos(x, y - 30);
+		}
 		if (rec.Event.MouseEvent.dwButtonState & FROM_LEFT_1ST_BUTTON_PRESSED) { // 좌측 버튼이 클릭되었을 경우
 			*lr = 1;
 			Sleep(100);
@@ -2124,26 +2168,26 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
-	else if (pencil == true && drag == true) {
+		else if (pencil == true && drag == true) {
 			float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
 			if (length == 0) return;
-				i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
-				j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
-				k = 0;// while문안에 쓸 변수 초기화.
-				xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
-				ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
-				ReceiveRect.w = ReceiveRect.h = strong;// 굵기설정
-				for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
-					ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
-					ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
-					SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
-				}
+			i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+			j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+			k = 0;// while문안에 쓸 변수 초기화.
+			xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+			ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+			ReceiveRect.w = ReceiveRect.h = strong;// 굵기설정
+			for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+				ReceiveRect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
+				ReceiveRect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+				SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
+			}
 			SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == true) {
-		
+
 			strong *= 80 / 50.0;
 			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
@@ -2391,17 +2435,17 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
 
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
-		
-	//	CLS;
-	
-			if (buff < SDLCLOCK) {
-				buff++;
-				sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-				ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
-			}
 
-		
+	//	CLS;
+
+		if (buff < SDLCLOCK) {
+			buff++;
+			sscanf(clientcatchmind, "%d %d %d %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+		}
+
+
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
 			case SDL_WINDOWEVENT://SDL종료 타입일 경우
