@@ -1371,7 +1371,7 @@ int sqllogin(void) {
 }
 int sqlsignup(void) {
 	LOG user;
-	char query3[100];
+	char query3[200];
 	char query2[100];
 	user = login(2);
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
