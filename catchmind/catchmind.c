@@ -3316,7 +3316,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					RenderTexture(Renderer3, UseTexture, &UserT);
 					TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
-					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 300, 90);
+					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
 
 				}
 			}
