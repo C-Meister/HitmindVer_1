@@ -36,8 +36,6 @@
 #include "SDL/SDL_image.h"
 #include "SDL/SDL_ttf.h"
 #include "SDL/han2unicode.h"
-//Ãß°¡//Ãß°¡
-//#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #include "SDL/SDL_mixer.h"
 #include "SDL/SDL.h"
@@ -58,13 +56,12 @@
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
 #pragma warning (disable : 4101)		//»ç¿ëÇÏÁö ¾ÊÀº Áö¿ªº¯¼öÀÔ´Ï´Ù. °æ°í ¹«½Ã
+
 //#define Á¤ÀÇ¹®
 #define CLS system("cls")		//È­¸é Áö¿ì±â
-//#define gotoxy(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //Ä¿¼­ÀÌµ¿
-//#define cur(X,Y) SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), { (short)X, (short)Y }) //Ä¿¼­ÀÌµ¿(°°À½)
 #define setcolor(X, Y) SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), X | (Y << 4))		//»ö±ò¼³Á¤ X±ÛÀÚ Y ¹è°æ
+#define RESET(X) ZeroMemory(X, sizeof(X))
 #define CHOP(x) x[strlen(x) - 1] = ' '	//fgets¸¦ ¾²¸é ¿£ÅÍµµ ¹è¿­¿¡³²À½. ¿£ÅÍ¸¦ ¹è¿­¿¡¼­ »èÁ¦ÇØÁÖ´Â°Í
-//»ö±òÃâ·Â ½¬¿î¹öÀü 
 #define COL                   GetStdHandle(STD_OUTPUT_HANDLE)			// ÄÜ¼ÖÃ¢ÀÇ ÇÚµéÁ¤º¸ ¹Þ±â
 #define BLACK                SetConsoleTextAttribute(COL, 0x0000);		// °ËÁ¤»ö
 #define DARK_BLUE         SetConsoleTextAttribute(COL, 0x0001);			// ÆÄ¶õ»ö
@@ -82,6 +79,8 @@
 #define PLUM                SetConsoleTextAttribute(COL, 0x000d);       // ÀÚÁÖ»ö
 #define YELLOW             SetConsoleTextAttribute(COL, 0x000e);        // ³ë¶õ»ö
 #define WHITE                SetConsoleTextAttribute(COL, 0x000f);      // Èò»ö
+#define MY_BUFSIZE 1024 // À©µµ¿ì ÄÜ¼ÖÃ¢ Á¦¸ñÀÇ ÃÖ´ë ¹öÆÛ¸¦ ÁöÁ¤ÇÔ
+
 //±¸Á¶Ã¼ ¼±¾ð
 typedef struct {
 	char name[20];
@@ -140,7 +139,7 @@ SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
 char chatquery[15][50];
-
+Mix_Music *music, *mainmusic;
 
 //±âº» ÇÔ¼öµé
 void gotoxy(short x, short y);
@@ -200,7 +199,8 @@ void jointema(void);							//È¸¿ø°¡ÀÔ µðÀÚÀÎ
 LOG login(int m);								//±âº»ÀûÀÎ ·Î±×ÀÎ ÀÔ·Â
 void zeroprint(int xx, int yy, int lr, int m);  //µðÀÚÀÎ
 char checkkeyborad(char n, int togl);
-void credit(); //Å©·¹µ÷
+void credit();									//Å©·¹µ÷
+
 //-------------------------ÄÜ¼Ö ÇÔ¼öµé------------------------------------
 void checkword(char*nowword, char*scanword);	//´Ü¾î¸¦ È®ÀÎÇÔ
 void click(int *xx, int *yy, int *lr);					//Å¬¸¯ÇÔ¼ö µÎ¹øÂ°, xx°ª°ú yy°ªÀ» º¯È¯ÇÔ
@@ -215,7 +215,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	//SDL_MAIN();
 	//º¯¼ö ¼±¾ð
 	//int i, j, k, v, result;	
-
+	
 	unsigned int timeout = 7;
 	char mainchoose = 0;
 	char bangchoose;
@@ -241,23 +241,26 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	// ÃÊ±âÈ­ ³¡
 	signalall();
 
-	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 2048) == -1)
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
 	{
 		printf("ÃÊ±âÈ­ ½ÇÆÐ");
 		Sleep(5000);
 	}
-
-
-	// load the MP3 file "music.mp3" to play as music
-	Mix_Music *music;
 	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
+	Mix_VolumeMusic(70);
 	music = Mix_LoadMUS(query);
 	if (!music) {
 		printf("Mix_LoadMUS(\"titlemusic.mp3\"): %s\n", Mix_GetError());
 		Sleep(5000);
 		// this might be a critical error...
 	}
-	Mix_PlayMusic(music, -1);
+	mainmusic = Mix_LoadMUS("music\\main.mp3");
+	if (!music) {
+		printf("Mix_LoadMUS(\"main.mp3\"): %s\n", Mix_GetError());
+		Sleep(5000);
+		// this might be a critical error...
+	}
+	Mix_FadeInMusic(mainmusic, -1, 5000);
 	disablecursor(1);
 	while (1) {								//·Î±×ÀÎ ¹Ýº¹¹®
 		mainchoose = maintitle();				//main È­¸é
@@ -1599,6 +1602,27 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				SDLCLOCK++;
 				continue;
 			}
+			else if (strcmp(message, "right 1 answer") == 0)
+			{
+				score[0][1] += 1;
+				RESET(message);
+			}
+			else if (strcmp(message, "right 2 answer") == 0)
+			{
+				score[1][1] += 1;
+				RESET(message);
+			}
+			else if (strcmp(message, "right 2 answer") == 0)
+			{
+				score[2][1] += 1;
+				RESET(message);
+			}
+			else if (strcmp(message, "right 1 answer") == 0)
+			{
+				score[3][1] += 1;
+				RESET(message);
+			}
+
 			else if (strncmp("first ", message, 6) == 0)
 			{
 				sscanf(message, "first %hhd ping %ld", &myownnumber, &Ping);
@@ -2313,6 +2337,13 @@ void Clnt_1(int v)
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 				sendall(message, v);
+				RESET(message);
+			}
+			else if (strcmp("right   answer", message) == 0)
+			{
+				message[6] = v + '0' + 1;
+				sendall(message, 5);
+				RESET(message);
 			}
 			else if (strncmp("first   ping", message, 12) == 0)
 			{
@@ -2809,7 +2840,7 @@ char* UNICODE2UTF8(wchar_t* unicode, int len) {
 	return str;
 }
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
-
+	
 	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
 	SDL_Renderer * Renderer = nullptr;// SDL ·»´õ·¯ ¼±¾ð 
 	SDL_Window * Window2 = nullptr;
@@ -2818,6 +2849,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Renderer * Renderer3 = nullptr;
 	SDL_Rect center = { 0 };
 	char query[256];
+
+
+	Mix_PauseMusic();
+	Mix_VolumeMusic(100);
+	Mix_PlayMusic(music, -1);
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð
 	SDL_Texture * RgbTexture = nullptr;// ¾ËÁöºñ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 	SDL_Texture * PenTexture = nullptr;// Ææ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
@@ -3111,7 +3147,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				break;
 			case SDL_KEYDOWN:
 				if (event.key.keysym.sym == SDLK_RETURN) {
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%ls')", username, inputText);
+					cur(0, 20);
+					
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, UNICODE2UTF8(inputText, wcslen(inputText)));
 					mysql_query(cons, query);
 					wcscpy(inputText, L"");
 					happen = true; 
@@ -3407,8 +3445,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			RenderTexture(Renderer, ChaTexture, &Chat);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 
 			for (l = 0; l < 15; l++) {
-				if (chatquery[(int)l][0] != 0)
-					TTF_DrawText(Renderer, Font, chatquery[(int)l], 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+				if (chatquery[(int)l][0] != 0) {
+					han2unicode(chatquery[(int)l], unicode);
+					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+				}
 			}
 			CHATHAPPEN = false;
 			happen = true;
@@ -3418,7 +3458,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 		if (happen == true) {
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-			TTF_DrawText(Renderer, topicFont, topic, 100, 90);
+			han2unicode(topic, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
 			for (int i = 0; i < 4; i++)
 			{
 
@@ -3426,11 +3467,15 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				{
 					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
 					RenderTexture(Renderer3, UseTexture, &UserT);
-					TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
-					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+					
 					sprintf(query, "%d", score[i][1]);
-					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 				}
 			}
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
@@ -3452,38 +3497,15 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 }
 HWND GetConsoleHwnd(void)
 {
-#define MY_BUFSIZE 1024 // Buffer size for console window titles.
-	HWND hwndFound;         // This is what is returned to the caller.
-	WCHAR pszNewWindowTitle[MY_BUFSIZE]; // Contains fabricated
-										 // WindowTitle.
-	WCHAR pszOldWindowTitle[MY_BUFSIZE]; // Contains original
-										 // WindowTitle.
 
-										 // Fetch current window title.
-
-	GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);
-
-	// Format a "unique" NewWindowTitle.
-
-	wsprintf(pszNewWindowTitle, L"%d/%d",
-		GetTickCount(),
-		GetCurrentProcessId());
-
-	// Change current window title.
-
-	SetConsoleTitle(pszNewWindowTitle);
-
-	// Ensure window title has been updated.
-
-	Sleep(40);
-
-	// Look for NewWindowTitle.
-
-	hwndFound = FindWindow(NULL, pszNewWindowTitle);
-
-	// Restore original window title.
-
-	SetConsoleTitle(pszOldWindowTitle);
-
+	HWND hwndFound;         // ¸®ÅÏÇÒ ÇÚµé °ªÀÓ
+	WCHAR pszNewWindowTitle[MY_BUFSIZE]; // »õ À©µµ¿ì Å¸ÀÌÆ²
+	WCHAR pszOldWindowTitle[MY_BUFSIZE]; // ¿ø·¡ À©µµ¿ì Å¸ÀÌÆ²
+	GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);		//¿ø·¡ À©µµ¿ì Å¸ÀÌÆ²À» ÀúÀå½ÃÅ´
+	wsprintf(pszNewWindowTitle, L"%d/%d", GetTickCount(), GetCurrentProcessId());	//»õ À©µµ¿ì Å¸ÀÌÆ²À» Æ¯º°ÇÏ°Ô ÀúÀå½ÃÅ´
+	SetConsoleTitle(pszNewWindowTitle);				//»õ À©µµ¿ì Å¸ÀÌÆ²À» Àû¿ë½ÃÅ´
+	Sleep(10);			//Àá½Ã ´ë±â
+	hwndFound = FindWindow(NULL, pszNewWindowTitle);		//»õ À©µµ¿ì Å¸ÀÌÆ²À» Àû¿ë½ÃÅ² À©µµ¿ì¸¦ Ã£¾Æ ±× ÇÚµé°ªÀ» Àû¿ëÇÔ
+	SetConsoleTitle(pszOldWindowTitle);					//À©µµ¿ìÅ¸ÀÌÆ²À» ¿ø·¡ Å¸ÀÌÆ²·Î ÀúÀåÇÔ
 	return(hwndFound);
 }
