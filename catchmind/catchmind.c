@@ -1556,25 +1556,25 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			{
 				sscanf(message, "topic 1 %s", topics[0]);
 				cur(0, 8);
-		//		printf("1¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[0]);
+				//		printf("1¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[0]);
 			}
 			else if (strncmp(message, "topic 2", 7) == 0)
 			{
 				sscanf(message, "topic 2 %s", topics[1]);
 				cur(0, 9);
-		//		printf("2¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[1]);
+				//		printf("2¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[1]);
 			}
 			else if (strncmp(message, "topic 3", 7) == 0)
 			{
 				sscanf(message, "topic 3 %s", topics[2]);
 				cur(0, 10);
-		//		printf("3¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[2]);
+				//		printf("3¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[2]);
 			}
 			else if (strncmp(message, "topic 4", 7) == 4)
 			{
 				sscanf(message, "topic 4 %s", topics[3]);
 				cur(0, 11);
-		//		printf("4¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[3]);
+				//		printf("4¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[3]);
 			}
 		}
 		//	Sleep(100);
@@ -1653,7 +1653,7 @@ int sqlsignup(void) {
 
 	if (user.name[0] == 0)
 		return 0;
-	sprintf(query2, "select * from catchmind.login where name = '%s'", user.name);	//id¸¦ DB¿¡¼­ Ã£À½
+	/*sprintf(query2, "select * from catchmind.login where name = '%s'", user.name);	//ÀÌ¸§À» DB¿¡¼­ Ã£À½
 	mysql_query(cons, query2);
 	sql_result = mysql_store_result(cons);
 	if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
@@ -1661,7 +1661,7 @@ int sqlsignup(void) {
 		if (sql_row[0][1] != 0)
 			return -2;
 	}
-
+	*/
 	sprintf(query2, "select * from catchmind.login where id = '%s'", user.id);	//id¸¦ DB¿¡¼­ Ã£À½
 	mysql_query(cons, query2);
 	sql_result = mysql_store_result(cons);
@@ -2379,7 +2379,21 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 		return;
 	}
 }
-
+void getlevel(void)
+{
+	MYSQL_RES sql_result;
+	MYSQL_ROW sql_row;
+	int i;
+	char query[100];
+	for (i = 0; i < 4; i++) {
+		if (status[i] != 0) {
+			sprintf(query, "select level from catchmind.login where name = '%s'", friendname[i]);
+			mysql_query(cons, query);
+			sql_row = mysql_fetch_row(mysql_store_result(cons));
+			score[i][0] = atoi(sql_row[0]);
+		}
+	}
+}
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
 	switch (step) {
 	case 10:
@@ -2726,7 +2740,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
 	//
-
+	getlevel();
 	// Ãß°¡
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_InitÇÔ¼ö·Î SDL ÃÊ±âÈ­ÇÏ°í ÃÊ±âÈ­ ¾ÈµÇ¸é if¹® ½ÇÇà SDL_InitÀÇ ÀÎ¼ö´Â ´Ù¾çÇÔ(ex : SDL_INIT_VIDEO)
 		SDL_ErrorLog("SDL_Init");
@@ -2914,7 +2928,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	QuesT.y = 60;
 
 	// ³¡
-	
+
 	bool quit = false;//ºÒ º¯¼ö ¼±¾ð
 	bool drag = false;// µå·¡±×ÁßÀÎÁö È®ÀÎÇÏ´Â º¯¼ö ¼±¾ð
 	bool happen = true;
@@ -2945,7 +2959,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_StartTextInput();
 	char inputText[128] = "";
 	char topic[30];
-	
+
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 
 	//	CLS;
@@ -3283,27 +3297,31 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 		SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer3);
-		for (int i = 0; i < 4; i++)
-		{
-			
-			if (status[i] != 0)
-			{
-				UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
-				RenderTexture(Renderer3, UseTexture, &UserT);
-				TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 
-			}
 
-		}
+
+
 		if (happen == true) {
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			TTF_DrawText(Renderer, topicFont, topic, 100, 90);
+			for (int i = 0; i < 4; i++)
+			{
 
+				if (status[i] != 0)
+				{
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 200, 35);
+
+				}
+			}
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
 			happen = false;
+
 		}
 	}
-
 	SDL_DestroyTexture(InpTexture);
 	SDL_DestroyTexture(UseTexture);
 	SDL_DestroyTexture(RgbTexture);// ÅØ½ºÃÄ ÆÄ±«ÇÏ±â
