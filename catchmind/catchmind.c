@@ -3076,10 +3076,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool happen = true;
 	
 	bool writemode = false;
-	if (myownnumber== turn)
-	{
-		writemode = true;
-	}
+	
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
@@ -3108,8 +3105,14 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	wchar_t inputText[128] = L"";
 	char topic[30];
 	bool hangeul = false;
+	long firstclock = clock();
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
-
+		if (myownnumber == turn)
+		{
+			writemode = true;
+		}
+		else
+			writemode = false;
 	//	CLS;
 		if (Gametopic == 0)
 		{
@@ -3459,6 +3462,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		SDL_RenderClear(Renderer3);
 
 		if (happen == true) {
+			sprintf(query, "³²Àº½Ã°£ : %ldÃÊ", 30 - (clock() - firstclock) / 1000);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 0, 50);
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			han2unicode(topic, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
