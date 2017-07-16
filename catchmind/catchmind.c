@@ -484,7 +484,7 @@ void sqlmakeroom(void) {
 				continue;
 			}
 
-
+			
 			if (myroom.password[i] == 1) {
 				togl *= -1;
 				myroom.password[i] = 0;
@@ -528,8 +528,10 @@ void sqlmakeroom(void) {
 				else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
 					myroom.password[i] = 0;
 				}
-				else
-					putchar(myroom.password[i++]);
+				else {
+					printf("*");
+					i++;
+				}
 			}
 			else {
 				disablecursor(1);
@@ -538,7 +540,7 @@ void sqlmakeroom(void) {
 				click(&xx, &yy, &lr);
 				
 				gotoxy(33, 9);
-				if (xx >= 16 && xx <= 25 && yy == 9) {
+				if (xx >= 16 && xx <= 24 && yy == 9) {
 					if (lr == 0) {
 						HIGH_GREEN printf("○비밀번호 미사용");
 					}
@@ -548,8 +550,9 @@ void sqlmakeroom(void) {
 						break;
 					}
 				}
-				else
-					WHITE printf("○비밀번호 미사용");	
+				else {
+					WHITE printf("○비밀번호 미사용");
+				}
 			}
 			cur(16+i, 7);
 			disablecursor(0);
