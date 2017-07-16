@@ -2840,7 +2840,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				//Handle backspace
 				if (event.text.windowID == SDL_GetWindowID(Window)){
 					if (event.key.keysym.sym == SDLK_RETURN) {
-						sprintf(query, "insert into catchmind.chatting (name, mean) values ('%s', '%s')", username, inputText);
+						sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, inputText);
 						mysql_query(cons, query);
 						strcpy(inputText, "");
 						happen = true;
