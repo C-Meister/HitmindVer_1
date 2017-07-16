@@ -135,7 +135,7 @@ int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
-char chatquery[10][50];
+char chatquery[15][50];
 
 
 //±âº» ÇÔ¼öµé
@@ -1300,9 +1300,9 @@ void readchating(void) {
 				if (last <= last2)
 				{
 					printf("%d : true", last2);
-					mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+					mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
 					sql_result = mysql_store_result(cons);
-					v = 9;
+					v = 14;
 					while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 					{
 						sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
@@ -2688,7 +2688,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Texture * ChaTexture = nullptr;// Ã¤ÆÃÃ¢ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 	SDL_Texture * StaTexture = nullptr;// »óÅÂÃ¢ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 	SDL_Texture * InpTexture = nullptr;// Ã¤ÆÃ º¸Àç´Â ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
-	SDL_Texture * UseTexture = nullptr;// À¯Á® ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
+	SDL_Texture * UseTexture = nullptr;// À¯Àú ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
+	SDL_Texture * QusTexture = nullptr;// ÁÖÁ¦ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 
 	SDL_Rect RgbCode = { 0 };// RgbCode ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±âÀ§ÇÑ »ç°¢Çüº¯¼ö ¼±¾ð
 	SDL_Rect Pencil = { 0 }; // Pencil ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±âÀ§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
@@ -2700,10 +2701,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Status = { 0 };//Status ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
+	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
+
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 	int chaty = 0;
-	float fontsize = 20.0;
-	float fontsize2 = 40.0;
+	float fontsize = 17.0;
+	float fontsize2 = 35.0;
 	TTF_Font * Font;
 	TTF_Font * topicFont;
 	SDL_Surface *Text;
@@ -2886,8 +2889,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		UserT.x = 0 + ((1920 - (1310 / 4 - 10)) / 5) * i;
 		
 		RenderTexture(Renderer3, UseTexture, &UserT);
-	}// ³¡
-	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
+	}
+	QusTexture = LoadTexture(Renderer, ".\\image\\question.png");												// Ã¤ÆÃ ÀÌ¹ÌÁö
+	if (QusTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		return 0;
+	}
+	QuesT.w = 200;
+	QuesT.h = 100;
+	QuesT.x = 0;
+	QuesT.y = 50;
+	
+	// ³¡
+	
 	bool quit = false;//ºÒ º¯¼ö ¼±¾ð
 	bool drag = false;// µå·¡±×ÁßÀÎÁö È®ÀÎÇÏ´Â º¯¼ö ¼±¾ð
 	bool happen = true;
@@ -3245,15 +3259,16 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		//	SDL_RenderFillRect(Renderer, &Happen);
 			RenderTexture(Renderer, ChaTexture, &Chat);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 		
-			for (l = 0; l < 10; l++) {
+			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0)
-					TTF_DrawText(Renderer, Font,chatquery[(int)l], 30, 300 + 30 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font,chatquery[(int)l], 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 			}
 			CHATHAPPEN = false;
 			happen = true;
 		}
 		if (happen == true) {
-			TTF_DrawText(Renderer, topicFont, topic, 0, 100);
+			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+			TTF_DrawText(Renderer, topicFont, topic, 85, 80);
 			
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture,InpTexture,Track, Box, Eraser, Pencil, New, &Fonts,Chat, InputT ,Font, inputText, strong, r, g, b);
 			happen = false;
