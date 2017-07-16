@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
-
+#include <crtdbg.h>
 //#include <WinSock2.h>		//¼ÒÄÏÇÁ·Î±×·¡¹Ö
 
 //Æ¯¼ö Çì´õÆÄÀÏ (µû·Î ¼³Ä¡) 
@@ -55,7 +55,7 @@
 
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
-#pragma warning (disable : 4101)		//»ç¿ëÇÏÁö ¾ÊÀº Áö¿ªº¯¼öÀÔ´Ï´Ù. °æ°í ¹«½Ã
+//#pragma warning (disable : 4101)		//»ç¿ëÇÏÁö ¾ÊÀº Áö¿ªº¯¼öÀÔ´Ï´Ù. °æ°í ¹«½Ã
 
 //#define Á¤ÀÇ¹®
 #define CLS system("cls")		//È­¸é Áö¿ì±â
@@ -402,6 +402,7 @@ void inserttopic(void)
 			num = atoi(sql_row[0]);
 
 		}
+		mysql_free_result(cons);
 		num++;
 		getchar();
 		CLS;
@@ -419,24 +420,26 @@ void inserttopic(void)
 
 }
 void sqlmakeroom(void) {
+	int count = 0;
+	int i = 0;
+	int c = 0;
+	int togl = -1;
+	int keybit = 0;
+	POINT a;
+	int xx = 0, yy = 0, lr = 0;
+	int buff = 0;
+	IN_ADDR addr;
+
+	addr = GetDefaultMyIP();	//µðÆúÆ® IPv4 ÁÖ¼Ò ¾ò¾î¿À±â
+	char * myip = inet_ntoa(addr);
+	ROOM myroom = { 0, 0, 0 };
+
 	while (1) {
 		ConsoleL(28, 11);
-		int count = 0;
-		int i = 0;
-		int c = 0;
-		int togl = -1;
-		int keybit = 0;
-		POINT a;
-		int xx = 0, yy = 0, lr = 0;
-		int buff = 0;
+		
 
 
-		IN_ADDR addr;
-
-		addr = GetDefaultMyIP();	//µðÆúÆ® IPv4 ÁÖ¼Ò ¾ò¾î¿À±â
-		char * myip = inet_ntoa(addr);
-		ROOM myroom = { 0, 0, 0 };
-
+	
 		WHITE
 			printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 		printf("¡á                                              ¡á\n");
@@ -744,8 +747,8 @@ int waitroom(void)
 			printf("          ");
 
 
-
-		if (status[0] == 10)
+			
+		if (status[0] == 10)									//°ÔÀÓ ½ÃÀÛ
 		{
 			status[0] = 2;
 			CLS;
@@ -759,11 +762,8 @@ int waitroom(void)
 				mysql_query(cons, query);
 
 			}
-			for (int i = 0; i < 3; i++)
-			{
-				cur(0, 1);
-				printf("%dÃÊÈÄ ½ÃÀÛ", 3 - i);
-			}
+		//	ExitThread(threads[5]);
+			
 			CheckPing();
 			_beginthreadex(0, 0, (_beginthreadex_proc_type)readchating, 0, 0, 0);
 			SDL_MAINS();
@@ -1374,6 +1374,7 @@ void readchating(void) {
 					last2 = atoi(sql_row[0]);
 				
 			}
+			mysql_free_result(cons);
 			if (last <= last2)
 			{
 				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
@@ -1384,11 +1385,13 @@ void readchating(void) {
 					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
 					v--;
 				}
+				mysql_free_result(cons);
 				CHATHAPPEN = true;
 				last = last2;
 			}
+			
 		}
-
+		Sleep(30);
 	}
 
 }
@@ -1708,9 +1711,10 @@ int sqllogin(void) {
 				gotoxy(2, 3);
 				printf("           ¾ÆÀÌµð°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù     ");
 
+
 			}
 			else {
-
+				mysql_free_result(cons);
 				sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass);
 				mysql_query(cons, query);	//password´Â DB¿¡ ¾ÏÈ£È­µÇ¾î ÀÖ¾î¼­ °ªÀ» ºñ±³ÇÒ¶§µµ ¼­·Î ¾ÏÈ£È­ÇØ¼­ ºñ±³¸¦ÇÔ
 				sql_result = mysql_store_result(cons);
@@ -1721,8 +1725,10 @@ int sqllogin(void) {
 				{
 					gotoxy(2, 3);
 					printf("              ºñ¹Ð¹øÈ£°¡ Æ²·È½À´Ï´Ù        ");
+
 				}
 				else {
+					mysql_free_result(cons);
 					strcpy(username, sql_row[1]);
 					sprintf(query, "title %s´Ô È÷Æ®¸¶ÀÎµå¿¡ ¿À½Å°ÍÀ» È¯¿µÇÕ´Ï´Ù!", username);
 					system(query);
@@ -1765,7 +1771,7 @@ int sqlsignup(void) {
 		if (sql_row[0][1] != 0)
 			return -1;
 	}
-
+	mysql_free_result(cons);
 	sprintf(query3, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
 
 	if (!(mysql_query(cons, query3)))											//		 password´Â mysql¿¡¼­ Áö¿øÇÏ´Â ¾ÏÈ£È­ Çü½ÄÀÓ.
@@ -1990,7 +1996,7 @@ void banglist(int j) {
 		i++;
 
 	}
-
+	mysql_free_result(cons);
 	i = 0;
 
 }
@@ -2142,7 +2148,7 @@ int chooseroom(int roomnum) {
 	mysql_query(cons, query);
 	sql_row = mysql_fetch_row(mysql_store_result(cons));
 	connectroom[roomnum].people = atoi(sql_row[0]);
-
+	mysql_free_result(cons);
 	if (connectroom[roomnum].people == 4)
 		return -1;
 
@@ -2200,8 +2206,8 @@ void sendall(char *message, int c) {
 }
 void makeroom(int *count) {
 	int i = 0;
-	char message[100];
-	IN_ADDR serverip = GetDefaultMyIP();
+//	char message[100];
+//	IN_ADDR serverip = GetDefaultMyIP();
 	listen_sock = socket(PF_INET, SOCK_STREAM, 0); // ¼ÒÄÏ »ý¼º ÈÄ ¼ÒÄÏ¿¡ ´ëÇÑ Á¤º¸¸¦ listen_sockº¯¼ö¿¡ ´ëÀÔ					
 	if (listen_sock == INVALID_SOCKET)
 		ErrorHandling("socket() error");
@@ -2292,6 +2298,7 @@ void signalall(void)
 }
 void exitsignal(void)
 {
+	CLS;
 	char query[100];
 	if (signalmode == 1)
 	{
@@ -2305,9 +2312,9 @@ void exitsignal(void)
 		mysql_query(cons, query);
 
 	}
-	Sleep(100);
 	mysql_close(cons);
-
+	
+	
 }
 void Clnt_1(int v)
 {
@@ -2335,6 +2342,7 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 				RESET(message);
+				continue;
 			}
 			else if (strcmp("right   answer", message) == 0)
 			{
@@ -2347,6 +2355,7 @@ void Clnt_1(int v)
 				message[6] = v + '0' + 1;
 				send(Sconnect_sock[v], message, 45, 0);
 				ZeroMemory(message, sizeof(message));
+				continue;
 			}
 			else if (strncmp("user   ping", message, 10) == 0)
 			{
@@ -2402,7 +2411,7 @@ void Clnt_1(int v)
 			}
 			ZeroMemory(message, sizeof(message));
 		}
-		//	Sleep(100);
+			
 	}
 }
 void gotoxy(short x, short y)
@@ -2501,7 +2510,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 }
 void getlevel(void)
 {
-	MYSQL_RES sql_result;
+//	MYSQL_RES sql_result;
 	MYSQL_ROW sql_row;
 	int i;
 	char query[100];
@@ -2511,6 +2520,7 @@ void getlevel(void)
 			mysql_query(cons, query);
 			sql_row = mysql_fetch_row(mysql_store_result(cons));
 			score[i][0] = atoi(sql_row[0]);
+			mysql_free_result(cons);
 		}
 	}
 }
@@ -2816,7 +2826,8 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int 
 
 wchar_t* UTF82UNICODE(char* UTF8, int len) {
 	wchar_t wstr[128] = L"";
-	int i, sum;
+//	int i, sum;
+	int i;
 	for (i = 0; i < len; i += 3) {
 		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
 	}
@@ -2825,7 +2836,7 @@ wchar_t* UTF82UNICODE(char* UTF8, int len) {
 }
 char* UNICODE2UTF8(wchar_t* unicode, int len) {
 	char str[128] = "";
-	int i, sum;
+	int i;
 	for (i = 0; i < 3 * len; i += 3) {
 		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
 		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
@@ -2878,7 +2889,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	float fontsize2 = 35.0;
 	TTF_Font * Font;
 	TTF_Font * topicFont;
-	SDL_Surface *Text;
+//	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
 	//
@@ -2951,7 +2962,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_RenderClear(Renderer3);// ·»´õ·¯ ¸ðµÎ Áö¿ò (±×¸®±â »ö±ò·Î È­¸éÀÌ Ã¤¿öÁü)
 							   // ³¡
 	SDL_Event event;//SDL_Event º¯¼ö ¼±¾ð
-	const Uint8 * keystate;// Key »óÅÂ ¹è¿­À» ¹Þ±â À§ÇÑ Æ÷ÀÎÅÍ ¼±¾ð
+//	const Uint8 * keystate;// Key »óÅÂ ¹è¿­À» ¹Þ±â À§ÇÑ Æ÷ÀÎÅÍ ¼±¾ð
 						   // RgbCode ÀÌ¹ÌÁö
 	RgbTexture = LoadTextureEx(Renderer, ".\\image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (RgbTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
@@ -3105,6 +3116,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	wchar_t inputText[128] = L"";
 	char topic[30];
 	bool hangeul = false;
+	wchar_t wstr[2];
 	long firstclock = clock();
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 		if (myownnumber == turn)
@@ -3120,6 +3132,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
 			sprintf(query, "topic   %s", sql_row[0]);
+			mysql_free_result(cons);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
 			happen = true;
@@ -3135,13 +3148,13 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			case SDL_TEXTINPUT:
 				if (hangeul == true && event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237)// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
 				{
-					wchar_t wstr[2] = L"";
+					wstr[2] = L"";
 					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
 					wstr[0] = sum;
 					wcscat(inputText, wstr);
 				}
 				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
-					wchar_t wstr[2] = L"";
+					wstr[2] = L"";
 					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);
 					wcscat(inputText, wstr);
 				}
@@ -3460,11 +3473,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 		SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer3);
-
+		sprintf(query, "³²Àº½Ã°£ : %ldÃÊ", 30 - (clock() - firstclock) / 1000);
+		han2unicode(query, unicode);
+		TTF_DrawText(Renderer, Font, unicode, 0, 50);
 		if (happen == true) {
-			sprintf(query, "³²Àº½Ã°£ : %ldÃÊ", 30 - (clock() - firstclock) / 1000);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer, Font, unicode, 0, 50);
+			
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			han2unicode(topic, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
@@ -3494,6 +3507,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = false;
 
 		}
+	
 	}
 	SDL_DestroyTexture(InpTexture);
 	SDL_DestroyTexture(UseTexture);
