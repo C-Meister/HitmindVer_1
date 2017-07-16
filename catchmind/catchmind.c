@@ -216,7 +216,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//변수 선언
 	//int i, j, k, v, result;	
 
-
+	unsigned int timeout = 7;
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
@@ -231,7 +231,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
 	char serverreturn = 0;					//Connect_Server가 반환한 값을 저장하는곳
-	mysql_options(cons, MYSQL_OPT_CONNECT_TIMEOUT, 6);
+	mysql_options(cons, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&timeout);
 	loadmysql(mysqlip);
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
@@ -3043,10 +3043,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				break;
 			case SDL_KEYDOWN:
 				if (event.key.keysym.sym == SDLK_RETURN) {
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, inputText);
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%ls')", username, inputText);
 					mysql_query(cons, query);
 					wcscpy(inputText, L"");
-					happen = true;
+					happen = true; 
 				}
 				else if (event.key.keysym.sym == SDLK_RALT)
 					hangeul = !(hangeul);
