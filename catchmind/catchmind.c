@@ -1242,17 +1242,19 @@ void readchating(void) {
 	MYSQL_ROW sql_row;
 	while (1) {
 	//	ZeroMemory(chatquery, sizeof(chatquery));
-		v = 9;
+	
 		if (CHATHAPPEN == false) {
 			mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
 			sql_result = mysql_store_result(cons);
+			v = 9;
 			while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 			{
 				sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
 				v--;
 			}
+			CHATHAPPEN = true;
 		}
-		CHATHAPPEN = true;
+		
 	//	Sleep(50);
 	}
 
@@ -3139,8 +3141,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (happen == true) {
 			TTF_DrawText(Renderer, topicFont, topic, 0, 100);
-			for (l = 0; l < 10; l++) {
-				TTF_DrawText(Renderer, Font, chatquery[(int)l], 0, 300 + 30*l);		//최근 10개의 채팅을 불러옴
+			for (int k = 0; k < 10; k++) {
+				TTF_DrawText(Renderer, Font, chatquery[k], 0, 300 + 30*k);		//최근 10개의 채팅을 불러옴
 			}
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText, strong, r, g, b);
 			happen = false;
