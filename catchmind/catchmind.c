@@ -2478,7 +2478,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_Rect Rect = { 0,0,1310 / 4 + 10,New.h - 10 };
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
 	SDL_RenderFillRect(Renderer, &Rect);
-	if (inputText!= "")
+	if (strcmp(inputText,"")!=0)
 		TTF_DrawText(Renderer, Fonts, inputText, 0, 0);
 	else
 		TTF_DrawText(Renderer, Fonts, " ", 0, 0);
@@ -2725,7 +2725,27 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 
 	//	CLS;
+		if (Gametopic == 0)
+		{
+			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+			TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 100);
+			happen = true;
+			sprintf(query, "topic   %s", sql_row[0]);
+			send(connect_sock, query, 45, 0);
+			Gametopic++;
+		}
+		if (CHATHAPPEN == true)													//채팅창
+		{
+			happen = true;
+			chaty = 0;
+			for (int i = 0; i < 10; i++) {
+				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//최근 10개의 채팅을 불러옴
+				chaty += 30;
 
+			}
+			CHATHAPPEN = false;
+		}
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
@@ -3020,27 +3040,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			happen = true;
 			on.new = false;
 		}
-		 if (Gametopic == 0)
-		 {
-		 mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
-		 sql_row = (mysql_fetch_row(mysql_store_result(cons)));
-		 TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 100);
-		 happen = true;
-		 sprintf(query, "topic   %s", sql_row[0]);
-		 send(connect_sock, query, 45, 0);
-		 Gametopic++;
-		 }
-		if (CHATHAPPEN == true)													//채팅창
-		{
-			happen = true;
-			chaty = 0;
-			for (int i = 0; i < 10; i++) {
-				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//최근 10개의 채팅을 불러옴
-				chaty += 30;
-
-			}
-			CHATHAPPEN = false;
-		}
+	
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText, strong, r, g, b);
 		}
