@@ -1284,7 +1284,7 @@ void writechating(void)
 	}
 }
 void readchating(void) {
-	//Sleep(1000);
+	Sleep(1000);
 	int v = 0;
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
@@ -1293,16 +1293,17 @@ void readchating(void) {
 	//	CHATHAPPEN = true;
 	while (1) {
 		if (CHATHAPPEN == false) {
-			//			ZeroMemory(chatquery, sizeof(chatquery));
+		//	ZeroMemory(sql_result, sizeof(sql_result));
+			ZeroMemory(chatquery, sizeof(chatquery));
 			mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
 			sql_result = mysql_store_result(cons);
-			sql_row = mysql_fetch_row(sql_result);
-			last2 = atoi(sql_row[0]);
-			cur(10, 10);
-
+			if (sql_result != 0) {
+				if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+					last2 = atoi(sql_row[0]);
+				
+			}
 			if (last <= last2)
 			{
-				printf("%d : true", last2);
 				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
 				sql_result = mysql_store_result(cons);
 				v = 14;
@@ -1603,7 +1604,7 @@ int sqllogin(void) {
 			else if (check == -2)
 				printf("             (닉네임이 중복됩니다)              ");
 			else
-				printf("               (회원가입 실패)          ");
+				printf("		     (중복 값이 있습니다)           ");
 		}
 		else {
 			sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
@@ -3313,7 +3314,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					RenderTexture(Renderer3, UseTexture, &UserT);
 					TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
-					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 200, 35);
+					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 300, 42);
 
 				}
 			}
