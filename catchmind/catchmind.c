@@ -2420,7 +2420,7 @@ void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Rendere
 	case 1:
 		SDL_Quit();
 	}
-	getch();
+	getchar();
 	return;
 }
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks) {
