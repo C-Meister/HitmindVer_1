@@ -246,6 +246,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		printf("초기화 실패");
 		Sleep(5000);
 	}
+	
 	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
 	Mix_VolumeMusic(70);
 	music = Mix_LoadMUS(query);
@@ -2474,8 +2475,6 @@ void CheckPing(void)
 	}
 	
 	WHITE
-	printf("\n엔터를 누르면 시작합니다");
-	getchar();
 	
 
 }
@@ -2849,8 +2848,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Renderer * Renderer3 = nullptr;
 	SDL_Rect center = { 0 };
 	char query[256];
-
-
 	Mix_PauseMusic();
 	Mix_VolumeMusic(100);
 	Mix_PlayMusic(music, -1);
@@ -3081,6 +3078,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	bool quit = false;//불 변수 선언
 	bool drag = false;// 드래그중인지 확인하는 변수 선언
 	bool happen = true;
+	
+	bool writemode = false;
+	if (myownnumber - 1 == turn)
+	{
+	//	writemode = true;
+	}
 	int alpha;// 명도와 채도를 담기위한 변수 선언
 	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
 	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
@@ -3182,6 +3185,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					break;
 				}
 			case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
+		
 				if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
 					if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
 						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
@@ -3252,153 +3256,155 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == 1) {
-					if (event.button.windowID == SDL_GetWindowID(Window)) {
-						if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
-							alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
-							switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
-							case 0:// 색 설정 코드
-								r = 255; g = 0; b = 0;
-								break;
-							case 1:
-								r = 255; g = 128; b = 0;
-								break;
-							case 2:
-								r = 255; g = 255; b = 0;
-								break;
-							case 3:
-								r = 128; g = 255; b = 0;
-								break;
-							case 4:
-								r = 0; g = 255; b = 0;
-								break;
-							case 5:
-								r = 0; g = 255; b = 128;
-								break;
-							case 6:
-								r = 0; g = 255; b = 255;
-								break;
-							case 7:
-								r = 0; g = 128; b = 255;
-								break;
-							case 8:
-								r = 0; g = 0; b = 255;
-								break;
-							case 9:
-								r = 127; g = 0; b = 255;
-								break;
-							case 10:
-								r = 255; g = 0; b = 255;
-								break;
-							case 11:
-								r = 255; g = 0; b = 127;
-								break;
-							case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
-								r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
-								alpha = 4;
-								break;
+				if (writemode == true) {
+					if (event.button.button == 1) {
+						if (event.button.windowID == SDL_GetWindowID(Window)) {
+							if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
+								alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
+								switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
+								case 0:// 색 설정 코드
+									r = 255; g = 0; b = 0;
+									break;
+								case 1:
+									r = 255; g = 128; b = 0;
+									break;
+								case 2:
+									r = 255; g = 255; b = 0;
+									break;
+								case 3:
+									r = 128; g = 255; b = 0;
+									break;
+								case 4:
+									r = 0; g = 255; b = 0;
+									break;
+								case 5:
+									r = 0; g = 255; b = 128;
+									break;
+								case 6:
+									r = 0; g = 255; b = 255;
+									break;
+								case 7:
+									r = 0; g = 128; b = 255;
+									break;
+								case 8:
+									r = 0; g = 0; b = 255;
+									break;
+								case 9:
+									r = 127; g = 0; b = 255;
+									break;
+								case 10:
+									r = 255; g = 0; b = 255;
+									break;
+								case 11:
+									r = 255; g = 0; b = 127;
+									break;
+								case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
+									r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
+									alpha = 4;
+									break;
+								}
+								// 수식으로 rgb값 설정
+								if (alpha <= 4) {
+									r = r + r / 5 * (alpha - 4);
+									g = g + g / 5 * (alpha - 4);
+									b = b + b / 5 * (alpha - 4);
+									happen = true;
+									break;
+								}
+								else {
+									r = r + (255 - r) / 5 * (alpha - 4);
+									g = g + (255 - g) / 5 * (alpha - 4);
+									b = b + (255 - b) / 5 * (alpha - 4);
+									happen = true;
+									break;
+
+								}
 							}
-							// 수식으로 rgb값 설정
-							if (alpha <= 4) {
-								r = r + r / 5 * (alpha - 4);
-								g = g + g / 5 * (alpha - 4);
-								b = b + b / 5 * (alpha - 4);
+							else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
+								SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
+								SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
+								Box.x = event.button.x;//스크롤 박스를 이동시킴
+								drag = true; //드래그로 조정이 가능하게 설정
+								strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
 								happen = true;
 								break;
 							}
-							else {
-								r = r + (255 - r) / 5 * (alpha - 4);
-								g = g + (255 - g) / 5 * (alpha - 4);
-								b = b + (255 - b) / 5 * (alpha - 4);
+							else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
+								SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = true;
+
+								clicks.pencil = false;
+								happen = true;
+							}
+							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New 이미지를 클릭했을때
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								SDL_RenderClear(Renderer2);
+								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
+								Fonts.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
+								Fonts.h += 2;
+								newclick = 1;
+								//여기~~~~~~~~~~~~~~~~~~
+								if (connect_sock != 0) {
+									send(connect_sock, "SDLCLEAR", 45, 0);
+								}
+								SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = false;
+								clicks.pencil = true;
+
+								happen = true;
+							}
+
+							else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
+								Fonts.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
+								Fonts.h += 2;
+								SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = false;
+								clicks.pencil = true;
+								sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
+								happen = true;
+							}
+						}
+						else if (event.button.windowID == SDL_GetWindowID(Window2)) {
+							if (clicks.pencil == true) {
+
+								Rect.x = event.button.x - strong / 2;
+								Rect.y = event.button.y - strong / 2;// 굵기만큼의 사각형을 만듬
+								Rect.w = Rect.h = strong;// 굵기 설정
+								SDL_RenderFillRect(Renderer2, &Rect);// 렌더러에 그림
+																	 // 여기~~~~~~~~~
+								if (connect_sock != 0) {
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
+									send(connect_sock, query, 45, 0);
+								}
+								drag = true; //드래그로 그릴수 있게 설정
+								happen = true;
+
+
+								break;
+							}
+							else if (clicks.eraser == true) {
+								strong *= 80 / (float)50.0;
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								int x1, y1, x2, y2;
+								Rect.x = event.button.x;// 원이라서 꼭짓점의 좌표가아닌 중심좌표를 찍어줘야함
+								Rect.y = event.button.y;
+								for (l = 0; l < 180; l++) {
+									x1 = sin(3.14 / 180 * l)*strong / 2;
+									y1 = cos(3.14 / 180 * l)*strong / 2;
+									x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+									y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+								}
+								// 여기~~~~~~~~~~~~~~
+								if (connect_sock != 0) {
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
+									send(connect_sock, query, 45, 0);
+								}
+								strong *= 50.0 / 80;
+								drag = true;
 								happen = true;
 								break;
-
 							}
-						}
-						else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
-							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
-							SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
-							Box.x = event.button.x;//스크롤 박스를 이동시킴
-							drag = true; //드래그로 조정이 가능하게 설정
-							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
-							happen = true;
-							break;
-						}
-						else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
-							SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
-							clicks.eraser = true;
-
-							clicks.pencil = false;
-							happen = true;
-						}
-						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New 이미지를 클릭했을때
-							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-							SDL_RenderClear(Renderer2);
-							sndPlaySoundA("music\\erase.wav", SND_ASYNC);
-							Fonts.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
-							Fonts.h += 2;
-							newclick = 1;
-							//여기~~~~~~~~~~~~~~~~~~
-							if (connect_sock != 0) {
-								send(connect_sock, "SDLCLEAR", 45, 0);
-							}
-							SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
-							clicks.eraser = false;
-							clicks.pencil = true;
-
-							happen = true;
-						}
-
-						else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
-							Fonts.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
-							Fonts.h += 2;
-							SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
-							clicks.eraser = false;
-							clicks.pencil = true;
-							sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
-							happen = true;
-						}
-					}
-					else if (event.button.windowID == SDL_GetWindowID(Window2)) {
-						if (clicks.pencil == true) {
-
-							Rect.x = event.button.x - strong / 2;
-							Rect.y = event.button.y - strong / 2;// 굵기만큼의 사각형을 만듬
-							Rect.w = Rect.h = strong;// 굵기 설정
-							SDL_RenderFillRect(Renderer2, &Rect);// 렌더러에 그림
-																 // 여기~~~~~~~~~
-							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
-							}
-							drag = true; //드래그로 그릴수 있게 설정
-							happen = true;
-
-
-							break;
-						}
-						else if (clicks.eraser == true) {
-							strong *= 80 / (float)50.0;
-							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-							int x1, y1, x2, y2;
-							Rect.x = event.button.x;// 원이라서 꼭짓점의 좌표가아닌 중심좌표를 찍어줘야함
-							Rect.y = event.button.y;
-							for (l = 0; l < 180; l++) {
-								x1 = sin(3.14 / 180 * l)*strong / 2;
-								y1 = cos(3.14 / 180 * l)*strong / 2;
-								x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
-								y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
-								SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
-							}
-							// 여기~~~~~~~~~~~~~~
-							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
-							}
-							strong *= 50.0 / 80;
-							drag = true;
-							happen = true;
-							break;
 						}
 					}
 				}
