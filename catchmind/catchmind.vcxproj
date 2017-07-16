@@ -82,7 +82,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>C:\Program Files (x86)\Windows Kits\8.1\Include\shared;C:\Users\YASUO\Desktop\MySQL Connecter-20170711T055727Z-001\MySQL Connecter\include;C:\Users\YASUO\Desktop\SDL2-devel-2.0.5-VC\SDL2-2.0.5\include;C:\Program Files (x86)\Windows Kits\8.1\Include\um;C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\상희\Source\Workspaces\catchmind 711\catchmind\lib;C:\Users\YASUO\Desktop\MySQL Connecter-20170711T055727Z-001\MySQL Connecter\lib;C:\Users\YASUO\Desktop\SDL2-devel-2.0.5-VC\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\Users\starocean\Source\Workspaces\catchmind 711\catchmind\lib;C:\Users\상희\Source\Workspaces\catchmind 711\catchmind\lib;C:\Users\YASUO\Desktop\MySQL Connecter-20170711T055727Z-001\MySQL Connecter\lib;C:\Users\YASUO\Desktop\SDL2-devel-2.0.5-VC\SDL2-2.0.5\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

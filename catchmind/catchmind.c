@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
+
 //#include <WinSock2.h>		//소켓프로그래밍
 
 //특수 헤더파일 (따로 설치) 
@@ -51,6 +52,7 @@
 #pragma comment (lib, "SDL2_mixer.lib")	//그래픽 사운드 라이브러리 4
 #pragma comment (lib, "ws2_32.lib")		//소켓(네트워크)라이브러리
 #pragma comment (lib, "winmm.lib")		//사운드 라이브러리
+#pragma comment (lib, "GDIPlus.lib")		//이미지 라이브러리
 
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
@@ -134,6 +136,7 @@ SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
 char chatquery[10][50];
+
 
 //기본 함수들
 void gotoxy(short x, short y);
@@ -329,7 +332,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
-
 void credit() {
 	//학교이름
 	//제작자
@@ -350,6 +352,21 @@ void credit() {
 	
 	gotoxy(50, 10);
 	printf("제작자 : 서상희, 장민석, 배수한, 신상호");
+
+	gotoxy(45, 14);
+	printf("    ##                                          ##   "); gotoxy(45, 15);
+	printf("   ##     #####      ####    #####   ##   ##     ##"); gotoxy(45, 16);
+	printf("   ##     ##  ##    ##  ##  ##   ##  ##   ##     ##  "); gotoxy(45, 17);
+	printf("   ##     ##   ##  ##       ##       ## # ##     ##  "); gotoxy(45, 18);
+	printf("  ##      ##   ##  ##        #####   ## # ##      ##"); gotoxy(45, 19);
+	printf("   ##     ##   ##  ##  ###       ##  ## # ##     ##"); gotoxy(45, 20);
+	printf("   ##     ##  ##    ##  ##  ##   ##  ### ###     ## "); gotoxy(45, 21);
+	printf("   ##     #####      #####   #####   ##   ##     ##"); gotoxy(45, 22);
+	printf("    ##                                          ##");
+	gotoxy(23, 28);
+	printf("본 창작물은 크리에이티브 커먼즈 저작자표시-비영리-동일조건변경허락 4.0 국제 라이선스에 따라 이용할 수 있습니다.");
+	gotoxy(49, 26);
+	printf("Copyright(c)2017 by 신상호,배수한,장민석,서상희");
 
 	_getch();
 }
