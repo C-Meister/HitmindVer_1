@@ -402,7 +402,7 @@ void inserttopic(void)
 			num = atoi(sql_row[0]);
 
 		}
-		mysql_free_result(cons);
+		mysql_free_result(sql_result);
 		num++;
 		getchar();
 		CLS;
@@ -1374,7 +1374,7 @@ void readchating(void) {
 					last2 = atoi(sql_row[0]);
 				
 			}
-			mysql_free_result(cons);
+			mysql_free_result(sql_result);
 			if (last <= last2)
 			{
 				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
@@ -1385,7 +1385,7 @@ void readchating(void) {
 					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
 					v--;
 				}
-				mysql_free_result(cons);
+				mysql_free_result(sql_result);
 				CHATHAPPEN = true;
 				last = last2;
 			}
@@ -1710,25 +1710,25 @@ int sqllogin(void) {
 			{
 				gotoxy(2, 3);
 				printf("           아이디가 존재하지 않습니다     ");
-
+		//		mysql_free_result(sql_result);
 
 			}
 			else {
-				mysql_free_result(cons);
+				mysql_free_result(sql_result);
 				sprintf(query, "select * from catchmind.login where password = password('%s')", user.pass);
 				mysql_query(cons, query);	//password는 DB에 암호화되어 있어서 값을 비교할때도 서로 암호화해서 비교를함
 				sql_result = mysql_store_result(cons);
-
 
 
 				if ((sql_row = mysql_fetch_row(sql_result)) == NULL)
 				{
 					gotoxy(2, 3);
 					printf("              비밀번호가 틀렸습니다        ");
+					mysql_free_result(sql_result);
 
 				}
 				else {
-					mysql_free_result(cons);
+					mysql_free_result(sql_result);
 					strcpy(username, sql_row[1]);
 					sprintf(query, "title %s님 히트마인드에 오신것을 환영합니다!", username);
 					system(query);
@@ -1771,7 +1771,7 @@ int sqlsignup(void) {
 		if (sql_row[0][1] != 0)
 			return -1;
 	}
-	mysql_free_result(cons);
+	mysql_free_result(sql_result);
 	sprintf(query3, "insert into catchmind.login (name, id, password) values ('%s', '%s', password('%s'))", user.name, user.id, user.pass);
 
 	if (!(mysql_query(cons, query3)))											//		 password는 mysql에서 지원하는 암호화 형식임.
@@ -1996,7 +1996,7 @@ void banglist(int j) {
 		i++;
 
 	}
-	mysql_free_result(cons);
+	//mysql_free_result(sql_result);
 	i = 0;
 
 }
@@ -2148,7 +2148,7 @@ int chooseroom(int roomnum) {
 	mysql_query(cons, query);
 	sql_row = mysql_fetch_row(mysql_store_result(cons));
 	connectroom[roomnum].people = atoi(sql_row[0]);
-	mysql_free_result(cons);
+//	mysql_free_result(sql_result);
 	if (connectroom[roomnum].people == 4)
 		return -1;
 
@@ -2520,9 +2520,10 @@ void getlevel(void)
 			mysql_query(cons, query);
 			sql_row = mysql_fetch_row(mysql_store_result(cons));
 			score[i][0] = atoi(sql_row[0]);
-			mysql_free_result(cons);
+			
 		}
 	}
+//	mysql_free_result(sql_result);
 }
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
 	switch (step) {
@@ -3132,7 +3133,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
 			sprintf(query, "topic   %s", sql_row[0]);
-			mysql_free_result(cons);
+			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
 			happen = true;
