@@ -3082,7 +3082,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	bool writemode = false;
 	if (myownnumber - 1 == turn)
 	{
-	//	writemode = true;
+		writemode = true;
 	}
 	int alpha;// 명도와 채도를 담기위한 변수 선언
 	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
