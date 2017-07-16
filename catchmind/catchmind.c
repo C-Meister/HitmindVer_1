@@ -2670,7 +2670,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Texture * BoxTexture = nullptr;// ½ºÅ©·Ñ ¹Ú½º ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 	SDL_Texture * ChaTexture = nullptr;// Ã¤ÆÃÃ¢ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 	SDL_Texture * StaTexture = nullptr;// »óÅÂÃ¢ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
-	SDL_Texture * InpTexture = nullptr;// »óÅÂÃ¢ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
+	SDL_Texture * InpTexture = nullptr;// Ã¤ÆÃ º¸Àç´Â ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
+	SDL_Texture * UseTexture = nullptr;// À¯Á® ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
 
 	SDL_Rect RgbCode = { 0 };// RgbCode ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±âÀ§ÇÑ »ç°¢Çüº¯¼ö ¼±¾ð
 	SDL_Rect Pencil = { 0 }; // Pencil ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±âÀ§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
@@ -2680,7 +2681,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Box = { 0 };//Box ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Chat = { 0 };// Chat ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Status = { 0 };//Status ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-	SDL_Rect InputT = { 0 };//Status ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
+	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
+	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 	int chaty = 0;
 	float fontsize = 20.0;
@@ -2854,7 +2856,20 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	InputT.h = 41;
 	InputT.x = 0;
 	InputT.y = Eraser.y -71;
-	// ³¡
+	UseTexture = LoadTexture(Renderer3, ".\\image\\user.png");
+	if (UseTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		return 0;
+	}
+	UserT.w = (1920 - (1310 / 4 - 10)) / 5;
+	UserT.h = (900 / 4 - 10);
+	UserT.y = 0;
+	for (int i = 0; i < 4; i++) {
+	
+		UserT.x = 0 + ((1920 - (1310 / 4 - 10)) / 5) * i;
+		
+		RenderTexture(Renderer3, UseTexture, &UserT);
+	}// ³¡
 	//DWORD th = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)thread, &SDL, 0, 0);
 	bool quit = false;//ºÒ º¯¼ö ¼±¾ð
 	bool drag = false;// µå·¡±×ÁßÀÎÁö È®ÀÎÇÏ´Â º¯¼ö ¼±¾ð
@@ -2881,7 +2896,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RenderTexture(Renderer, RgbTexture, &RgbCode);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 												  // º¯¼ö ÃÊ±â°ª ¼³Á¤³¡
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
-	
+	RenderTexture(Renderer3, UseTexture, &UserT);
 	SDL_StartTextInput();
 	char inputText[128] = "";
 	char topic[30];
@@ -3227,6 +3242,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = false;
 		}
 	}
+
+	SDL_DestroyTexture(InpTexture);
+	SDL_DestroyTexture(UseTexture);
 	SDL_DestroyTexture(RgbTexture);// ÅØ½ºÃÄ ÆÄ±«ÇÏ±â
 	SDL_DestroyTexture(ChaTexture);
 	SDL_DestroyTexture(BoxTexture);
