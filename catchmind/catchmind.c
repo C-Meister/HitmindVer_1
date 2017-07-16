@@ -2478,7 +2478,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_Rect Rect = { 0,0,1310 / 4 + 10,New.h - 10 };
 	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
 	SDL_RenderFillRect(Renderer, &Rect);
-	if (strcmp(inputText, "") != 0)
+	if (inputText!= "")
 		TTF_DrawText(Renderer, Fonts, inputText, 0, 0);
 	else
 		TTF_DrawText(Renderer, Fonts, " ", 0, 0);
@@ -2720,56 +2720,42 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 												  // º¯¼ö ÃÊ±â°ª ¼³Á¤³¡
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
 
-	SDL_RenderPresent(Renderer);
-	SDL_Delay(500);
 	SDL_StartTextInput();
 	char inputText[128] = "";
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 
 	//	CLS;
-		if (Gametopic == 0)
-		{
-			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
-			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
-			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
-			SDL_Rect Rect = { 0,0,1310 / 4 + 10,200 };
-			SDL_RenderFillRect(Renderer, &Rect);
-			TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 100);
-			happen = true;
-			sprintf(query, "topic   %s", sql_row[0]);
-			send(connect_sock, query, 45, 0);
-			Gametopic++;
-		}
+
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 		}
-
-
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
+			case SDL_TEXTINPUT:
+				if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
+					strcat(inputText, event.text.text);// ÀÌ¾î ºÙÀÓ 
+					happen = true;
+				}
+				break;
+			case SDL_KEYDOWN:
+				//Handle backspace
+				if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0) {// Å°º¸µå ¹é½ºÆäÀÌ½º°í ¹è¿­ÀÇ ±æÀÌ°¡ 1ÀÌ»óÀÏ¶§
+					inputText[strlen(inputText) - 1] = '\0';// ¸¶Áö¸·¹®ÀÚ¸¦ ³Î¹®ÀÚ·Î ¹Ù²Þ
+					happen = true;
+				}
+				else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í c¸¦ ´­·¶´Ù¸é
+					SDL_SetClipboardText(inputText);// Å¬¸³º¸µå¿¡ ³ÖÀ½
+				else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {// ÄÁÆ®·Ñ ¸ðµåÀÌ°í v¸¦ ´­·¶´Ù¸é
+					strcpy(inputText, SDL_GetClipboardText());// Å¬¸³º¸µå¿¡¼­ °¡Á®¿È
+					happen = true;
+				}
+				break;
 			case SDL_WINDOWEVENT://SDLÁ¾·á Å¸ÀÔÀÏ °æ¿ì
 				switch (event.window.event) {
-				case SDL_TEXTINPUT:
-					if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
-						strcat(inputText, event.text.text);// ÀÌ¾î ºÙÀÓ 
-					happen = true;
-					break;
-				case SDL_KEYDOWN:
-					//Handle backspace
-					if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0)// Å°º¸µå ¹é½ºÆäÀÌ½º°í ¹è¿­ÀÇ ±æÀÌ°¡ 1ÀÌ»óÀÏ¶§
-					{
-						inputText[strlen(inputText) - 1] = '\0';// ¸¶Áö¸·¹®ÀÚ¸¦ ³Î¹®ÀÚ·Î ¹Ù²Þ
-						happen = true;
-					}
-					else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í c¸¦ ´­·¶´Ù¸é
-						SDL_SetClipboardText(inputText);// Å¬¸³º¸µå¿¡ ³ÖÀ½
-					else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í v¸¦ ´­·¶´Ù¸é
-						strcpy(inputText, SDL_GetClipboardText());// Å¬¸³º¸µå¿¡¼­ °¡Á®¿È
-					happen = true;
-					break;
+				
 				case SDL_WINDOWEVENT_CLOSE:// ´Ù¼ö Ã¢¿¡¼­ÀÇ ´Ý±âÀÌº¥Æ®°¡ ¹ß»ýÇÒ°æ¿ì
 					quit = true;// quit¸¦ true·Î º¯°æ
 					break;// ºê·¹ÀÌÅ©
@@ -3034,13 +3020,20 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			on.new = false;
 		}
+		 if (Gametopic == 0)
+		 {
+		 mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+		 sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+		 TTF_DrawText(Renderer, topicFont, sql_row[0], 0, 100);
+		 happen = true;
+		 sprintf(query, "topic   %s", sql_row[0]);
+		 send(connect_sock, query, 45, 0);
+		 Gametopic++;
+		 }
 		if (CHATHAPPEN == true)													//Ã¤ÆÃÃ¢
 		{
 			happen = true;
 			chaty = 0;
-			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);					//È­¸éÁö¿ì±â
-			SDL_Rect Rect = { 0,300,1310 / 4 + 10,400 };
-			SDL_RenderFillRect(Renderer, &Rect);
 			for (int i = 0; i < 10; i++) {
 				TTF_DrawText(Renderer, Font, chatquery[i], 0, 300 + chaty);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 				chaty += 30;
@@ -3049,8 +3042,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			CHATHAPPEN = false;
 		}
 		if (happen == true) {
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText,strong, r, g, b);
-
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText, strong, r, g, b);
 		}
 		happen = false;
 
