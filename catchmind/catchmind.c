@@ -3462,6 +3462,9 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
 			han2unicode(topic, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+			sprintf(query, "%s 차례입니다", friendname[turn - 1]);
 			for (int i = 0; i < 4; i++)
 			{
 
@@ -3472,9 +3475,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					han2unicode(friendname[i], unicode);
 					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
-					sprintf(query, "%s 차례입니다", friendname[turn - 1]);
+				
 					han2unicode(query, unicode);
 					TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
 
