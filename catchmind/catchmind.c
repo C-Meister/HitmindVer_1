@@ -519,12 +519,9 @@ void sqlmakeroom(void) {
 					myroom.password[i - 1] = 0;
 					myroom.password[i--] = 0;
 				}
-				else if ((myroom.password[i] == 8 || myroom.password[i] == 13) && i > 3) {
-					myroom.password[i] = 0;
-					break;
-				}
 				else if (myroom.password[i] == 13) {
 					myroom.password[i] = 0;
+					break;
 				}
 				else if (i >= 15) {
 					continue;
