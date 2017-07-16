@@ -420,7 +420,14 @@ void sqlmakeroom(void) {
 		CLS;
 		int count = 0;
 		int i = 0;
-		int a = 0;
+		int c = 0;
+		int togl = -1;
+		int keybit = 0;
+		POINT a;
+		int xx = 0, yy = 0, lr = 0;
+		int buff = 0;
+
+
 		IN_ADDR addr;
 
 		addr = GetDefaultMyIP();	//디폴트 IPv4 주소 얻어오기
@@ -441,7 +448,7 @@ void sqlmakeroom(void) {
 		printf("■");
 		disablecursor(0);
 		while (1) {
-			a = 0;
+			c = 0;
 			i = 0;
 			for (i = 0; i < 30; i++)
 				myroom.roomname[i] = 0;
@@ -454,9 +461,9 @@ void sqlmakeroom(void) {
 			for (i = 0; myroom.roomname[i] != 0; i++) {
 				if (myroom.roomname[i] >= 0)
 					if (!((myroom.roomname[i] >= '0' && myroom.roomname[i] <= '9') || (myroom.roomname[i] >= 'a' && myroom.roomname[i] <= 'z') || (myroom.roomname[i] >= 'A' && myroom.roomname[i] <= 'Z')))
-						a++;
+						c++;
 			}
-			if (a == 0)
+			if (c == 0)
 				break;
 			gotoxy(10, 9);
 			printf("영어,숫자로만 입력해 주세요");
@@ -470,31 +477,82 @@ void sqlmakeroom(void) {
 		i = 0;
 		while (1) {
 
+			myroom.password[i] = checkkeyborad(myroom.password[i], togl);
 
-			myroom.password[i] = _getch();
-			if (myroom.password[i] == 8) {
-				if (i == 0) {
-					myroom.password[0] = 0;
-					continue;
-				}
-				printf("\b \b");
-				myroom.password[i - 1] = 0;
-				myroom.password[i--] = 0;
-			}
-			else if (myroom.password[i] == 13) {
-				myroom.password[i] = 0;
-				break;
-			}
-			else if (i >= 15) {
+			if (buff < 20) {
+				buff++;
 				continue;
 			}
-			else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
+
+
+			if (myroom.password[i] == 1) {
+				togl *= -1;
 				myroom.password[i] = 0;
+				continue;
+			}
+			if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+				if (togl == -1 && 'a' <= myroom.password[i] && 'z' >= myroom.password[i])
+					myroom.password[i] -= 32;
+				else if (togl == 1 && 'A' <= myroom.password[i] && 'Z' >= myroom.password[i])
+					myroom.password[i] += 32;
+			}
+
+
+
+			if (myroom.password[i])
+				keybit = 1;
+			else
+				keybit = 0;
+
+			if (keybit) {
+
+				if (myroom.password[i] == 8) {
+					if (i == 0) {
+						myroom.password[0] = 0;
+						continue;
+					}
+					printf("\b \b");
+					myroom.password[i - 1] = 0;
+					myroom.password[i--] = 0;
+				}
+				else if ((myroom.password[i] == 8 || myroom.password[i] == 13) && i > 3) {
+					myroom.password[i] = 0;
+					break;
+				}
+				else if (myroom.password[i] == 13) {
+					myroom.password[i] = 0;
+				}
+				else if (i >= 15) {
+					continue;
+				}
+				else if (!((myroom.password[i] >= '0' && myroom.password[i] <= '9') || (myroom.password[i] >= 'a' && myroom.password[i] <= 'z') || (myroom.password[i] >= 'A' && myroom.password[i] <= 'Z'))) {
+					myroom.password[i] = 0;
+				}
+				else
+					putchar(myroom.password[i++]);
 			}
 			else {
-				printf("*");
-				i++;
+				disablecursor(1);
+				GetCursorPos(&a);
+				SetCursorPos(a.x, a.y);
+				click(&xx, &yy, &lr);
+				
+				gotoxy(33, 9);
+				if (xx >= 16 && xx <= 25 && yy == 9) {
+					if (lr == 0) {
+						HIGH_GREEN printf("○비밀번호 미사용");
+					}
+					else if (lr == 1) {
+						WHITE
+						ZeroMemory(myroom.password, sizeof(myroom.password));
+						break;
+					}
+				}
+				else
+					WHITE printf("○비밀번호 미사용");	
 			}
+			cur(16+i, 7);
+			disablecursor(0);
 		}
 
 		char query[100];
@@ -1932,6 +1990,10 @@ int bangchose(void) {
 			if (9 <= xx && xx <= 22 && 2 == yy)			//방만들기
 				return 0;
 			else if (24 <= xx && xx <= 37 && 2 == yy) {//빠른시작
+				for (c = 3; c > 0; c--)
+					for (b = 0; b < 6; b++)
+						if (connectroom[b].people == c && connectroom[b].password[0] == 0)
+							return b + 2;
 				for (c = 3; c > 0; c--)
 					for (b = 0; b < 6; b++)
 						if (connectroom[b].people == c)
