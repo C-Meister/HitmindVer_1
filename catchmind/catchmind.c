@@ -120,6 +120,8 @@ SOCKADDR_IN connect_addr, listen_addr;			//¼­¹ö ÁÖ¼ÒÁ¤º¸ ÀúÀåÇÏ´Â º¯¼ö
 int sockaddr_in_size;
 ROOM connectroom[6];
 uintptr_t threads[10] = { 0, };
+char turn = 0;
+int score[4][2] = { 0, };
 char signalmode;
 char querys[10][100];
 long Ping = 0;
@@ -274,7 +276,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 				{
 					if (connectroom[bangchoose - 2].people == 4)  //4¸íÀÏ‹š
 						chooseroomcount = -1;
-					
+
 					if (connectroom[bangchoose - 2].password[0] == 0 && connectroom[bangchoose - 2].people > 0) //ºñ¹Ð¹øÈ£ ¾øÀ»°æ¿ì °Ç³Ê¶ê
 						chooseroomcount = 1;
 					else
@@ -349,7 +351,7 @@ void credit() {
 
 	gotoxy(50, 8);
 	printf("¼Ò¼ÓÇÐ±³ : ´ë±¸¼ÒÇÁÆ®¿þ¾î°íµîÇÐ±³");
-	
+
 	gotoxy(50, 10);
 	printf("Á¦ÀÛÀÚ : ¼­»óÈñ, Àå¹Î¼®, ¹è¼öÇÑ, ½Å»óÈ£");
 
@@ -430,9 +432,9 @@ void sqlmakeroom(void) {
 		printf("¡á");
 		disablecursor(0);
 		while (1) {
-			a = 0; 
+			a = 0;
 			i = 0;
-			for (i = 0; i<30 ; i++)
+			for (i = 0; i < 30; i++)
 				myroom.roomname[i] = 0;
 
 			cur(16, 5);
@@ -445,7 +447,7 @@ void sqlmakeroom(void) {
 					if (!((myroom.roomname[i] >= '0' && myroom.roomname[i] <= '9') || (myroom.roomname[i] >= 'a' && myroom.roomname[i] <= 'z') || (myroom.roomname[i] >= 'A' && myroom.roomname[i] <= 'Z')))
 						a++;
 			}
-			if(a==0)
+			if (a == 0)
 				break;
 			gotoxy(10, 9);
 			printf("¿µ¾î,¼ýÀÚ·Î¸¸ ÀÔ·ÂÇØ ÁÖ¼¼¿ä");
@@ -454,7 +456,7 @@ void sqlmakeroom(void) {
 
 		gotoxy(10, 9);
 		printf("                                ");
-		
+
 		cur(16, 7);
 		i = 0;
 		while (1) {
@@ -680,6 +682,7 @@ int waitroom(void)
 			printf("°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
 			if (lead == true)
 			{
+				turn = 1;
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
 				mysql_query(cons, query);
@@ -1271,7 +1274,7 @@ void writechating(void)
 			printf("%ls", buffer);
 			cur(0, 0);
 			LeaveCriticalSection(&cs);
-	//		Sleep(10);
+			//		Sleep(10);
 		}
 		CLS;
 		i = 0;
@@ -1287,34 +1290,34 @@ void readchating(void) {
 	MYSQL_ROW sql_row;
 	int last2 = 0;
 	int last = 0;
-//	CHATHAPPEN = true;
+	//	CHATHAPPEN = true;
 	while (1) {
-			if (CHATHAPPEN == false) {
-	//			ZeroMemory(chatquery, sizeof(chatquery));
-				mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
-				sql_result = mysql_store_result(cons);
-				sql_row = mysql_fetch_row(sql_result);
-				last2 = atoi(sql_row[0]);
-				cur(10, 10);
-				
-				if (last <= last2)
-				{
-					printf("%d : true", last2);
-					mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
-					sql_result = mysql_store_result(cons);
-					v = 14;
-					while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
-					{
-						sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
-						v--;
-					}
-					CHATHAPPEN = true;
-					last = last2;
-				}
-			}
+		if (CHATHAPPEN == false) {
+			//			ZeroMemory(chatquery, sizeof(chatquery));
+			mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
+			sql_result = mysql_store_result(cons);
+			sql_row = mysql_fetch_row(sql_result);
+			last2 = atoi(sql_row[0]);
+			cur(10, 10);
 
+			if (last <= last2)
+			{
+				printf("%d : true", last2);
+				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
+				sql_result = mysql_store_result(cons);
+				v = 14;
+				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+				{
+					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
+					v--;
+				}
+				CHATHAPPEN = true;
+				last = last2;
+			}
 		}
-	
+
+	}
+
 }
 void loadmysql(char mysqlip[])	//MYSQL ¼­¹ö ºÒ·¯¿À±â
 {
@@ -1516,7 +1519,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				status[0] = -1;
 				ZeroMemory(message, sizeof(message));
 			}
-			
+
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
 				SDL_Clear = true;
@@ -1553,25 +1556,25 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			{
 				sscanf(message, "topic 1 %s", topics[0]);
 				cur(0, 8);
-				printf("1¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[0]);
+		//		printf("1¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[0]);
 			}
 			else if (strncmp(message, "topic 2", 7) == 0)
 			{
 				sscanf(message, "topic 2 %s", topics[1]);
 				cur(0, 9);
-				printf("2¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[1]);
+		//		printf("2¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[1]);
 			}
 			else if (strncmp(message, "topic 3", 7) == 0)
 			{
 				sscanf(message, "topic 3 %s", topics[2]);
 				cur(0, 10);
-				printf("3¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[2]);
+		//		printf("3¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[2]);
 			}
 			else if (strncmp(message, "topic 4", 7) == 4)
 			{
 				sscanf(message, "topic 4 %s", topics[3]);
 				cur(0, 11);
-				printf("4¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[3]);
+		//		printf("4¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[3]);
 			}
 		}
 		//	Sleep(100);
@@ -1597,6 +1600,8 @@ int sqllogin(void) {
 				printf("               (È¸¿ø°¡ÀÔ ¼º°ø)           ");
 			else if (check == -1)
 				printf("             (¾ÆÀÌµð°¡ Áßº¹µË´Ï´Ù)              ");
+			else if (check == -2)
+				printf("             (´Ð³×ÀÓÀÌ Áßº¹µË´Ï´Ù)              ");
 			else
 				printf("               (È¸¿ø°¡ÀÔ ½ÇÆÐ)          ");
 		}
@@ -1648,6 +1653,14 @@ int sqlsignup(void) {
 
 	if (user.name[0] == 0)
 		return 0;
+	sprintf(query2, "select * from catchmind.login where name = '%s'", user.name);	//id¸¦ DB¿¡¼­ Ã£À½
+	mysql_query(cons, query2);
+	sql_result = mysql_store_result(cons);
+	if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+	{
+		if (sql_row[0][1] != 0)
+			return -2;
+	}
 
 	sprintf(query2, "select * from catchmind.login where id = '%s'", user.id);	//id¸¦ DB¿¡¼­ Ã£À½
 	mysql_query(cons, query2);
@@ -1727,9 +1740,9 @@ int maintitle(void) { //°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â
 			return 3;
 		}
 		else {
-			WHITE 
-			gotoxy(16, 23);
-		    printf("°ÔÀÓ ½ÃÀÛ");
+			WHITE
+				gotoxy(16, 23);
+			printf("°ÔÀÓ ½ÃÀÛ");
 			gotoxy(56, 23);
 			printf("ÁÖÁ¦ Ãß°¡");
 			gotoxy(98, 23);
@@ -2312,17 +2325,17 @@ void CheckPing(void)
 	printf("Ping Check....");
 	while (Ping == 0)
 	{
-		
+
 	}
 	now = clock() - Ping + 1;
-	printf("OK. My Ping is %ldms\n", now -1);
+	printf("OK. My Ping is %ldms\n", now - 1);
 	Sleep(100);
 	sprintf(query, "user   ping %ld", now);
 	send(connect_sock, query, 45, 0);
 	for (i = 0; i < 4; i++)
 	{
 		WHITE
-		cur(0, 4 + i);
+			cur(0, 4 + i);
 		printf("%s : ", friendname[i]);
 		if (status[i] == 0)
 		{
@@ -2569,7 +2582,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 			for (k = 0; k < length; k++) {// µÎ Á¡»çÀÌÀÇ °ø¹éÀ» ÀüºÎ »ç°¢ÇüÀ¸·Î Ã¤¿ì´Â ¹Ýº¹¹®ÀÓ
 				ReceiveRect.x = xpos + k*i;// ÂïÀ» Á¡ÀÇ ¿ÞÂÊÀ§ ²ÀÁþÁ¡ÀÇ xÁÂÇ¥¸¦ ¼³Á¤ 
 				ReceiveRect.y = ypos + k*j;// ÂïÀ» Á¡ÀÇ ¿ÞÂÊÀ§ ²ÀÁþÁ¡ÀÇ yÁÂÇ¥¸¦ ¼³Á¤
-				
+
 				SDL_RenderFillRect(Renderer4, &ReceiveRect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 			}
 			SDL_RenderPresent(Renderer4);
@@ -2606,7 +2619,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 	}
 }
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts,char* inputText, float strong, int r, int g, int b) {
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts, char* inputText, float strong, int r, int g, int b) {
 	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// »ö±ò¼³Á¤
 	RenderTexture(Renderer, TraTexture, &Track);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 	RenderTexture(Renderer, BoxTexture, &Box);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
@@ -2614,7 +2627,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	RenderTexture(Renderer, PenTexture, &Pencil);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 	RenderTexture(Renderer, NewTexture, &New);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 	RenderTexture(Renderer, InpTexture, &InputT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-		if (on.eraser == true || clicks.eraser == true) { // eraser°¡ Å¬¸¯ µÇ¾î ÀÖ°Å³ª eraser¾ÆÀÌÄÜÀ§¿¡ ¸¶¿ì½º°¡ ÀÖÀ¸¸é
+	if (on.eraser == true || clicks.eraser == true) { // eraser°¡ Å¬¸¯ µÇ¾î ÀÖ°Å³ª eraser¾ÆÀÌÄÜÀ§¿¡ ¸¶¿ì½º°¡ ÀÖÀ¸¸é
 		SDL_RenderRemoveEdge(Renderer, &Eraser);
 		RenderTexture(Renderer, EraTexture, &Eraser);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 		SDL_RenderDrawEdge(Renderer, &Eraser, clicks.eraser);
@@ -2640,7 +2653,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	else {
 		TTF_DrawText(Renderer, Fonts, " ", 10, 672);
 	}
-		SDL_RenderPresent(Renderer);// ·»´õ·¯ Ãâ·Â
+	SDL_RenderPresent(Renderer);// ·»´õ·¯ Ãâ·Â
 	SDL_RenderPresent(Renderer2);
 	SDL_RenderPresent(Renderer3);
 	SDL_RenderRemoveEdge(Renderer, &Eraser);
@@ -2875,7 +2888,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	InputT.w = (1310 / 4);
 	InputT.h = 41;
 	InputT.x = 0;
-	InputT.y = Eraser.y -71;
+	InputT.y = Eraser.y - 71;
 	RenderTexture(Renderer, RgbTexture, &RgbCode);
 	UseTexture = LoadTexture(Renderer3, ".\\image\\user.png");
 	if (UseTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
@@ -2884,12 +2897,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}
 	UserT.w = (1920 - (1310 / 4 - 10)) / 4;
 	UserT.h = (900 / 4 - 10);
-	UserT.y = 0;
+	UserT.y = 0;/*
 	for (int i = 0; i < 4; i++) {
 		UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
 		RenderTexture(Renderer3, UseTexture, &UserT);
 		TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
-	}
+	}*/
 	QusTexture = LoadTexture(Renderer, ".\\image\\question_fix.png");												// Ã¤ÆÃ ÀÌ¹ÌÁö
 	if (QusTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
@@ -2899,7 +2912,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	QuesT.h = 100;
 	QuesT.x = -40;
 	QuesT.y = 60;
-	
+
 	// ³¡
 	
 	bool quit = false;//ºÒ º¯¼ö ¼±¾ð
@@ -2909,6 +2922,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
 	float i = 0, j = 0, k = 0, l = 0, length = 0;// for¹®¿¡¼­ ¾µ º¯¼ö¼±¾ð
+	int past[4][2] = { 0 , };
 	int newclick = 0;
 	float xpos = 0, ypos = 0;// ¸¶¿ì½º xÁÂÇ¥ yÁÂÇ¥¸¦ ÀúÀåÇÏ´Â º¯¼ö¼±¾ð 
 	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// ±½±âÀÇ ¼±¾ð
@@ -2931,10 +2945,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_StartTextInput();
 	char inputText[128] = "";
 	char topic[30];
+	
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 
 	//	CLS;
-		if (Gametopic == 0 )
+		if (Gametopic == 0)
 		{
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
@@ -2953,7 +2968,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_TEXTINPUT:
-				if (event.text.windowID==SDL_GetWindowID(Window)){
+				if (event.text.windowID == SDL_GetWindowID(Window)) {
 					if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
 						strcat(inputText, event.text.text);// ÀÌ¾î ºÙÀÓ 
 						happen = true;
@@ -2962,7 +2977,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				break;
 			case SDL_KEYDOWN:
 				//Handle backspace
-				if (event.text.windowID == SDL_GetWindowID(Window)){
+				if (event.text.windowID == SDL_GetWindowID(Window)) {
 					if (event.key.keysym.sym == SDLK_RETURN) {
 						sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, inputText);
 						mysql_query(cons, query);
@@ -2979,7 +2994,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						strcpy(inputText, SDL_GetClipboardText());// Å¬¸³º¸µå¿¡¼­ °¡Á®¿È
 						happen = true;
 					}
-					
+
 				}
 				break;
 			case SDL_WINDOWEVENT://SDLÁ¾·á Å¸ÀÔÀÏ °æ¿ì
@@ -3012,7 +3027,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
 						if (length == 0) break;
 						if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
-						
+
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
@@ -3022,7 +3037,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							k = 0;// while¹®¾È¿¡ ¾µ º¯¼ö ÃÊ±âÈ­.
 							xpos = Rect.x + Rect.w / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ xÁÂÇ¥¸¦ µû·Î ÀúÀå
 							ypos = Rect.y + Rect.h / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ yÁÂÇ¥¸¦ µû·Î ÀúÀå
-							
+
 							Rect.w = Rect.h = strong;// ±½±â¼³Á¤
 							SDL_SetRenderDrawColor(Renderer, r, g, b, 0);
 							for (k = 0; k < length; k++) {// µÎ Á¡»çÀÌÀÇ °ø¹éÀ» ÀüºÎ »ç°¢ÇüÀ¸·Î Ã¤¿ì´Â ¹Ýº¹¹®ÀÓ
@@ -3160,7 +3175,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = true;
-							
+
 							happen = true;
 						}
 
@@ -3176,7 +3191,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					}
 					else if (event.button.windowID == SDL_GetWindowID(Window2)) {
 						if (clicks.pencil == true) {
-							
+
 							Rect.x = event.button.x - strong / 2;
 							Rect.y = event.button.y - strong / 2;// ±½±â¸¸Å­ÀÇ »ç°¢ÇüÀ» ¸¸µë
 							Rect.w = Rect.h = strong;// ±½±â ¼³Á¤
@@ -3253,24 +3268,38 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			on.new = false;
 		}
-	
+
 		if (CHATHAPPEN == true) {
-		//	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
-		//	SDL_RenderFillRect(Renderer, &Happen);
+			//	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+			//	SDL_RenderFillRect(Renderer, &Happen);
 			RenderTexture(Renderer, ChaTexture, &Chat);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-		
+
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0)
-					TTF_DrawText(Renderer, Font,chatquery[(int)l], 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font, chatquery[(int)l], 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 			}
 			CHATHAPPEN = false;
 			happen = true;
 		}
+		SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);
+		SDL_RenderClear(Renderer3);
+		for (int i = 0; i < 4; i++)
+		{
+			
+			if (status[i] != 0)
+			{
+				UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+				RenderTexture(Renderer3, UseTexture, &UserT);
+				TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+
+			}
+
+		}
 		if (happen == true) {
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			TTF_DrawText(Renderer, topicFont, topic, 100, 90);
-			
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture,InpTexture,Track, Box, Eraser, Pencil, New, &Fonts,Chat, InputT ,Font, inputText, strong, r, g, b);
+
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
 			happen = false;
 		}
 	}
@@ -3284,7 +3313,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(EraTexture);
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
-	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,10);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 10);
 	return 0;// Á¾·á
 }
 HWND GetConsoleHwnd(void)
