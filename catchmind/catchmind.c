@@ -2265,11 +2265,11 @@ void CheckPing(void)
 			{
 			}
 			HIGH_GREEN
-				printf("ping : %hd", Userping[i]);
+				printf("ping : %hd", Userping[i] - 1);
 		}
 	}
 	WHITE
-	Sleep(1000);
+
 }
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
 	printf("%s Error: %s\n", msg, SDL_GetError());
@@ -2562,9 +2562,9 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
 
 	if (strcmp(inputText,"")!=0)
-		TTF_DrawText(Renderer, Fonts, inputText, 0, 0);
+		TTF_DrawText(Renderer, Fonts, inputText, 0, 650);
 	else
-		TTF_DrawText(Renderer, Fonts, " ", 0, 0);
+		TTF_DrawText(Renderer, Fonts, " ", 0, 650);
 	SDL_RenderPresent(Renderer);// 렌더러 출력
 	SDL_RenderPresent(Renderer2);
 	SDL_RenderPresent(Renderer3);
@@ -2840,6 +2840,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				//Handle backspace
 				if (event.text.windowID == SDL_GetWindowID(Window)){
 					if (event.key.keysym.sym == SDLK_RETURN) {
+						sprintf(query, "insert into catchmind.chatting (name, mean) values ('%s', '%s')", username, inputText);
+						mysql_query(cons, query);
 						strcpy(inputText, "");
 						happen = true;
 					}
