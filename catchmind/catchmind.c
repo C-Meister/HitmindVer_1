@@ -2840,6 +2840,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				//Handle backspace
 				if (event.text.windowID == SDL_GetWindowID(Window)){
 					if (event.key.keysym.sym == SDLK_RETURN) {
+						strcpy(inputText, "");
+						happen = true;
 					}
 					else if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0) {// 키보드 백스페이스고 배열의 길이가 1이상일때
 						inputText[strlen(inputText) - 1] = '\0';// 마지막문자를 널문자로 바꿈
