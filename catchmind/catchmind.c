@@ -1238,24 +1238,36 @@ void writechating(void)
 void readchating(void) {
 	//Sleep(1000);
 	int v = 0;
+	int timer = 0;
+	int status = 0;
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
+	char row[50];
 	while (1) {
 	//	ZeroMemory(chatquery, sizeof(chatquery));
 	
 		if (CHATHAPPEN == false) {
-			mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+			mysql_query(cons, "select * from catchmind.chating order by id desc limit 1");
 			sql_result = mysql_store_result(cons);
 			v = 9;
-			while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
-			{
-				sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
-				v--;
+			sql_row = mysql_fetch_row(sql_result);
+			if (timer < atoi(sql_row[0])) {
+				
+				timer = atoi(sql_row[0]);
+				mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+				sql_result = mysql_store_result(cons);
+				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+				{
+					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
+					v--;
+					strcpy(row, sql_row[0]);
+				}
+				CHATHAPPEN = true;
 			}
-			CHATHAPPEN = true;
+		
 		}
 		
-	//	Sleep(50);
+	
 	}
 
 }
