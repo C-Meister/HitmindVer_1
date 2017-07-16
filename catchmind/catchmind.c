@@ -2661,7 +2661,7 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 	}
 }
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts, char* inputText, float strong, int r, int g, int b) {
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts, wchar_t* inputText, float strong, int r, int g, int b) {
 	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// 색깔설정
 	RenderTexture(Renderer, TraTexture, &Track);// 렌더러에 저장하기
 	RenderTexture(Renderer, BoxTexture, &Box);// 렌더러에 저장하기
@@ -2687,7 +2687,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	if (clicks.eraser == true || clicks.pencil == true)
 		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
 
-	if (strcmp(inputText, "") != 0) {
+	if (wcscmp(inputText, L"") != 0) {
 		RenderTexture(Renderer, InpTexture, &InputT);// 렌더러에 저장하기
 
 		TTF_DrawText(Renderer, Fonts, inputText, 10, 672);
@@ -2703,11 +2703,9 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, &New);
 
 }
-void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x, int y) {
-	unsigned short unicode[128];// 유니코드 배열을 만든다
-	han2unicode(sentence, unicode);// 문장을 유니코드로 바꿔서 유니코드 배열에 넣는다
+void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int x, int y) {
 	SDL_Color Color = { 0,0,0 };
-	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, unicode, Color);// 폰트의 종류,문자열, 색깔을 보내서 유니코드로 렌더한다음 서피스에 저장한다
+	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, sentence, Color);// 폰트의 종류,문자열, 색깔을 보내서 유니코드로 렌더한다음 서피스에 저장한다
 	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// 서피스로부터 텍스쳐를 생성한다
 	SDL_FreeSurface(Surface);//서피스 메모리를 해제 해준다.
 	SDL_Rect Src;
@@ -2721,6 +2719,26 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x,
 	Dst.h = Src.h;
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst); //그대로 렌더러에 저장한다
 	return;
+}
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	int i, sum;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i, sum;
+	for (i = 0; i < len; i += 3) {
+		str[i] = (unicode[i / 3] - 41088) / (64 * 64) - 22;
+		str[i + 1] = (unicode[i / 3] - 41088) / 64 - 128;
+		str[i + 2] = (unicode[i / 3] - 41088) - str[i] - str[i + 1];
+	}
+	strcat(str, "\0");
+	return str;
 }
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 
@@ -2984,9 +3002,9 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
 	RenderTexture(Renderer3, UseTexture, &UserT);
 	SDL_StartTextInput();
-	char inputText[128] = "";
+	wchar_t inputText[128] = L"";
 	char topic[30];
-
+	bool hangeul = false;
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 
 	//	CLS;
@@ -3009,34 +3027,39 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
 			case SDL_TEXTINPUT:
-				if (event.text.windowID == SDL_GetWindowID(Window)) {
-					if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {// c나 v를 눌렀었는데 컨트롤 모드가 아닌경우 즉 대부분의 자판입력의 경우
-						strcat(inputText, event.text.text);// 이어 붙임 
-						happen = true;
-					}
+				if (hangeul == true && event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237)// c나 v를 눌렀었는데 컨트롤 모드가 아닌경우 즉 대부분의 자판입력의 경우
+				{
+					wchar_t wstr[2] = L"";
+					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
+					wstr[0] = sum;
+					wcscat(inputText, wstr);
 				}
+				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
+					wchar_t wstr[2] = L"";
+					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);
+					wcscat(inputText, wstr);
+				}
+				happen = true;
 				break;
 			case SDL_KEYDOWN:
-				//Handle backspace
-				if (event.text.windowID == SDL_GetWindowID(Window)) {
-					if (event.key.keysym.sym == SDLK_RETURN) {
-						sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, inputText);
-						mysql_query(cons, query);
-						strcpy(inputText, "");
-						happen = true;
-					}
-					else if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(inputText) > 0) {// 키보드 백스페이스고 배열의 길이가 1이상일때
-						inputText[strlen(inputText) - 1] = '\0';// 마지막문자를 널문자로 바꿈
-						happen = true;
-					}
-					else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 c를 눌렀다면
-						SDL_SetClipboardText(inputText);// 클립보드에 넣음
-					else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL) {// 컨트롤 모드이고 v를 눌렀다면
-						strcpy(inputText, SDL_GetClipboardText());// 클립보드에서 가져옴
-						happen = true;
-					}
-
+				if (event.key.keysym.sym == SDLK_RETURN) {
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, inputText);
+					mysql_query(cons, query);
+					wcscpy(inputText, L"");
+					happen = true;
 				}
+				else if (event.key.keysym.sym == SDLK_RALT)
+					hangeul = !(hangeul);
+				else if (event.key.keysym.sym == SDLK_BACKSPACE && wcslen(inputText) > 0)// 키보드 백스페이스고 배열의 길이가 1이상일때
+				{
+					inputText[wcslen(inputText) - 1] = '\0';// 마지막문자를 널문자로 바꿈
+					happen = true;
+				}
+				else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 c를 눌렀다면
+					SDL_SetClipboardText(UNICODE2UTF8(inputText, wcslen(inputText)));// 클립보드에 넣음
+				else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 v를 눌렀다면
+					wcscpy(inputText, UTF82UNICODE(SDL_GetClipboardText(), strlen(SDL_GetClipboardText())));// 클립보드에서 가져옴
+				happen = true;
 				break;
 			case SDL_WINDOWEVENT://SDL종료 타입일 경우
 				switch (event.window.event) {
