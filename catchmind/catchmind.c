@@ -193,6 +193,7 @@ void jointema(void);							//회원가입 디자인
 LOG login(int m);								//기본적인 로그인 입력
 void zeroprint(int xx, int yy, int lr, int m);  //디자인
 char checkkeyborad(char n, int togl);
+void credit(); //크레딧
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
@@ -319,12 +320,39 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 			inserttopic();
 			continue;
 		}
+		if (mainchoose == 3)
+		{
+			credit();
+		}
 	}return 0;
 }
 
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 
+void credit() {
+	//학교이름
+	//제작자
+	//개발기간
+	//히트마인드 with c
+
+	gotoxy(50, 2);
+	printf("히트마인드 with c project");
+
+	gotoxy(50, 4);
+	printf("개발기간 : 10일");
+
+	gotoxy(50, 6);
+	printf("사용기술 : c언어, SDL, 소켓, mysql");
+
+	gotoxy(50, 8);
+	printf("소속학교 : 대구소프트웨어고등학교");
+	
+	gotoxy(50, 10);
+	printf("제작자 : 서상희, 장민석, 배수한, 신상호");
+
+	_getch();
+}
 void inserttopic(void)
 {
 	char topic[50];
@@ -1637,7 +1665,7 @@ void mainatitleimage(void) {
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■"); gotoxy(12, 21);
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 22);
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 23);
-	printf("■  게임 시작   ■                      ■   주제 추가  ■                      ■              ■"); gotoxy(12, 24);
+	printf("■  게임 시작   ■                      ■  주제 추가   ■                      ■    크레딧    ■"); gotoxy(12, 24);
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 25);
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
@@ -1672,13 +1700,24 @@ int maintitle(void) { //게임 메인타이틀 출력
 		{
 			return 2;
 		}
-		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 1)
-			return 1;
+		else if (47 <= xx && xx <= 53 && 21 <= yy && yy <= 25 && lr == 0)
+		{
+			gotoxy(98, 23);
+			HIGH_GREEN printf("크레딧");
+		}
+		else if (47 <= xx && xx <= 53 && 21 <= yy && yy <= 25 && lr == 1)
+		{
+			return 3;
+		}
 		else {
+			WHITE 
 			gotoxy(16, 23);
-			WHITE printf("게임 시작");
+		    printf("게임 시작");
 			gotoxy(56, 23);
-			WHITE printf("주제 추가");
+			printf("주제 추가");
+			gotoxy(98, 23);
+			printf("크레딧");
+
 		}
 
 
