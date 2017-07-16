@@ -417,7 +417,7 @@ void inserttopic(void)
 }
 void sqlmakeroom(void) {
 	while (1) {
-		CLS;
+		ConsoleL(28, 11);
 		int count = 0;
 		int i = 0;
 		int c = 0;
@@ -2070,7 +2070,7 @@ int chooseroom(int roomnum) {
 	if (connectroom[roomnum].ip[0] == 0)
 		return -1;
 
-	CLS;
+	ConsoleL(28, 11);
 	WHITE
 		printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 	printf("¡á                                              ¡á\n");
