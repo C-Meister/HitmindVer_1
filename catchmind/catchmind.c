@@ -341,6 +341,8 @@ void credit() {
 	//개발기간
 	//히트마인드 with c
 
+	(GetAsyncKeyState(VK_LBUTTON) & 0x0001);
+
 	gotoxy(50, 2);
 	printf("히트마인드 with c project");
 
@@ -371,7 +373,12 @@ void credit() {
 	gotoxy(49, 26);
 	printf("Copyright(c)2017 by 신상호,배수한,장민석,서상희");
 
-	_getch();
+	while (1) {
+		if (kbhit())
+			break;
+		else if (GetAsyncKeyState(VK_LBUTTON) & 0x0001)
+			break;
+	}
 }
 void inserttopic(void)
 {
