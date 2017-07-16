@@ -2800,10 +2800,10 @@ wchar_t* UTF82UNICODE(char* UTF8, int len) {
 char* UNICODE2UTF8(wchar_t* unicode, int len) {
 	char str[128] = "";
 	int i, sum;
-	for (i = 0; i < len; i += 3) {
-		str[i] = (unicode[i / 3] - 41088) / (64 * 64) - 22;
-		str[i + 1] = (unicode[i / 3] - 41088) / 64 - 128;
-		str[i + 2] = (unicode[i / 3] - 41088) - str[i] - str[i + 1];
+	for (i = 0; i < 3 * len; i += 3) {
+		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
+		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
+		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
 	}
 	strcat(str, "\0");
 	return str;
