@@ -130,10 +130,11 @@ bool lead = false;
 char SOCKETCOUNT = 0;
 char clientcatchmind[50];
 char topics[4][30];
+char myownnumber;
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
-short Userping[4];
+short Userping[4] = { -1, -1, -1, -1 };
 int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
@@ -230,6 +231,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
 	char serverreturn = 0;					//Connect_Server가 반환한 값을 저장하는곳
+	mysql_options(cons, MYSQL_OPT_CONNECT_TIMEOUT, 6);
 	loadmysql(mysqlip);
 	memset(&wsaData, 0, sizeof(wsaData));
 	memset(&connect_sock, 0, sizeof(connect_sock));
@@ -332,7 +334,6 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		}
 	}return 0;
 }
-
 
 //함수 내용들		전부 최소화 Ctrl + M + O  전부 보이기 Ctrl + M + L
 void credit() {
@@ -1345,7 +1346,7 @@ void loadmysql(char mysqlip[])	//MYSQL 서버 불러오기
 	{
 		printf("\b실패... \n서버가 존재하지 않습니다.\n");
 		fprintf(stderr, "%s\n", mysql_error(cons));
-		printf("새로운 ip를 설정해 주세요.\n->");
+		printf("새로운 ip를 설정해 주세요.\n윈도우 10이 안되면 윈도우7 ip는 10.80.162.92입니다.\n->");
 		scanf("%s", mysqlip);
 		loadmysql(mysqlip);					//재귀함수 호출
 	}
@@ -1535,9 +1536,9 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				SDLCLOCK++;
 				continue;
 			}
-			else if (strncmp("first ping", message, 10) == 0)
+			else if (strncmp("first ", message, 6) == 0)
 			{
-				sscanf(message, "first ping %ld", &Ping);
+				sscanf(message, "first %hhd ping %ld", &myownnumber, &Ping);
 				ZeroMemory(message, sizeof(message));
 
 			}
@@ -2109,94 +2110,6 @@ void sendall(char *message, int c) {
 
 
 }
-void Clnt_1(int v)
-{
-	int i;
-	for (i = 0; i < 4; i++)
-	{
-		if (i == v)
-			continue;
-		if (Sconnect_sock[i] != 0)
-			send(Sconnect_sock[v], querys[i], 45, 0);
-	}
-	/*if (Sconnect_sock[1] != 0)
-		send(Sconnect_sock[v], querys[1], 40, 0);
-	if (Sconnect_sock[2] != 0)
-		send(Sconnect_sock[v], querys[2], 40, 0);
-	if (Sconnect_sock[3] != 0)
-		send(Sconnect_sock[v], querys[3], 40, 0);
-	if (Sconnect_sock[0] != 0)
-		send(Sconnect_sock[v], querys[0], 40, 0);*/
-
-	char message[100];
-	while (1) {
-		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
-			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
-			{
-				sendall(message, v);
-			}
-			else if (strncmp("first ping", message, 10) == 0)
-			{
-				send(Sconnect_sock[v], message, 45, 0);
-				ZeroMemory(message, sizeof(message));
-			}
-			else if (strncmp("user   ping", message, 10) == 0)
-			{
-				message[5] = v + '0' + 1;
-				sendall(message, 5);
-			}
-			else if (strncmp(message, "player   connect", 16) == 0) {
-				message[7] = v + '0' + 1;
-				strcpy(querys[v], message);
-				sendall(message, 5);
-
-			}
-			else if (strcmp(message, "player ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d ready %s", v + 1, friendname[v]);
-				strcpy(querys[v], message);
-				sendall(message, 5);
-			}
-			else if (strcmp(message, "player not ready") == 0) {
-				ZeroMemory(message, sizeof(message));
-				sprintf(message, "player %d not ready %s", v + 1, friendname[v]);
-				strcpy(querys[v], message);
-				sendall(message, 5);
-			}
-			else if (strcmp(message, "exit") == 0)
-			{
-				ZeroMemory(message, sizeof(message));
-				if (v == 0)
-					sendall("server close", 5);
-				else {
-					sprintf(message, "player %d exit", v + 1);
-					closesocket(Sconnect_sock[v]);
-					SOCKETCOUNT = v;
-					Sconnect_sock[v] = 0;
-					strcpy(querys[v], message);
-				}
-				sendall(message, 5);
-			}
-			else if (strcmp(message, "game start") == 0)
-			{
-				cur(0, 0);
-				printf("%s", message);
-				sendall(message, 5);
-			}
-			else if (strncmp(message, "topic", 5) == 0)
-			{
-				message[6] = v + '0' + 1;
-				sendall(message, 5);
-			}
-			else
-			{
-				sendall(message, v);
-			}
-			ZeroMemory(message, sizeof(message));
-		}
-		//	Sleep(100);
-	}
-}
 void makeroom(int *count) {
 	int i = 0;
 	char message[100];
@@ -2308,6 +2221,95 @@ void exitsignal(void)
 	mysql_close(cons);
 
 }
+void Clnt_1(int v)
+{
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		if (i == v)
+			continue;
+		if (Sconnect_sock[i] != 0)
+			send(Sconnect_sock[v], querys[i], 45, 0);
+	}
+	/*if (Sconnect_sock[1] != 0)
+		send(Sconnect_sock[v], querys[1], 40, 0);
+	if (Sconnect_sock[2] != 0)
+		send(Sconnect_sock[v], querys[2], 40, 0);
+	if (Sconnect_sock[3] != 0)
+		send(Sconnect_sock[v], querys[3], 40, 0);
+	if (Sconnect_sock[0] != 0)
+		send(Sconnect_sock[v], querys[0], 40, 0);*/
+
+	char message[100];
+	while (1) {
+		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
+			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
+			{
+				sendall(message, v);
+			}
+			else if (strncmp("first   ping", message, 12) == 0)
+			{
+				message[6] = v + '0' + 1;
+				send(Sconnect_sock[v], message, 45, 0);
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strncmp("user   ping", message, 10) == 0)
+			{
+				message[5] = v + '0' + 1;
+				sendall(message, 5);
+			}
+			else if (strncmp(message, "player   connect", 16) == 0) {
+				message[7] = v + '0' + 1;
+				strcpy(querys[v], message);
+				sendall(message, 5);
+
+			}
+			else if (strcmp(message, "player ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player %d ready %s", v + 1, friendname[v]);
+				strcpy(querys[v], message);
+				sendall(message, 5);
+			}
+			else if (strcmp(message, "player not ready") == 0) {
+				ZeroMemory(message, sizeof(message));
+				sprintf(message, "player %d not ready %s", v + 1, friendname[v]);
+				strcpy(querys[v], message);
+				sendall(message, 5);
+			}
+			else if (strcmp(message, "exit") == 0)
+			{
+				ZeroMemory(message, sizeof(message));
+				if (v == 0)
+					sendall("server close", 5);
+				else {
+					sprintf(message, "player %d exit", v + 1);
+					closesocket(Sconnect_sock[v]);
+					SOCKETCOUNT = v;
+					Sconnect_sock[v] = 0;
+					strcpy(querys[v], message);
+				}
+				sendall(message, 5);
+			}
+			else if (strcmp(message, "game start") == 0)
+			{
+				cur(0, 0);
+				printf("%s", message);
+				sendall(message, 5);
+			}
+			else if (strncmp(message, "topic", 5) == 0)
+			{
+				message[6] = v + '0' + 1;
+				sendall(message, 5);
+			}
+			else
+			{
+				sendall(message, v);
+			}
+			ZeroMemory(message, sizeof(message));
+		}
+		//	Sleep(100);
+	}
+}
 void gotoxy(short x, short y)
 {
 	COORD pos = { x, y };
@@ -2320,6 +2322,7 @@ void cur(short x, short y)
 }
 void CheckPing(void)
 {
+	Sleep(500);
 	int i;
 	for (i = 0; i < 4; i++)
 	{
@@ -2329,16 +2332,16 @@ void CheckPing(void)
 	long now;
 	printf("통신을 확인 중입니다.\n");
 	char query[100];
-	sprintf(query, "first ping %ld", clock());
+	sprintf(query, "first   ping %ld", clock() + 1);
 	send(connect_sock, query, 45, 0);
 	//printf("%s\n", query);
-	printf("Ping Check....");
+	printf("핑 체크중....");
 	while (Ping == 0)
 	{
 
 	}
 	now = clock() - Ping + 1;
-	printf("OK. My Ping is %ldms\n", now - 1);
+	printf("성공. 내 핑은 %ldms입니다\n내 고유 번호 = %d", now, myownnumber);
 	Sleep(100);
 	sprintf(query, "user   ping %ld", now);
 	send(connect_sock, query, 45, 0);
@@ -2350,18 +2353,32 @@ void CheckPing(void)
 		if (status[i] == 0)
 		{
 			GRAY
-				printf("Disconnect");
+				printf("연결 안됨.");
 		}
 		else
 		{
-			while (Userping[i] == 0)
+			now = clock();
+			while (Userping[i] == -1)
 			{
+				if (clock() - now > 1000)
+					break;
 			}
-			HIGH_GREEN
-				printf("ping : %hd", Userping[i] - 1);
+			if (Userping[i] == -1)
+			{
+				RED
+					printf("오류.");
+			}
+			else {
+				HIGH_GREEN
+					printf("핑 : %hd", Userping[i]);
+			}
 		}
 	}
+	
 	WHITE
+	printf("\n엔터를 누르면 시작합니다");
+	getchar();
+	
 
 }
 void SDL_ErrorLog(const char * msg) {//에러코드 출력 함수
@@ -2705,7 +2722,6 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, char* sentence, int x,
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst); //그대로 렌더러에 저장한다
 	return;
 }
-
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 
 	SDL_Window * Window = nullptr;//SDL 윈도우 선언
@@ -3309,9 +3325,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer3);
 
-
-
-
 		if (happen == true) {
 			RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
 			TTF_DrawText(Renderer, topicFont, topic, 100, 90);
@@ -3325,7 +3338,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
 					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
-
+					sprintf(query, "%d", score[i][1]);
+					TTF_DrawText(Renderer3, topicFont, query, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 				}
 			}
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
