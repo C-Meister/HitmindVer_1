@@ -2562,9 +2562,9 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
 
 	if (strcmp(inputText,"")!=0)
-		TTF_DrawText(Renderer, Fonts, inputText, 0, 650);
+		TTF_DrawText(Renderer, Fonts, inputText, 0, 0);
 	else
-		TTF_DrawText(Renderer, Fonts, " ", 0, 650);
+		TTF_DrawText(Renderer, Fonts, " ", 0, 0);
 	SDL_RenderPresent(Renderer);// ·»´õ·¯ Ãâ·Â
 	SDL_RenderPresent(Renderer2);
 	SDL_RenderPresent(Renderer3);
