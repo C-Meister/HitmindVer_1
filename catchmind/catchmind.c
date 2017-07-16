@@ -1266,38 +1266,38 @@ void writechating(void)
 void readchating(void) {
 	//Sleep(1000);
 	int v = 0;
-	int timer = 0;
-	int status = 0;
 	MYSQL_RES *sql_result;
 	MYSQL_ROW sql_row;
-	char row[50];
+	int last2 = 0;
+	int last = 0;
+//	CHATHAPPEN = true;
 	while (1) {
-	//	ZeroMemory(chatquery, sizeof(chatquery));
-	
-		if (CHATHAPPEN == false) {
-			mysql_query(cons, "select * from catchmind.chating order by id desc limit 1");
-			sql_result = mysql_store_result(cons);
-			v = 9;
-			sql_row = mysql_fetch_row(sql_result);
-			if (timer < atoi(sql_row[0])) {
-				
-				timer = atoi(sql_row[0]);
-				mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+			if (CHATHAPPEN == false) {
+	//			ZeroMemory(chatquery, sizeof(chatquery));
+				mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
 				sql_result = mysql_store_result(cons);
-				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+				sql_row = mysql_fetch_row(sql_result);
+				last2 = atoi(sql_row[0]);
+				cur(10, 10);
+				
+				if (last <= last2)
 				{
-					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
-					v--;
-					strcpy(row, sql_row[0]);
+					printf("%d : true", last2);
+					mysql_query(cons, "select * from catchmind.chating order by id desc limit 10");
+					sql_result = mysql_store_result(cons);
+					v = 9;
+					while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
+					{
+						sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
+						v--;
+					}
+					CHATHAPPEN = true;
+					last = last2;
 				}
-				CHATHAPPEN = true;
 			}
-		
-		}
-		
-	
-	}
 
+		}
+	
 }
 void loadmysql(char mysqlip[])	//MYSQL 서버 불러오기
 {
@@ -2298,7 +2298,7 @@ void CheckPing(void)
 		
 	}
 	now = clock() - Ping + 1;
-	printf("OK. My Ping is %ldms\n", now);
+	printf("OK. My Ping is %ldms\n", now -1);
 	Sleep(100);
 	sprintf(query, "user   ping %ld", now);
 	send(connect_sock, query, 45, 0);
@@ -2944,8 +2944,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								cur(0, 6);
-								printf("query : %s", query);
 								send(connect_sock, query, 45, 0);
 							}
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
@@ -3184,17 +3182,26 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			happen = true;
 			on.new = false;
 		}
-		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
-		SDL_RenderFillRect(Renderer, &Happen);
+		
 		if (CHATHAPPEN == true) {
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+			SDL_RenderFillRect(Renderer, &Happen);
+			for (l = 0; l < 10; l++) {
+				if (chatquery[(int)l][0] != 0)
+					TTF_DrawText(Renderer, Font,chatquery[(int)l], 0, 300 + 30 * l);		//최근 10개의 채팅을 불러옴
+			}
 			happen = true;
-			CHATHAPPEN = false;
 		}
 		if (happen == true) {
-			TTF_DrawText(Renderer, topicFont, topic, 0, 100);
-			for (int k = 0; k < 10; k++) {
-				TTF_DrawText(Renderer, Font, chatquery[k], 0, 300 + 30*k);		//최근 10개의 채팅을 불러옴
+			if (CHATHAPPEN != true) {
+				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+				SDL_RenderFillRect(Renderer, &Happen);
 			}
+			else
+				CHATHAPPEN = false;
+
+			TTF_DrawText(Renderer, topicFont, topic, 0, 100);
+			
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, Track, Box, Eraser, Pencil, New, &Fonts, Font, inputText, strong, r, g, b);
 			happen = false;
 		}
