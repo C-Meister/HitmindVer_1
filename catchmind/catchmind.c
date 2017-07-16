@@ -120,6 +120,7 @@ ROOM connectroom[6];
 uintptr_t threads[10] = { 0, };
 char signalmode;
 char querys[10][100];
+long Ping = 0;
 bool lead = false;
 char SOCKETCOUNT = 0;
 char clientcatchmind[50];
@@ -127,6 +128,7 @@ char topics[4][30];
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
+short Userping[4];
 int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
@@ -152,6 +154,7 @@ void Clnt_1(int v);								//¼­¹ö - Å¬¶óÀÌ¾ðÆ® 1Åë½Å
 void makeroom(int *count);							//¹æ¸¸µé±â(³×Æ®¿öÅ©)
 IN_ADDR GetDefaultMyIP(void);					//³» ip ¾ò±â
 bool exitallthread(void);
+void CheckPing(void);
 
 //--------------------- MySQL ÇÔ¼öµé --------------------------------------
 int sqllogin(void);						//mysql¿¡ ÀúÀåµÈ µ¥ÀÌÅÍ¸¦ ºñ±³ÇØ ·Î±×ÀÎÀ» ÇÏ´Â ÇÔ¼ö
@@ -642,6 +645,7 @@ int waitroom(void)
 				cur(0, 1);
 				printf("%dÃÊÈÄ ½ÃÀÛ", 3 - i);
 			}
+			CheckPing();
 			_beginthreadex(0, 0, (_beginthreadex_proc_type)readchating, 0, 0, 0);
 			SDL_MAINS();
 			return 1;
@@ -1369,7 +1373,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				SDLCLOCK++;
 				continue;
 			}
-			if (strncmp("player 1 connect", message, 15) == 0) {
+			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
 				ZeroMemory(message, sizeof(message));
@@ -1459,6 +1463,32 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				SDL_Clear = true;
 				SDLCLOCK++;
 				continue;
+			}
+			else if (strncmp("first ping", message, 10) == 0)
+			{
+				sscanf(message, "first ping %ld", &Ping);
+				ZeroMemory(message, sizeof(message));
+
+			}
+			else if (strncmp("user 1 ping", message, 10) == 0)
+			{
+				sscanf(message, "user 1 ping %hd", &Userping[0]);
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strncmp("user 2 ping", message, 10) == 0)
+			{
+				sscanf(message, "user 2 ping %hd", &Userping[1]);
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strncmp("user 3 ping", message, 10) == 0)
+			{
+				sscanf(message, "user 3 ping %hd", &Userping[2]);
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strncmp("user 4 ping", message, 10) == 0)
+			{
+				sscanf(message, "user 4 ping %hd", &Userping[3]);
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp(message, "topic 1", 7) == 0)
 			{
@@ -2012,6 +2042,16 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 			}
+			else if (strncmp("first ping", message, 10) == 0)
+			{
+				send(Sconnect_sock[v], message, 45, 0);
+				ZeroMemory(message, sizeof(message));
+			}
+			else if (strncmp("user   ping", message, 10) == 0)
+			{
+				message[5] = v + '0' + 1;
+				sendall(message, 5);
+			}
 			else if (strncmp(message, "player   connect", 16) == 0) {
 				message[7] = v + '0' + 1;
 				strcpy(querys[v], message);
@@ -2185,7 +2225,52 @@ void cur(short x, short y)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
-
+void CheckPing(void)
+{
+	int i;
+	for (i = 0; i < 4; i++)
+	{
+		Userping[i] = 0;
+	}
+	CLS;
+	long now;
+	printf("Åë½ÅÀ» È®ÀÎ ÁßÀÔ´Ï´Ù.\n");
+	char query[100];
+	sprintf(query, "first ping %ld", clock());
+	send(connect_sock, query, 45, 0);
+	//printf("%s\n", query);
+	printf("Ping Check....");
+	while (Ping == 0)
+	{
+		
+	}
+	now = clock() - Ping + 1;
+	printf("OK. My Ping is %ldms\n", now);
+	Sleep(100);
+	sprintf(query, "user   ping %ld", now);
+	send(connect_sock, query, 45, 0);
+	for (i = 0; i < 4; i++)
+	{
+		WHITE
+		cur(0, 4 + i);
+		printf("%s : ", friendname[i]);
+		if (status[i] == 0)
+		{
+			GRAY
+				printf("Disconnect");
+		}
+		else
+		{
+			while (Userping[i] == 0)
+			{
+			}
+			HIGH_GREEN
+				printf("ping : %hd", Userping[i]);
+		}
+	}
+	WHITE
+	Sleep(1000);
+}
 void SDL_ErrorLog(const char * msg) {//¿¡·¯ÄÚµå Ãâ·Â ÇÔ¼ö
 	printf("%s Error: %s\n", msg, SDL_GetError());
 	return;
@@ -2804,6 +2889,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
 						if (length == 0) break;
 						if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
+						
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								cur(0, 6);
@@ -2815,6 +2901,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							k = 0;// while¹®¾È¿¡ ¾µ º¯¼ö ÃÊ±âÈ­.
 							xpos = Rect.x + Rect.w / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ xÁÂÇ¥¸¦ µû·Î ÀúÀå
 							ypos = Rect.y + Rect.h / 2 - strong / 2;// Àü¿¡ÂïÀºÁ¡ yÁÂÇ¥¸¦ µû·Î ÀúÀå
+							
 							Rect.w = Rect.h = strong;// ±½±â¼³Á¤
 							SDL_SetRenderDrawColor(Renderer, r, g, b, 0);
 							for (k = 0; k < length; k++) {// µÎ Á¡»çÀÌÀÇ °ø¹éÀ» ÀüºÎ »ç°¢ÇüÀ¸·Î Ã¤¿ì´Â ¹Ýº¹¹®ÀÓ
@@ -2934,12 +3021,14 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
 							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = true;
+
 							clicks.pencil = false;
 							happen = true;
 						}
 						else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 							SDL_RenderClear(Renderer2);
+							sndPlaySoundA("music\\erase.wav", SND_ASYNC);
 							Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
 							Fonts.h += 2;
 							newclick = 1;
@@ -2950,6 +3039,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = true;
+							
 							happen = true;
 						}
 
@@ -2959,11 +3049,13 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 							clicks.eraser = false;
 							clicks.pencil = true;
+							sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
 							happen = true;
 						}
 					}
 					else if (event.button.windowID == SDL_GetWindowID(Window2)) {
 						if (clicks.pencil == true) {
+							
 							Rect.x = event.button.x - strong / 2;
 							Rect.y = event.button.y - strong / 2;// ±½±â¸¸Å­ÀÇ »ç°¢ÇüÀ» ¸¸µë
 							Rect.w = Rect.h = strong;// ±½±â ¼³Á¤
