@@ -2695,13 +2695,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 1);
 		return 0;
 	}
-	Font = TTF_OpenFont("NanumGothic.ttf", fontsize);
+	Font = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize);
 	if (Font == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
 		return 0;
 	}
-	topicFont = TTF_OpenFont("NanumGothic.ttf", fontsize2);
+	topicFont = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize2);
 	if (Font == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
