@@ -40,6 +40,7 @@
 //#include "SDL/render/SDL_sysrender.h"
 #include "mysql/mysql.h"
 #include "SDL/SDL_mixer.h"
+#include "SDL/SDL.h"
 #define nullptr 0
 
 // 라이브러리 선언문 라이브러리파일은 따로 추가안해도 됩니다.
@@ -949,6 +950,7 @@ restart:
 		printf("                                       ");
 	}
 	gotoxy(16, 5);
+	
 	buff = 0;
 	while (1) {
 
@@ -965,7 +967,6 @@ restart:
 			user.id[i] = 0;
 			continue;
 		}
-
 		if (GetAsyncKeyState(VK_SHIFT) & 0x8000) {
 			if (togl == -1 && 'a' <= user.id[i] && 'z' >= user.id[i])
 				user.id[i] -= 32;
@@ -1604,7 +1605,7 @@ int sqllogin(void) {
 			else if (check == -2)
 				printf("             (닉네임이 중복됩니다)              ");
 			else
-				printf("		     (중복 값이 있습니다)           ");
+				printf("	      (중복 값이 있습니다)           ");
 		}
 		else {
 			sprintf(query, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
@@ -1654,15 +1655,16 @@ int sqlsignup(void) {
 
 	if (user.name[0] == 0)
 		return 0;
-	/*sprintf(query2, "select * from catchmind.login where name = '%s'", user.name);	//이름을 DB에서 찾음
+	/*
+	sprintf(query2, "select * from catchmind.login where name = '%s'", user.name);	//이름을 DB에서 찾음
 	mysql_query(cons, query2);
 	sql_result = mysql_store_result(cons);
 	if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 	{
 		if (sql_row[0][1] != 0)
 			return -2;
-	}
-	*/
+	}*/
+	ZeroMemory(query2, sizeof(query2));
 	sprintf(query2, "select * from catchmind.login where id = '%s'", user.id);	//id를 DB에서 찾음
 	mysql_query(cons, query2);
 	sql_result = mysql_store_result(cons);
