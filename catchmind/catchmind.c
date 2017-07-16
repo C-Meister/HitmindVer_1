@@ -241,21 +241,20 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	// 초기화 끝
 	signalall();
 
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
 	{
 		printf("초기화 실패");
 		Sleep(5000);
 	}
 	
 	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
-	Mix_VolumeMusic(70);
 	music = Mix_LoadMUS(query);
 	if (!music) {
 		printf("Mix_LoadMUS(\"titlemusic.mp3\"): %s\n", Mix_GetError());
 		Sleep(5000);
 		// this might be a critical error...
 	}
-	mainmusic = Mix_LoadMUS("music\\main.mp3");
+	mainmusic = Mix_LoadMUS("music\\main2.mp3");
 	if (!music) {
 		printf("Mix_LoadMUS(\"main.mp3\"): %s\n", Mix_GetError());
 		Sleep(5000);
@@ -3077,7 +3076,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	bool happen = true;
 	
 	bool writemode = false;
-	if (myownnumber - 1 == turn)
+	if (myownnumber== turn)
 	{
 		writemode = true;
 	}
@@ -3475,7 +3474,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					sprintf(query, "%d", score[i][0]);
 					han2unicode(query, unicode);
 					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
-					
+					sprintf(query, "%s 차례입니다", friendname[turn - 1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+
 					sprintf(query, "%d", score[i][1]);
 					han2unicode(query, unicode);
 					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
