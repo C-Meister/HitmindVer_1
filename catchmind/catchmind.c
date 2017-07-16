@@ -2768,7 +2768,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RgbCode.y = 1080 * (1) - RgbCode.h - 10 * (1);
 	// ³¡
 	// Track ÀÌ¹ÌÁö
-	TraTexture = LoadTextureEx(Renderer, "image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	TraTexture = LoadTextureEx(Renderer, ".\\image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (TraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
@@ -2782,7 +2782,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Track.y = RgbCode.y - Track.h - 25 * (1);
 	// ³¡
 	// Box ÀÌ¹ÌÁö
-	BoxTexture = LoadTextureEx(Renderer, "image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	BoxTexture = LoadTextureEx(Renderer, ".\\image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (BoxTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
@@ -2796,7 +2796,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Box.y = Track.y + Track.h / 2 - Box.h / 2;
 	// ³¡
 	// Pencil ÀÌ¹ÌÁö
-	PenTexture = LoadTexture(Renderer, "image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	PenTexture = LoadTexture(Renderer, ".\\image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (PenTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
@@ -2808,7 +2808,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Pencil.y = Track.y - 30 - Pencil.h;
 	// ³¡
 	// Eraser ÀÌ¹ÌÁö
-	EraTexture = LoadTexture(Renderer, "image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	EraTexture = LoadTexture(Renderer, ".\\image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (EraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
@@ -2819,7 +2819,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Eraser.y = Pencil.y;
 	// ³¡
 	// New ÀÌ¹ÌÁö
-	NewTexture = LoadTexture(Renderer, "image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
+	NewTexture = LoadTexture(Renderer, ".\\image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (NewTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
 		return 0;
