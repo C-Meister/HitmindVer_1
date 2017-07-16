@@ -1075,8 +1075,9 @@ restart:
 			else if (!((user.id[i] >= '0' && user.id[i] <= '9') || (user.id[i] >= 'a' && user.id[i] <= 'z') || (user.id[i] >= 'A' && user.id[i] <= 'Z'))) {
 				user.id[i] = 0;
 			}
-			else
+			else {
 				putchar(user.id[i++]);
+			}
 		}
 		else {
 			GetCursorPos(&a);
