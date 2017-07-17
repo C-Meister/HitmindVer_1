@@ -12,6 +12,9 @@ Global
 		Debug|Default = Debug|Default
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Default = Release|Default
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|Default.ActiveCfg = Debug|Win32
@@ -20,11 +23,24 @@ Global
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.ActiveCfg = Debug|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.Build.0 = Debug|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.Deploy.0 = Debug|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|Default.ActiveCfg = Release|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.ActiveCfg = Release|x64
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.Build.0 = Release|x64
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.Deploy.0 = Release|x64
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.ActiveCfg = Release|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.Build.0 = Release|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.Deploy.0 = Release|Win32
 		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|Default.ActiveCfg = Debug
 		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|Default.Build.0 = Debug
 		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x64.ActiveCfg = Debug
 		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x86.ActiveCfg = Debug
 		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x86.Build.0 = Debug
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|Default.ActiveCfg = Release
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|Default.Build.0 = Release
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|x64.ActiveCfg = Release
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|x64.Build.0 = Release
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|x86.ActiveCfg = Release
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Release|x86.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +54,11 @@ Global
 		SccAuxPath0 = https://tbvajos510.visualstudio.com
 		SccLocalPath0 = .
 		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Default = Debug|Default
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Default = Debug|Default
