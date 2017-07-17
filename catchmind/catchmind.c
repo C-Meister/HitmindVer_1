@@ -3399,10 +3399,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					while (1)
 					{
 						turn++;
-						if (status[turn - 1] != 0)
+						if (status[turn] != 0)
 							break;
 						else if (turn == 5)
-							break;
+							turn = 1;
 					}
 					sprintf(query, "time out %d", turn);
 					send(connect_sock, query, 45, 0);
