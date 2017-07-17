@@ -308,7 +308,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		mainchoose = maintitle();				//main 화면
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
-			ConsoleL(25, 14);
+			ConsoleL(25, 15);
 			if (sqllogin() != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 
@@ -1051,7 +1051,7 @@ restart:
 	/*닉네임 생성*/
 	disablecursor(0);
 	if (m == 2) {
-		ConsoleL(30, 30);
+		ConsoleL(25, 15);
 		jointema();
 		gotoxy(9, 13);
 		printf("닉네임 적을때는 마우스 사용 불가능");
