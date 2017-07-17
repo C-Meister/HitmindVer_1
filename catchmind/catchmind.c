@@ -1662,7 +1662,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				score[0][1] += 1;
 				turn = 1;
 				RESET(message);
-				if (myownnumber = 1)
+				if (myownnumber == 1)
 					Gametopic = 0;
 				CurrectHappen = true;
 			}
@@ -1671,7 +1671,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				score[1][1] += 1;
 				turn = 2;
 				RESET(message);
-				if (myownnumber = 2)
+				if (myownnumber == 2)
 					Gametopic = 0;
 				CurrectHappen = true;
 			}
@@ -1680,7 +1680,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				score[2][1] += 1;
 				turn = 3;
 				RESET(message);
-				if (myownnumber = 3)
+				if (myownnumber == 3)
 					Gametopic = 0;
 				CurrectHappen = true;
 			}
@@ -1689,7 +1689,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				score[3][1] += 1;
 				turn = 4;
 				RESET(message);
-				if (myownnumber = 4)
+				if (myownnumber == 4)
 					Gametopic = 0;
 				CurrectHappen = true;
 			}
