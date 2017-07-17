@@ -801,7 +801,10 @@ int waitroom(void)
 			printf("°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
 			if (lead == true)
 			{
-
+				sprintf(query, "delete from catchmind.chating where room = '%s'", inet_ntoa(GetDefaultMyIP()));
+				mysql_query(cons, query);
+				sprintf(query, "insert into catchmind.chating (name, mean, room) values ('°ü¸®ÀÚ', '%s¹æ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù', '%s')", connectroom[CHOOSEROOM].roomname, connectroom[CHOOSEROOM].ip);
+				mysql_query(cons, query);
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
 				mysql_query(cons, query);
@@ -1407,6 +1410,7 @@ void readchating(void) {
 	MYSQL_ROW sql_row;
 	int last2 = 0;
 	int last = 0;
+	char query[100];
 	//	CHATHAPPEN = true;
 	while (1) {
 		EnterCriticalSection(&cs);
@@ -1414,7 +1418,11 @@ void readchating(void) {
 
 			//	ZeroMemory(sql_result, sizeof(sql_result));
 			ZeroMemory(chatquery, sizeof(chatquery));
-			mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
+			
+			sprintf(query, "select id from catchmind.chating where room = '%s' order by id desc limit 1", connectroom[CHOOSEROOM].ip);
+		//	printf("\n%s", query);
+		//	getchar();
+			mysql_query(cons, query);
 			sql_result = mysql_store_result(cons);
 			if (sql_result != 0) {
 				if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
@@ -1424,8 +1432,10 @@ void readchating(void) {
 			mysql_free_result(sql_result);
 			if (last < last2)
 			{
-				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
+				sprintf(query, "select * from catchmind.chating where room = '%s' order by id desc limit 15", connectroom[CHOOSEROOM].ip);
+				mysql_query(cons, query);
 				sql_result = mysql_store_result(cons);
+				
 				v = 14;
 				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 				{
@@ -2516,6 +2526,8 @@ void exitsignal(void)
 	{
 		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
 		mysql_query(cons, query);
+		sprintf(query, "delete from catchmind.chating where room = '%s'", inet_ntoa(GetDefaultMyIP()));
+		mysql_query(cons, query);
 
 	}
 	mysql_close(cons);
@@ -3366,11 +3378,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 		if (CurrectHappen == true)
 		{
+			SDL_DestroyRenderer(Renderer2);
+			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+			SDL_RenderClear(Renderer2);
 			if (ee != 0) {
 				
 				sprintf(query, "%s ´ÔÀÌ ¸ÂÃß¾ú½À´Ï´Ù! Á¤´äÀº %s ÀÔ´Ï´Ù", friendname[turn - 1], pasttopic);
 				han2unicode(query, unicode);
 				TTF_DrawText(Renderer2, topicFont, unicode, 100, 100);
+				SDL_RenderPresent(Renderer2);
+				SDL_Delay(1000);
 			}
 			ee++;
 				for (int i = 0; i < 4; i++)
@@ -3392,11 +3410,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 					}
 				}
-				SDL_Delay(2000);
-				SDL_DestroyRenderer(Renderer2);
-				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-				SDL_RenderClear(Renderer2);
+			
+				
+			
 				happen = true;
 				CurrectHappen = false;
 			
@@ -3449,7 +3465,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						}
 						else {
 							EnterCriticalSection(&cs);
-							sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, euckr);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '%s', '%s')", username, euckr, connectroom[CHOOSEROOM].ip);
 							mysql_query(cons, query);
 							LeaveCriticalSection(&cs);
 						}
@@ -3477,7 +3493,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					happen = true;
 				break;
 			case SDL_WINDOWEVENT://SDLÁ¾·á Å¸ÀÔÀÏ °æ¿ì
+
 				switch (event.window.event) {
+
 				case SDL_WINDOWEVENT_CLOSE:// ´Ù¼ö Ã¢¿¡¼­ÀÇ ´Ý±âÀÌº¥Æ®°¡ ¹ß»ýÇÒ°æ¿ì
 					send(connect_sock, "exit", 35, 0);
 					quit = true;// quit¸¦ true·Î º¯°æ
