@@ -2803,8 +2803,8 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 	}
 }
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int *r, int *g, int *b) {
-	SDL_SetRenderDrawColor(Renderer2, *r, *g, *b, 0);// 색깔설정
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int r, int g, int b) {
+	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// 색깔설정
 	RenderTexture(Renderer, TraTexture, Track);// 렌더러에 저장하기
 	RenderTexture(Renderer, BoxTexture, Box);// 렌더러에 저장하기
 	RenderTexture(Renderer, EraTexture, Eraser);// 렌더러에 저장하기
@@ -2827,7 +2827,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 		SDL_RenderDrawEdge(Renderer, New, 0);
 	}
 	if (clicks.eraser == true || clicks.pencil == true)
-		SDL_FontUpdate(Renderer, Font, *Track, *strong, *r, *g, *b);
+		SDL_FontUpdate(Renderer, Font, *Track, *strong, r, g, b);
 
 	if (wcscmp(inputText, L"") != 0) {
 		RenderTexture(Renderer, InpTexture, InputT);// 렌더러에 저장하기
@@ -3565,7 +3565,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
 			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
 		
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,&r, &g, &b);
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,r, g, b);
 			happen = false;
 
 		}
