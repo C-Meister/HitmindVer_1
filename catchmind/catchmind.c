@@ -145,6 +145,7 @@ SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 char pasttopic[20];
 bool CHATHAPPEN = false;
+bool ExitHappen = false;
 char chatquery[15][50];
 Mix_Music *music, *mainmusic;
 
@@ -1546,9 +1547,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 				strcpy(clientcatchmind, message);
-				ZeroMemory(message, sizeof(message));
 				SDLCLOCK++;
-				continue;
+				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
@@ -1612,22 +1612,22 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp("player 1 exit", message, 12) == 0) {
 				status[0] = 0;
-				CurrectHappen = true;
+				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 exit", message, 12) == 0) {
 				status[1] = 0;
-				CurrectHappen = true;
+				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 exit", message, 12) == 0) {
 				status[2] = 0;
-				CurrectHappen = true;
+				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
-				CurrectHappen = true;
+				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp("game start", message) == 0) {
@@ -1643,6 +1643,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
+				printf("SDLCLEAR");
 				SDL_Clear = true;
 				SDLCLOCK++;
 				continue;
@@ -3359,6 +3360,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (CurrectHappen == true)
 		{
+			CurrectHappen = false;
 			SDL_DestroyRenderer(Renderer2);
 			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
@@ -3394,7 +3396,33 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				
 			
 				happen = true;
-				CurrectHappen = false;
+				
+			
+		}
+		if (ExitHappen == true)
+		{
+			ExitHappen = false;
+			SDL_RenderClear(Renderer3);
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+				
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
 			
 		}
 		if (myownnumber == turn)
