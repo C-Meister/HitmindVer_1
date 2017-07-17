@@ -1645,7 +1645,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				printf("SDLCLEAR");
 				SDL_Clear = true;
-				SDLCLOCK++;
+				SDLCLOCK+=2;
 				continue;
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
@@ -2540,7 +2540,7 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 				RESET(message);
-				continue;
+			
 			}
 			else if (strcmp("right   answer", message) == 0)
 			{
@@ -2607,7 +2607,7 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 			}
-			ZeroMemory(message, sizeof(message));
+		//	ZeroMemory(message, sizeof(message));
 		}
 
 	}
