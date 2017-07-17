@@ -3323,10 +3323,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (CurrectHappen == true)
 		{
 			if (ee != 0) {
-				SDL_DestroyRenderer(Renderer2);
-				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-				SDL_RenderClear(Renderer2);
+				
 				sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn - 1], pasttopic);
 				han2unicode(query, unicode);
 				TTF_DrawText(Renderer2, topicFont, unicode, 100, 100);
