@@ -3238,11 +3238,11 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					
 					UTF8toEUCKR(euckr, 256,str, 256);
 					euckr[strlen(euckr)]='\0';
-					if (strcmp(euckr, topics[turn]) == 0)
+					if (strcmp(euckr, topics[turn - 1]) == 0)
 					{
 						if (myownnumber != turn)
 							send(connect_sock, "right   answer", 35, 0);
-				
+						
 					}
 					else {
 						EnterCriticalSection(&cs);
@@ -3250,7 +3250,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						mysql_query(cons, query);
 						LeaveCriticalSection(&cs);
 					}
-					
+					RESET(euckr);
 					wcscpy(inputText, L"");
 					happen = true; 
 				}
