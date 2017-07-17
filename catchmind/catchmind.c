@@ -133,6 +133,7 @@ char myownnumber;
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
+bool CurrectHappen = true;
 short Userping[4] = { -1, -1, -1, -1 };
 int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
@@ -752,7 +753,7 @@ int waitroom(void)
 		{
 			status[0] = 2;
 			CLS;
-			turn = 1;
+			turn = 0;
 			printf("°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
 			if (lead == true)
 			{
@@ -2883,8 +2884,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-
+	SDL_Rect Timer = { 600, 600, 0, 0 };
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
+	
 	int chaty = 0;
 	float fontsize = 17.0;
 	float fontsize2 = 35.0;
@@ -3093,7 +3095,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
 	float i = 0, j = 0, k = 0, l = 0, length = 0;// for¹®¿¡¼­ ¾µ º¯¼ö¼±¾ð
-	int past[4][2] = { 0 , };
+	int pastturn = turn;
 	int newclick = 0;
 	float xpos = 0, ypos = 0;// ¸¶¿ì½º xÁÂÇ¥ yÁÂÇ¥¸¦ ÀúÀåÇÏ´Â º¯¼ö¼±¾ð 
 	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// ±½±âÀÇ ¼±¾ð
@@ -3119,7 +3121,44 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool hangeul = false;
 	wchar_t wstr[2];
 	long firstclock = clock();
+	turn++;
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
+	
+		if (pastturn != turn)
+		{
+			han2unicode(topic, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+			pastturn = turn;
+		}
+		if (CurrectHappen == true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
+			CurrectHappen = false;
+		}
 		if (myownnumber == turn)
 		{
 			writemode = true;
@@ -3133,7 +3172,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
 			sprintf(query, "topic   %s", sql_row[0]);
-			mysql_free_result(sql_result);
+//			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
 			happen = true;
@@ -3466,44 +3505,20 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
-					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 10°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 				}
 			}
 			CHATHAPPEN = false;
 			happen = true;
 		}
-		SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);
-		SDL_RenderClear(Renderer3);
-		sprintf(query, "³²Àº½Ã°£ : %ldÃÊ", 30 - (clock() - firstclock) / 1000);
+		
 		han2unicode(query, unicode);
 		TTF_DrawText(Renderer, Font, unicode, 0, 50);
 		if (happen == true) {
-			
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-			han2unicode(topic, unicode);
-			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
-			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
-			for (int i = 0; i < 4; i++)
-			{
-
-				if (status[i] != 0)
-				{
-					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
-					RenderTexture(Renderer3, UseTexture, &UserT);
-					han2unicode(friendname[i], unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
-					sprintf(query, "%d", score[i][0]);
-				
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
-
-					sprintf(query, "%d", score[i][1]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
-				}
-			}
+			
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
 			happen = false;
 
