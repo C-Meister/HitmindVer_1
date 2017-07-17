@@ -2885,7 +2885,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_Rect QuesT = { 0 };//QuesT 이미지의 정보를 담기 위한 사각형 변수 선언
 	SDL_Rect Timer = { 600, 600, 0, 0 };
 							// 텍스쳐와 사각형 선언 끝
-	
+
+	char str[256] = "";//UNICODE2UTF8의 반환값을 복사할 배열선언
 	int chaty = 0;
 	float fontsize = 17.0;
 	float fontsize2 = 35.0;
@@ -3217,8 +3218,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					inputText[wcslen(inputText) - 1] = '\0';// 마지막문자를 널문자로 바꿈
 					happen = true;
 				}
-				else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 c를 눌렀다면
-					SDL_SetClipboardText(UNICODE2UTF8(inputText, wcslen(inputText)));// 클립보드에 넣음
+				else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {// 컨트롤 모드이고 c를 눌렀다면
+					strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
+					SDL_SetClipboardText(str);// 클립보드에 넣음
+				}
 				else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 v를 눌렀다면
 					wcscpy(inputText, UTF82UNICODE(SDL_GetClipboardText(), strlen(SDL_GetClipboardText())));// 클립보드에서 가져옴
 				happen = true;
