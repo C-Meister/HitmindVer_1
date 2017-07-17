@@ -1638,27 +1638,32 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
+			
 				score[0][1] += 1;
 				turn = 1;
 				RESET(message);
+				CurrectHappen = true;
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
 			{
 				score[1][1] += 1;
 				turn = 2;
 				RESET(message);
+				CurrectHappen = true;
 			}
-			else if (strcmp(message, "right 2 answer") == 0)
+			else if (strcmp(message, "right 3 answer") == 0)
 			{
 				score[2][1] += 1;
 				turn = 3;
 				RESET(message);
+				CurrectHappen = true;
 			}
-			else if (strcmp(message, "right 1 answer") == 0)
+			else if (strcmp(message, "right 4 answer") == 0)
 			{
 				score[3][1] += 1;
 				turn = 4;
 				RESET(message);
+				CurrectHappen = true;
 			}
 
 			else if (strncmp("first ", message, 6) == 0)
@@ -2908,7 +2913,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-	SDL_Rect Timer = { 600, 600, 0, 0 };
+	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -3153,7 +3158,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 		if (Gametopic == turn - 1)
 		{
-			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+			
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
@@ -3165,15 +3170,20 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 		if (pastturn != turn)
 		{
-
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
+			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			han2unicode(topic, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
 //			han2unicode(query, unicode);
-//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
+	//		SDL_RenderPresent(Renderer);
+	//		SDL_Delay(3000);
 			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
 			pastturn = turn;
+			happen = true;
 		}
 		if (CurrectHappen == true)
 		{
@@ -3242,7 +3252,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					{
 						if (myownnumber != turn)
 							send(connect_sock, "right   answer", 35, 0);
-						
+							
 					}
 					else {
 						EnterCriticalSection(&cs);
@@ -3562,8 +3572,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	//	han2unicode(query, unicode);
 	//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
 		if (happen == true) {
-			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
-			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
+	//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+	//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 		
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,r, g, b);
 			happen = false;
