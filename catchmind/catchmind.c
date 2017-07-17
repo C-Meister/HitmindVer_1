@@ -225,10 +225,47 @@ HWND GetConsoleHwnd(void);
 
 
 
-
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i = 0, j = 0;
+	for (i = 0; j < len; j++) {
+		if (unicode[j] == 92||unicode[j]==39) {// À¯´ÏÄÚµå 92¹ø(¿ª½½·¡½Ã)³ª 39¹ø(ÀÛÀºµû¿îÇ¥´Â) mysql¿¡¼­ °¢°¢ \\, \'·Î ÀÔ·ÂÇØ¾ßÇÏ¹Ç·Î ¿¹¿Ü Ã³¸®¸¦ ÇØÁØ´Ù
+			str[i] = 92;
+			str[i + 1] = unicode[j];
+			i+=2;
+		}
+		else if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {// ¿Ï¼ºÇü ÇÑ±ÛÀÏ°æ¿ì
+			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
+			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
+			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
+			i += 3;
+		}
+		else if (unicode[j] >= 0x3131 && unicode[j] <= 0x3163) {// ÃÊÁßÁ¾¼ºÀÏ °æ¿ì
+			str[i] = (unicode[j] - 12544) / (64 * 64) - 29;
+			str[i + 1] = (unicode[j] - 12544) % (4096) / 64 - 124;
+			str[i + 2] = (unicode[j] - 12544) % 64 - 128;
+			i += 3;
+		}
+		else {
+			str[i] = unicode[j];
+			i++;
+		}
+	}
+	strcat(str, "\0");
+	return str;
+}
 int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ 
 {
-
 	//SDL_MAIN();
 	//º¯¼ö ¼±¾ð
 	//int i, j, k, v, result;	
@@ -3034,6 +3071,14 @@ int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength)
 
 	return ires;
 }
+int unicodehan(wchar_t unicode[],int len) {
+	int i,cnt=0;
+	for (i = 0; i < len;i++) {
+		if ((unicode[i] >= 0xac00 && unicode[i] <= 0xd7a0) || (unicode[i] >= 0x3131 && unicode[i] <= 0x3163))
+			cnt++;
+	}
+	return cnt;
+}
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
 
 	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
@@ -3083,7 +3128,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	TTF_Font * topicFont;
 	//	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
-	unsigned short unicode[128];
+	unsigned short unicode[128]=L"";
 
 	//
 	getlevel();
@@ -3471,6 +3516,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
 						UTF8toEUCKR(euckr, 256, str, 256);
 						euckr[strlen(euckr)] = '\0';
+						han2unicode(euckr, unicode);
+						if (unicodehan(unicode, wcslen(unicode)) != unicodehan(inputText, wcslen(inputText)))
+							strcpy(euckr, "[Error] invalid conversion");
 						if (strcmp(euckr, topics[turn - 1]) == 0)
 						{
 							if (myownnumber != turn)
@@ -3483,7 +3531,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							mysql_query(cons, query);
 							LeaveCriticalSection(&cs);
 						}
-						wcscpy(inputText, L"");
+						ZeroMemory(unicode, sizeof(unicode));
+						ZeroMemory(str,sizeof(str));
+						ZeroMemory(euckr,sizeof(euckr));
+						ZeroMemory(inputText,sizeof(inputText));
 						enter = false;
 						happen = true;
 					}
@@ -3792,6 +3843,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
 					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					ZeroMemory(unicode, sizeof(unicode));// Ãß°¡
 				}
 			}
 			CHATHAPPEN = false;
