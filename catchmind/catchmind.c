@@ -2630,10 +2630,10 @@ void CheckPing(void)
 			}
 		}
 	}
-
-	printf("엔터를 눌러 시작");
-	getchar();
 	WHITE
+	printf("\n게임시작");
+	Sleep(1000);
+
 
 
 }
@@ -3251,6 +3251,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	char click_eraser, click_pencil;
 	char dragging;
 	MYSQL_ROW sql_row;
+	int ee = 0;
 	char euckr[256];
 	Gametopic = 0;
 	RESET(euckr);
@@ -3311,39 +3312,43 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (CurrectHappen == true)
 		{
-			SDL_DestroyRenderer(Renderer2);
-			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-			SDL_RenderClear(Renderer2);
-			sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn - 1], pasttopic);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
-			for (int i = 0; i < 4; i++)
-			{
-
-				if (status[i] != 0)
+			if (ee != 0) {
+				SDL_DestroyRenderer(Renderer2);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+				SDL_RenderClear(Renderer2);
+				sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn - 1], pasttopic);
+				han2unicode(query, unicode);
+				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
+			}
+			ee++;
+				for (int i = 0; i < 4; i++)
 				{
 
-					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
-					RenderTexture(Renderer3, UseTexture, &UserT);
-					han2unicode(friendname[i], unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
-					sprintf(query, "%d", score[i][0]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+					if (status[i] != 0)
+					{
 
-					sprintf(query, "%d", score[i][1]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+						UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+						RenderTexture(Renderer3, UseTexture, &UserT);
+						han2unicode(friendname[i], unicode);
+						TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+						sprintf(query, "%d", score[i][0]);
+						han2unicode(query, unicode);
+						TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+						sprintf(query, "%d", score[i][1]);
+						han2unicode(query, unicode);
+						TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+					}
 				}
-			}
-			SDL_Delay(2000);
-			SDL_DestroyRenderer(Renderer2);
-			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-			SDL_RenderClear(Renderer2);
-			happen = true;
-			CurrectHappen = false;
+				SDL_Delay(2000);
+				SDL_DestroyRenderer(Renderer2);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+				SDL_RenderClear(Renderer2);
+				happen = true;
+				CurrectHappen = false;
+			
 		}
 		if (myownnumber == turn)
 		{
