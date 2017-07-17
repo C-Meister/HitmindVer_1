@@ -157,7 +157,10 @@ void signalall(void);
 void ConsoleL(int x, int y);					//ÄÜ¼ÖÃ¢ÀÇ Å©±â¸¦ ¼³Á¤ÇÏ´Â ÇÔ¼ö x yÀÇ ³Êºñ°¡ °°À½
 POINT MouseClick(void);							//¸¶¿ì½º¸¦ Å¬¸¯ÇÏ¸é ±× °ªÀ» ¹Ù·Î ¹ÝÈ¯ÇØÁÖ´Â ÇÔ¼ö ¹ÝÈ¯°ªÀº POINTÀÌ´Ù (x, y)
 void disablecursor(bool a);						//Ä¿¼­ º¸ÀÌ±â, ¼û±â±â  0 = º¸ÀÌ±â 1 = ¼û±â±â
+wchar_t* UTF82UNICODE(char* UTF8, int len);
+char* UNICODE2UTF8(wchar_t* unicode, int len);
 void usermain(void);
+
 //--------------------- ³×Æ®¿öÅ© ÇÔ¼öµé -----------------------------------
 void ErrorHandling(char *Message);				//¼ÒÄÏ ¿¡·¯ Ãâ·Â ÇÏ´Â ÇÔ¼ö
 int Connect_Server(char *ServerIP);			//¼­¹ö ¿¬°á ÇØÁÖ´Â ÇÔ¼ö
@@ -187,7 +190,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // ÅØ½ºÃÄ¿¡ ÀÌ¹ÌÁöÆÄÀÏ ·ÎµåÇÏ´Â ÇÔ¼ö ¼±¾ð
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // ÅØ½ºÃÄ¿¡ ÀÌ¹ÌÁöÆÄÀÏ ´Ù¾çÇÏ°Ô ·ÎµåÇÏ´Â ÇÔ¼ö ¼±¾ð
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//ÅØ½ºÃÄ¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö ¼±¾ð
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int *r, int *g, int *b);
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int r, int g, int b);
 void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
@@ -217,27 +220,7 @@ HWND GetConsoleHwnd(void);
 
 
 
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-	//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i;
-	for (i = 0; i < 3 * len; i += 3) {
-		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
-		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
-		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
-	}
-	strcat(str, "\0");
-	return str;
-}
+
 int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ 
 {
 
@@ -2244,6 +2227,27 @@ void jointema(void) {
 	printf("¡á              ¡á              ¡á              ¡á\n");
 	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 }
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i;
+	for (i = 0; i < 3 * len; i += 3) {
+		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
+		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
+		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
+	}
+	strcat(str, "\0");
+	return str;
+}
 void sendall(char *message, int c) {
 	for (int i = 0; i < 4; i++)
 	{
@@ -2924,6 +2928,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
+	SDL_Rect Timer2 = { 0, 100, 1310 / 4 + 10, 200 };
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -3148,6 +3153,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	char dragging;
 	MYSQL_ROW sql_row;
 	char euckr[256];
+	Gametopic = 0;
 	RESET(euckr);
 	int xxx, yyy;
 	float sstrong;
@@ -3167,7 +3173,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	long firstclock = clock();
 	turn++;
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
-		if (Gametopic == turn - 1)
+		/*if ((myownnumber + Gametopic) == turn)
 		{
 			
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
@@ -3176,9 +3182,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			sprintf(query, "topic   %s", sql_row[0]);
 			//			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
-			Gametopic++;
+			myownnumber += 4;
 			happen = true;
-		}
+		}*/
 		if (pastturn != turn)
 		{
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
@@ -3457,17 +3463,22 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								happen = true;
 							}
 							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
+						/*		SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								SDL_RenderClear(Renderer2);*/
+								SDL_DestroyRenderer(Renderer2);
+								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 								SDL_RenderClear(Renderer2);
+								happen = true;
 								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
-								Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
+							/*	Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
 								Fonts.h += 2;
-								newclick = 1;
+								newclick = 1;*/
 								//¿©±â~~~~~~~~~~~~~~~~~~
 								if (connect_sock != 0) {
 									send(connect_sock, "SDLCLEAR", 45, 0);
 								}
-								SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
+							//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 								clicks.eraser = false;
 								clicks.pencil = true;
 
