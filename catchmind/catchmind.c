@@ -197,7 +197,7 @@ int SDL_MAINS(void);
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step);
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int x, int y);
 Uint32 get_pixel32(SDL_Surface *surface, int x, int y);
-void makebmp(const char *filename, SDL_Surface *Surface);
+void makebmp(const char *filename, SDL_Renderer * Renderer2);
 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
@@ -216,41 +216,15 @@ void Auto_Update(void);
 
 //-------------------------콘솔 함수들------------------------------------
 void checkword(char*nowword, char*scanword);	//단어를 확인함
+wchar_t* UTF82UNICODE(char* UTF8, int len);
 int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength);
+char* UNICODE2UTF8(wchar_t* unicode, int len);
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
 HWND GetConsoleHwnd(void);
 
 
 
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-	//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i = 0, j = 0;
-	for (i = 0; j < len; j++) {
-		if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {
-			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
-			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
-			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
-			i += 3;
-		}
-		else {
-			str[i] = unicode[j];
-			i++;
-		}
 
-	}
-	strcat(str, "\0");
-	return str;
-}
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 
@@ -3837,4 +3811,33 @@ void makebmp(const char *filename, SDL_Renderer * Renderer2) {
 	SDL_RenderReadPixels(Renderer2, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
 	SDL_SaveBMP(sshot, filename);
 	SDL_FreeSurface(sshot);
+}
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i = 0, j = 0;
+	for (i = 0; j < len; j++) {
+		if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {
+			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
+			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
+			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
+			i += 3;
+		}
+		else {
+			str[i] = unicode[j];
+			i++;
+		}
+
+	}
+	strcat(str, "\0");
+	return str;
 }
