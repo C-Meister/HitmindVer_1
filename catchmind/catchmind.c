@@ -1954,7 +1954,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 			gotoxy(95, 38);
 			HIGH_GREEN printf("● 간단한 설문조사와 피드백 (클릭)");
 			gotoxy(95, 36);
-			WHITE printf("●게임 최초 실행시 해야할 설정들 (클릭)");
+			WHITE printf("● 게임 최초 실행시 해야할 설정들 (클릭)");
 		}
 		else if (46 <= xx && xx <= 70 && yy == 36 && lr == 1) {
 			system("start https://blog.naver.com/soohan530/221053393169");
