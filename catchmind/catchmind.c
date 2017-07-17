@@ -1677,21 +1677,29 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			}
 			else if (strcmp(message, "time out 1") == 0)
 			{
+				if (myownnumber == 1)
+				Gametopic = 0;
 				turn = 1;
 				timeout = true;
 			}
 			else if (strcmp(message, "time out 2") == 0)
 			{
+				if (myownnumber == 2)
+					Gametopic = 0;
 				turn = 2;
 				timeout = true;
 			}
 			else if (strcmp(message, "time out 3") == 0)
 			{
+				if (myownnumber == 3)
+					Gametopic = 0;
 				turn = 3;
 				timeout = true;
 			}
 			else if (strcmp(message, "time out 4") == 0)
 			{
+				if (myownnumber == 4)
+					Gametopic = 0;
 				turn = 4;
 				timeout = true;
 			}
@@ -3409,10 +3417,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 				}
 				while (!timeout);
-				printf("turn : %d", turn);
+		//		printf("turn : %d", turn);
 				firstclock = clock();
 				first = 0;
 				timeout = false;
+		
 			}
 			sprintf(query, "%dÃÊ ³²À½", 10 - first);
 			han2unicode(query, unicode);
@@ -3631,7 +3640,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					break;
 				}
 			case SDL_MOUSEMOTION: // ¸¶¿ì½º°¡ ¿òÁ÷ÀÎ Å¸ÀÔÀÏ °æ¿ì
-
+			if (writemode == true) {
 				if (event.motion.state == 1 && drag == true) {// ¸¶¿ì½º°¡ ¿òÁ÷¿´À»¶§ ¸¶¿ì½º ¿ÞÂÊ ¹öÆ°ÀÌ ´­·ÁÁ®ÀÖ´Ù¸é Áï, µå·¡±× Çß´Ù¸é
 					if (event.motion.windowID == SDL_GetWindowID(Window)) {// ¸¶¿ì½º°¡ ¿òÁ÷ÀÎ °÷ÀÌ Ã¹¹øÂ° À©µµ¿ì Ã¢ÀÏ°æ¿ì
 						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// µå·¡±×ÇÑ Á¡ÀÇ Áß½É xÁÂÇ¥°¡ Æ®·¢¾È¿¡ ÀÕ°í µå·¡±×ÇÑ Á¡ÀÇ Áß½É yÁÂÇ¥°¡ ¹Ú½ºÀÇ yÁÂÇ¥ ¹üÀ§ ¾È¿¡ ÀÖÀ¸¸é if¹® ½ÇÇà
@@ -3701,7 +3710,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (writemode == true) {
+		
 					if (event.button.button == 1) {
 						if (event.button.windowID == SDL_GetWindowID(Window)) {
 							if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode ÀÌ¹ÌÁö ¾ÈÀÌ¸é if¹® ½ÇÇà
