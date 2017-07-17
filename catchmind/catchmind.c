@@ -987,6 +987,8 @@ char checkkeyborad(char n, int togl) {
 		return '9';
 	else if (GetAsyncKeyState(VK_BACK) & 0x0001)
 		return 8;
+	else if (GetAsyncKeyState(VK_TAB) & 0x0001)
+		return 9;
 	else if (GetAsyncKeyState(VK_RETURN) & 0x0001)
 		return 13;
 	else if (GetAsyncKeyState(VK_CAPITAL) & 0x0001) {
@@ -1084,11 +1086,11 @@ restart:
 				user.id[i - 1] = 0;
 				user.id[i--] = 0;
 			}
-			else if ((user.id[i] == 8 || user.id[i] == 13) && i > 3) {
+			else if ((user.id[i] == 9 || user.id[i] == 13) && i > 3) {
 				user.id[i] = 0;
 				break;
 			}
-			else if (user.id[i] == 13) {
+			else if (user.id[i] == 13 || user.id[i] == 9) {
 				user.id[i] = 0;
 			}
 			else if (i >= 15) {
@@ -1895,8 +1897,8 @@ int maintitle(void) { //게임 메인타이틀 출력
 		if(GetAsyncKeyState(VK_RETURN) & 0x0001)
 			system("start https://blog.naver.com/soohan530/221053393169");
 		WHITE
-		gotoxy(0, 0);
-		printf("%3d %3d\n", xx, yy);
+	/*	gotoxy(0, 0);
+		printf("%3d %3d\n", xx, yy);*/
 	
 		click(&xx, &yy, &lr);
 		cur(6, 1);
@@ -2123,8 +2125,8 @@ int bangchose(void) {
 	j = -1;
 	while (1) {
 		banglist(j);
-		gotoxy(0, 0);
-		printf("%3d %3d\n", xx, yy);
+	/*	gotoxy(0, 0);
+		printf("%3d %3d\n", xx, yy);*/
 
 		GetCursorPos(&a);
 		SetCursorPos(a.x, a.y);
