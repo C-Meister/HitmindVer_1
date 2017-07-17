@@ -3356,10 +3356,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 //	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
 	RenderTexture(Renderer3, UseTexture, &UserT);
 	SDL_StartTextInput();
-	wchar_t inputText[128] = L"";
+	wchar_t inputText[128]=L"";
 	char topic[30];
 	bool hangeul = false;
-	wchar_t wstr[2];
+	wchar_t wstr[2]=L"";
 	long firstclock = clock();
 	turn++;
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
