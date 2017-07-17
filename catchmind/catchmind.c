@@ -3319,7 +3319,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				SDL_RenderClear(Renderer2);
 				sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn - 1], pasttopic);
 				han2unicode(query, unicode);
-				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
+				TTF_DrawText(Renderer2, topicFont, unicode, 100, 100);
 			}
 			ee++;
 				for (int i = 0; i < 4; i++)
