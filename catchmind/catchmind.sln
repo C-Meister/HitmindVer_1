@@ -1,18 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "catchmind", "catchmind.vcxproj", "{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CatchMind Setup", "..\CatchMind Setup\CatchMind Setup.vdproj", "{9F490BA7-CF72-46C4-B524-32D3173426A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Default = Debug|Default
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		Release|Default = Release|Default
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|Default.ActiveCfg = Debug|Win32
@@ -20,11 +19,12 @@ Global
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x64.Build.0 = Debug|x64
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.ActiveCfg = Debug|Win32
 		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.Build.0 = Debug|Win32
-		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|Default.ActiveCfg = Release|Win32
-		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.ActiveCfg = Release|x64
-		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x64.Build.0 = Release|x64
-		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.ActiveCfg = Release|Win32
-		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Release|x86.Build.0 = Release|Win32
+		{BEEA3CCA-583D-4C5B-A7B1-EC61C9B86803}.Debug|x86.Deploy.0 = Debug|Win32
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|Default.ActiveCfg = Debug
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|Default.Build.0 = Debug
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x64.ActiveCfg = Debug
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x86.ActiveCfg = Debug
+		{9F490BA7-CF72-46C4-B524-32D3173426A0}.Debug|x86.Build.0 = Debug
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,14 +38,6 @@ Global
 		SccAuxPath0 = https://tbvajos510.visualstudio.com
 		SccLocalPath0 = .
 		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-	EndGlobalSection
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Default = Debug|Default
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|Default = Release|Default
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Default = Debug|Default

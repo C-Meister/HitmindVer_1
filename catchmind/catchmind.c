@@ -50,13 +50,10 @@
 #pragma comment (lib,"SDL2_ttf")
 #pragma comment (lib, "SDL2_mixer.lib")	//±×·¡ÇÈ »ç¿îµå ¶óÀÌºê·¯¸® 4
 #pragma comment (lib, "ws2_32.lib")		//¼ÒÄÏ(³×Æ®¿öÅ©)¶óÀÌºê·¯¸®
-#pragma comment (lib, "libcharset.lib")
-#pragma comment (lib, "libcharset-bcc.lib")
-#pragma comment (lib, "libiconv.a")
+
 #pragma comment (lib, "libiconv.lib")
-#pragma comment (lib, "libiconv-bcc.lib")
+
 #pragma comment (lib, "winmm.lib")		//»ç¿îµå ¶óÀÌºê·¯¸®
-#pragma comment (lib, "GDIPlus.lib")		//ÀÌ¹ÌÁö ¶óÀÌºê·¯¸®
 
 #pragma warning (disable : 4700)
 #pragma warning (disable : 4244)
@@ -135,6 +132,7 @@ char SOCKETCOUNT = 0;
 char clientcatchmind[50];
 char topics[4][30];
 char myownnumber;
+bool timeout = false;
 MYSQL *cons;
 char CHOOSEROOM = 0;
 bool SDL_Clear = false;
@@ -270,7 +268,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	//º¯¼ö ¼±¾ð
 	//int i, j, k, v, result;	
 	InitializeCriticalSection(&cs);
-	unsigned int timeout = 7;
+	unsigned int timeout = 15;
 	char mainchoose = 0;
 	char bangchoose;
 	char chooseroomcount;
@@ -301,7 +299,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 		Sleep(5000);
 	}
 
-	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
+	sprintf(query, "music\\5.mp3");
 	music = Mix_LoadMUS(query);
 	if (!music) {
 		printf("Mix_LoadMUS(\"titlemusic.mp3\"): %s\n", Mix_GetError());
@@ -1677,7 +1675,26 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
-
+			else if (strcmp(message, "time out 1") == 0)
+			{
+				turn = 1;
+				timeout = true;
+			}
+			else if (strcmp(message, "time out 2") == 0)
+			{
+				turn = 2;
+				timeout = true;
+			}
+			else if (strcmp(message, "time out 3") == 0)
+			{
+				turn = 3;
+				timeout = true;
+			}
+			else if (strcmp(message, "time out 4") == 0)
+			{
+				turn = 4;
+				timeout = true;
+			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
 				printf("SDLCLEAR");
@@ -2353,7 +2370,7 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.1";
+	char version[] = "0.0.2";
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
@@ -2380,7 +2397,7 @@ void Auto_Update(void)
 	{
 		CLS;
 		cur(0, 0);
-		printf("¼­¹ö ¹öÀü°ú ÇöÀç ¹öÀüÀÌ ´Ù¸¨´Ï´Ù. ¾÷µ¥ÀÌÆ® ÇÏ½Ã°Ú½À´Ï±î?      ¼­¹ö ¹öÀü : %s ³» ¹öÀü : %s\n 1. ¿¹ 2. ¾Æ´Ï¿ä", serverversion, version);
+		printf("¼­¹ö ¹öÀü°ú ÇöÀç ¹öÀüÀÌ ´Ù¸¨´Ï´Ù. ¾÷µ¥ÀÌÆ® ÇÏ½Ã°Ú½À´Ï±î? ¾ÈµÇ¸é °ü¸®ÀÚ±ÇÇÑÀ¸·Î ½ÇÇàÇØÁÖ¼¼¿ä ¼­¹ö ¹öÀü : %s ³» ¹öÀü : %s\n 1. ¿¹ 2. ¾Æ´Ï¿ä", serverversion, version);
 		choose = getch();
 		if (choose != '1')
 			return;
@@ -2392,7 +2409,7 @@ void Auto_Update(void)
 				fprintf(ftp, "open %s\n", "10.80.161.182");
 				fprintf(ftp, "»óÈñ\n");
 				fprintf(ftp, "Desgayle10!\n");
-				fprintf(ftp, "get catchmind.exe	catchmind.exe\n");
+				fprintf(ftp, "get catchmind.exe	Hitmind.exe\n");
 				fprintf(ftp, "bye");
 			}
 			fclose(ftp);
@@ -2400,13 +2417,13 @@ void Auto_Update(void)
 			if ((fftp = fopen("./autoupdater.bat", "w+")) != NULL)
 			{
 				fprintf(ftp, "timeout /t 1 /NOBREAK\n");
-				fprintf(ftp, "del catchmind.exe\n");
+				fprintf(ftp, "del Hitmind.exe\n");
 				fprintf(ftp, "ftp -s:ftpscript.bat\n");
 				fprintf(ftp, "del ftpscript.bat\n");
-				fprintf(ftp, "start catchmind.exe\n");
+				fprintf(ftp, "start Hitmind.exe\n");
 				fprintf(ftp, "exit");
 			}
-			fclose(fftp);
+	//		fclose(fftp);
 			system("start autoupdater.bat && del auto_updater.bat");
 			exit(1);
 
@@ -2602,6 +2619,11 @@ void Clnt_1(int v)
 				strcpy(querys[v], message);
 				sendall(message, 5);
 
+			}
+			else if (strncmp(message, "time out", 8) == 0)
+			{
+				sendall(message, 5);
+				RESET(message);
 			}
 			else if (strcmp(message, "player ready") == 0) {
 				ZeroMemory(message, sizeof(message));
@@ -3090,7 +3112,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect center = { 0 };
 	char query[256];
 	Mix_PauseMusic();
-	Mix_VolumeMusic(100);
+	Mix_VolumeMusic(120);
 	Mix_PlayMusic(music, -1);
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð
 	SDL_Texture * RgbTexture = nullptr;// ¾ËÁöºñ ÀÌ¹ÌÁö¸¦ ´ã±âÀ§ÇÑ ÅØ½ºÃÄ ¼±¾ð
@@ -3118,6 +3140,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 150 };
 	SDL_Rect Timer2 = { 0, 60, 400, 200};
+	SDL_Rect Timer3 = { 150, 150, 100, 50 };
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -3361,8 +3384,39 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool hangeul = false;
 	wchar_t wstr[2]=L"";
 	long firstclock = clock();
+	int first = 0;
 	turn++;
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
+		if ((clock() - firstclock) / 1000 > first)
+		{
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+			SDL_RenderFillRect(Renderer, &Timer3);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
+			first++;
+			if (first == 61)
+			{
+				if (turn == myownnumber)
+				{
+					while (1)
+					{
+						turn++;
+						if (status[turn - 1] != 0)
+							break;
+						else if (turn == 5)
+							break;
+					}
+					sprintf(query, "time out %d", turn);
+					send(connect_sock, query, 45, 0);
+
+				}
+				while (!timeout);
+				firstclock = clock();
+				first = 0;
+			}
+			sprintf(query, "%dÃÊ ³²À½", 60 - first);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 150, 150);
+			happen = true;
+		}
 		if (myownnumber == turn && Gametopic == 0)
 		{
 			EnterCriticalSection(&cs);
@@ -3727,8 +3781,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							}
 							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
 
-								sprintf(query, "screenshot\\%d.bmp", time(NULL));
-								makebmp(query, Renderer2);
+						//		sprintf(query, "screenshot\\%d.bmp", time(NULL));
+						//		makebmp(query, Renderer2);
 								SDL_DestroyRenderer(Renderer2);
 								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
@@ -3886,7 +3940,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			good = j;
 		}
 	}
-	if (myownnumber - 1 == j)
+	if (myownnumber == j)
 	{
 		sprintf(query, "update catchmind.login set level = level + 1 where name = '%s'", username);
 		mysql_query(cons, query);
