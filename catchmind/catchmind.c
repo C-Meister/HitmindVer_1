@@ -3067,8 +3067,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
-	SDL_Rect Timer2 = { 0, 60, 400, 100 };
+	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 150 };
+	SDL_Rect Timer2 = { 0, 60, 400, 200};
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -3349,6 +3349,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+			sprintf(query, "¹®Á¦ %d/15", ee+1);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 0, 150);
 			pastturn = turn;
 			happen = true;
 		}
@@ -3362,9 +3365,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				
 				sprintf(query, "%s ´ÔÀÌ ¸ÂÃß¾ú½À´Ï´Ù! Á¤´äÀº %s ÀÔ´Ï´Ù", friendname[turn - 1], pasttopic);
 				han2unicode(query, unicode);
-				TTF_DrawText(Renderer2, topicFont, unicode, 100, 100);
+				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
 				SDL_RenderPresent(Renderer2);
-				SDL_Delay(1000);
 			}
 			ee++;
 				for (int i = 0; i < 4; i++)
