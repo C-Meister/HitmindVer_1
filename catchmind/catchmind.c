@@ -3845,6 +3845,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	{
 		printf("%s : %d개\n", friendname[k], score[k][1]);
 	}
+	pritnf("\n엔터..");
+	getchar();
 	return 0;// 종료
 }
 HWND GetConsoleHwnd(void)
