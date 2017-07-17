@@ -3235,6 +3235,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					EnterCriticalSection(&cs);
 					UTF8toEUCKR(euckr, 256,str, 256);
 					euckr[strlen(euckr)]='\0';
+				
 					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username,euckr);
 					mysql_query(cons, query);
 					LeaveCriticalSection(&cs);
