@@ -3409,6 +3409,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 
 				}
 				while (!timeout);
+				printf("turn : %d", turn);
 				firstclock = clock();
 				first = 0;
 				timeout = false;
