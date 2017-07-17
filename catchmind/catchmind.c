@@ -2301,7 +2301,7 @@ void Auto_Update(void)
 	{
 		CLS;
 		cur(0, 0);
-		printf("서버 버전과 현재 버전이 다릅니다. 업데이트 하시겠습니까?      서버 버전 %s\n 1. 예 2. 아니요", serverversion);
+		printf("서버 버전과 현재 버전이 다릅니다. 업데이트 하시겠습니까?      서버 버전 : %s 내 버전 : %s\n 1. 예 2. 아니요", serverversion, version);
 		choose = getch();
 		if (choose != '1')
 			return;
