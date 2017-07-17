@@ -1406,7 +1406,7 @@ void readchating(void) {
 				
 			}
 			mysql_free_result(sql_result);
-			if (last <= last2)
+			if (last < last2)
 			{
 				mysql_query(cons, "select * from catchmind.chating order by id desc limit 15");
 				sql_result = mysql_store_result(cons);
@@ -1421,6 +1421,8 @@ void readchating(void) {
 				CHATHAPPEN = true;
 				last = last2;
 			}
+			else
+				CHATHAPPEN = false;
 			
 		}
 		LeaveCriticalSection(&cs);
@@ -1606,26 +1608,32 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			}
 			else if (strncmp("player 1 exit", message, 12) == 0) {
 				status[0] = 0;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 exit", message, 12) == 0) {
 				status[1] = 0;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 exit", message, 12) == 0) {
 				status[2] = 0;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp("game start", message) == 0) {
 				status[0] = 10;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp("server close", message) == 0) {
 				status[0] = -1;
+				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 
@@ -2268,7 +2276,7 @@ void makeroom(int *count) {
 	printf("listen() ¿Ï·á!\n");
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
-	while (1) {
+	while (!turn) {
 		if (Sconnect_sock[SOCKETCOUNT] == 0) {
 			Sconnect_sock[SOCKETCOUNT] = accept(listen_sock, (SOCKADDR*)&connect_addr, &sockaddr_in_size); // Á¢¼ÓÇÏ¸é accept() ÇØÁÜ
 			threads[SOCKETCOUNT + 1] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)Clnt_1, (int *)SOCKETCOUNT, 0, NULL);
@@ -2297,6 +2305,8 @@ void makeroom(int *count) {
 
 		Sleep(100);
 	}
+	CLS;
+	printf("ThreadExit");
 
 }
 IN_ADDR GetDefaultMyIP()
@@ -2925,6 +2935,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 //	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
+
 	//
 	getlevel();
 	// Ãß°¡
@@ -3214,7 +3225,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			writemode = true;
 		}
 		else
-			writemode = false;
+			writemode = false;		//X
 	//	CLS;
 		
 		if (buff < SDLCLOCK) {
@@ -3522,7 +3533,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					drag = false;// µå·¡±×·Î ÇÏ´Â ¸ðµç °ÍÀ» ºÒ°¡´ÉÇÏ°Ô ¸¸µê
 			}
 		}
-
+		
 		SDL_GetMouseState(&x, &y);
 		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser¾È¿¡ ¸¶¿ì½º°¡ ÀÖÀ»¶§
 			if (on.eraser == false && clicks.eraser == false) // ±×Àü±îÁö´Â ¸¶¿ì½º°¡ ¿Ã·ÁÁ®ÀÖÁö¾Ê°í Áö¿ì°³°¡ È°¼ºÈ­µÇÁö¾Ê¾ÒÀ»¶§
@@ -3553,12 +3564,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			on.new = false;
 		}
-
+		
 		if (CHATHAPPEN == true) {
-			//	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
-			//	SDL_RenderFillRect(Renderer, &Happen);
 			RenderTexture(Renderer, ChaTexture, &Chat);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
@@ -3571,6 +3579,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		
 	//	han2unicode(query, unicode);
 	//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
+	
 		if (happen == true) {
 	//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 	//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
@@ -3581,6 +3590,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 	
 	}
+
 	SDL_DestroyTexture(InpTexture);
 	SDL_DestroyTexture(UseTexture);
 	SDL_DestroyTexture(RgbTexture);// ÅØ½ºÃÄ ÆÄ±«ÇÏ±â
