@@ -213,6 +213,7 @@ LOG login(int m);								//±âº»ÀûÀÎ ·Î±×ÀÎ ÀÔ·Â
 void zeroprint(int xx, int yy, int lr, int m);  //µðÀÚÀÎ
 char checkkeyborad(char n, int togl);
 void credit();									//Å©·¹µ÷
+void Auto_Update(void);
 
 //-------------------------ÄÜ¼Ö ÇÔ¼öµé------------------------------------
 void checkword(char*nowword, char*scanword);	//´Ü¾î¸¦ È®ÀÎÇÔ
@@ -234,17 +235,17 @@ wchar_t* UTF82UNICODE(char* UTF8, int len) {
 }
 char* UNICODE2UTF8(wchar_t* unicode, int len) {
 	char str[128] = "";
-	int i=0,j=0;
+	int i = 0, j = 0;
 	for (i = 0; j < len; j++) {
 		if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {
 			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
-			str[i+1] = (unicode[j] - 40960) % (4096) / 64 - 128;
-			str[i+2] = (unicode[j] - 40960) % 64 - 128;
+			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
+			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
 			i += 3;
 		}
 		else {
 			str[i] = unicode[j];
-			i ++;
+			i++;
 		}
 
 	}
@@ -288,7 +289,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 		printf("ÃÊ±âÈ­ ½ÇÆÐ");
 		Sleep(5000);
 	}
-	
+
 	sprintf(query, "music\\%d.mp3", rand() % 6 + 1);
 	music = Mix_LoadMUS(query);
 	if (!music) {
@@ -478,10 +479,10 @@ void sqlmakeroom(void) {
 
 	while (1) {
 		ConsoleL(28, 11);
-		
 
 
-	
+
+
 		WHITE
 			printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 		printf("¡á                                              ¡á\n");
@@ -532,7 +533,7 @@ void sqlmakeroom(void) {
 				continue;
 			}
 
-			
+
 			if (myroom.password[i] == 1) {
 				togl *= -1;
 				myroom.password[i] = 0;
@@ -583,7 +584,7 @@ void sqlmakeroom(void) {
 				GetCursorPos(&a);
 				SetCursorPos(a.x, a.y);
 				click(&xx, &yy, &lr);
-				
+
 				gotoxy(33, 9);
 				if (xx >= 16 && xx <= 24 && yy == 9) {
 					if (lr == 0) {
@@ -591,7 +592,7 @@ void sqlmakeroom(void) {
 					}
 					else if (lr == 1) {
 						WHITE
-						ZeroMemory(myroom.password, sizeof(myroom.password));
+							ZeroMemory(myroom.password, sizeof(myroom.password));
 						break;
 					}
 				}
@@ -599,7 +600,7 @@ void sqlmakeroom(void) {
 					WHITE printf("¡Ûºñ¹Ð¹øÈ£ ¹Ì»ç¿ë");
 				}
 			}
-			cur(16+i, 7);
+			cur(16 + i, 7);
 			disablecursor(0);
 		}
 
@@ -789,7 +790,7 @@ int waitroom(void)
 			printf("          ");
 
 
-			
+
 		if (status[0] == 10)									//°ÔÀÓ ½ÃÀÛ
 		{
 			status[0] = 2;
@@ -798,14 +799,14 @@ int waitroom(void)
 			printf("°ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù.");
 			if (lead == true)
 			{
-				
+
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
 				mysql_query(cons, query);
 
 			}
-		//	ExitThread(threads[5]);
-			
+			//	ExitThread(threads[5]);
+
 			CheckPing();
 			_beginthreadex(0, 0, (_beginthreadex_proc_type)readchating, 0, 0, 0);
 			SDL_MAINS();
@@ -1062,7 +1063,7 @@ restart:
 		printf("                                       ");
 	}
 	gotoxy(16, 5);
-	
+
 	buff = 0;
 	while (1) {
 
@@ -1408,15 +1409,15 @@ void readchating(void) {
 	while (1) {
 		EnterCriticalSection(&cs);
 		if (CHATHAPPEN == false) {
-		
-		//	ZeroMemory(sql_result, sizeof(sql_result));
+
+			//	ZeroMemory(sql_result, sizeof(sql_result));
 			ZeroMemory(chatquery, sizeof(chatquery));
 			mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
 			sql_result = mysql_store_result(cons);
 			if (sql_result != 0) {
 				if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 					last2 = atoi(sql_row[0]);
-				
+
 			}
 			mysql_free_result(sql_result);
 			if (last < last2)
@@ -1426,8 +1427,8 @@ void readchating(void) {
 				v = 14;
 				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 				{
-			
-					sprintf(chatquery[v],"%s : %s", sql_row[2], sql_row[3]);
+
+					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
 					v--;
 				}
 				mysql_free_result(sql_result);
@@ -1436,7 +1437,7 @@ void readchating(void) {
 			}
 			else
 				CHATHAPPEN = false;
-			
+
 		}
 		LeaveCriticalSection(&cs);
 		Sleep(30);
@@ -1658,7 +1659,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
-			
+
 				score[0][1] += 1;
 				turn = 1;
 				RESET(message);
@@ -1781,7 +1782,7 @@ int sqllogin(void) {
 			{
 				gotoxy(2, 3);
 				printf("           ¾ÆÀÌµð°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù     ");
-		//		mysql_free_result(sql_result);
+				//		mysql_free_result(sql_result);
 
 			}
 			else {
@@ -1874,7 +1875,8 @@ void mainatitleimage(void) {
 	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á                      ¡á¡á¡á¡á¡á¡á¡á¡á¡á                      ¡á¡á¡á¡á¡á¡á¡á¡á¡á");
 }
 int maintitle(void) { //°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â
-	ConsoleL(80, 30);
+	ConsoleL(80, 50);
+	Auto_Update();
 	disablecursor(true);
 	int xx = 0, yy = 0, lr = 0;
 	mainatitleimage();
@@ -2220,7 +2222,7 @@ int chooseroom(int roomnum) {
 	mysql_query(cons, query);
 	sql_row = mysql_fetch_row(mysql_store_result(cons));
 	connectroom[roomnum].people = atoi(sql_row[0]);
-//	mysql_free_result(sql_result);
+	//	mysql_free_result(sql_result);
 	if (connectroom[roomnum].people == 4 || connectroom[roomnum].people == 0)
 		return -1;
 
@@ -2265,7 +2267,74 @@ void jointema(void) {
 	printf("¡á              ¡á              ¡á              ¡á\n");
 	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
 }
+void Auto_Update(void)
+{
+	MYSQL_ROW sql_row;
+	MYSQL_RES *sql_result;
+	int i = 0;
+	char serverversion[10];
+	char choose;
+	char version[] = "0.0.1";
+	mysql_query(cons, "select * from catchmind.autoupdate order by version");
+	sql_result = mysql_store_result(cons);
+	cur(10, 34);
+	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");
+	while ((sql_row = mysql_fetch_row(sql_result)) != 0)
+	{
+		cur(10, 35 + (i * 3));
+		printf("¡á                                                        ¡á");
+		cur(10, 36 + (i * 3));
+		printf("¡á                                                        ¡á");
+		cur(10, 37 + (i * 3));
+		printf("¡á                                                        ¡á");
+		cur(20, 36 + (i * 3));
+		printf("%s :", sql_row[0]);
+		cur(30, 36 + (i * 3));
+		printf("%s", sql_row[1]);
+		strcpy(serverversion, sql_row[0]);
+		i++;
+	}
 
+	cur(10, 35 + (i * 3));
+	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");
+	if (strcmp(serverversion, version) != 0)
+	{
+		CLS;
+		cur(0, 0);
+		printf("¼­¹ö ¹öÀü°ú ÇöÀç ¹öÀüÀÌ ´Ù¸¨´Ï´Ù. ¾÷µ¥ÀÌÆ® ÇÏ½Ã°Ú½À´Ï±î?      ¼­¹ö ¹öÀü %s\n 1. ¿¹ 2. ¾Æ´Ï¿ä", serverversion);
+		choose = getch();
+		if (choose != '1')
+			return;
+		else
+		{
+			FILE *ftp, *fftp;
+			if ((ftp = fopen("./ftpscript.bat", "w+")) != NULL)
+			{
+				fprintf(ftp, "open %s\n", "10.80.161.182");
+				fprintf(ftp, "»óÈñ\n");
+				fprintf(ftp, "Desgayle10!\n");
+				fprintf(ftp, "get catchmind.exe	catchmind.exe\n");
+				fprintf(ftp, "bye");
+			}
+			fclose(ftp);
+
+			if ((fftp = fopen("./autoupdater.bat", "w+")) != NULL)
+			{
+				fprintf(ftp, "timeout /t 1 /NOBREAK\n");
+				fprintf(ftp, "del catchmind.exe\n");
+				fprintf(ftp, "ftp -s:ftpscript.bat\n");
+				fprintf(ftp, "del ftpscript.bat\n");
+				fprintf(ftp, "start catchmind.exe\n");
+				fprintf(ftp, "exit");
+			}
+			fclose(fftp);
+			system("start autoupdater.bat && del auto_updater.bat");
+			exit(1);
+
+		}
+
+	}
+}
 void sendall(char *message, int c) {
 	for (int i = 0; i < 4; i++)
 	{
@@ -2279,8 +2348,8 @@ void sendall(char *message, int c) {
 }
 void makeroom(int *count) {
 	int i = 0;
-//	char message[100];
-//	IN_ADDR serverip = GetDefaultMyIP();
+	//	char message[100];
+	//	IN_ADDR serverip = GetDefaultMyIP();
 	listen_sock = socket(PF_INET, SOCK_STREAM, 0); // ¼ÒÄÏ »ý¼º ÈÄ ¼ÒÄÏ¿¡ ´ëÇÑ Á¤º¸¸¦ listen_sockº¯¼ö¿¡ ´ëÀÔ					
 	if (listen_sock == INVALID_SOCKET)
 		ErrorHandling("socket() error");
@@ -2388,8 +2457,8 @@ void exitsignal(void)
 
 	}
 	mysql_close(cons);
-	
-	
+
+
 }
 void Clnt_1(int v)
 {
@@ -2486,7 +2555,7 @@ void Clnt_1(int v)
 			}
 			ZeroMemory(message, sizeof(message));
 		}
-			
+
 	}
 }
 void gotoxy(short x, short y)
@@ -2553,11 +2622,11 @@ void CheckPing(void)
 			}
 		}
 	}
-	
+
 	printf("¿£ÅÍ¸¦ ´­·¯ ½ÃÀÛ");
 	getchar();
 	WHITE
-	
+
 
 }
 void SDL_ErrorLog(const char * msg) {//¿¡·¯ÄÚµå Ãâ·Â ÇÔ¼ö
@@ -2587,7 +2656,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 }
 void getlevel(void)
 {
-//	MYSQL_RES sql_result;
+	//	MYSQL_RES sql_result;
 	MYSQL_ROW sql_row;
 	int i;
 	char query[100];
@@ -2597,10 +2666,10 @@ void getlevel(void)
 			mysql_query(cons, query);
 			sql_row = mysql_fetch_row(mysql_store_result(cons));
 			score[i][0] = atoi(sql_row[0]);
-			
+
 		}
 	}
-//	mysql_free_result(sql_result);
+	//	mysql_free_result(sql_result);
 }
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
 	switch (step) {
@@ -2884,7 +2953,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderRemoveEdge(Renderer, Pencil);
 	SDL_RenderRemoveEdge(Renderer, New);
 }
-void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int x, int y) {
+void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int x, int y) {
 	SDL_Color Color = { 0,0,0 };
 	SDL_Surface * Surface = TTF_RenderUNICODE_Blended(Font, sentence, Color);// ÆùÆ®ÀÇ Á¾·ù,¹®ÀÚ¿­, »ö±òÀ» º¸³»¼­ À¯´ÏÄÚµå·Î ·»´õÇÑ´ÙÀ½ ¼­ÇÇ½º¿¡ ÀúÀåÇÑ´Ù
 	SDL_Texture* Texture = SDL_CreateTextureFromSurface(Renderer, Surface);// ¼­ÇÇ½º·ÎºÎÅÍ ÅØ½ºÃÄ¸¦ »ý¼ºÇÑ´Ù
@@ -2912,7 +2981,7 @@ int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength)
 	return ires;
 }
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
-	
+
 	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
 	SDL_Renderer * Renderer = nullptr;// SDL ·»´õ·¯ ¼±¾ð 
 	SDL_Window * Window2 = nullptr;
@@ -2950,7 +3019,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
 	SDL_Rect Timer2 = { 0, 60, 400, 100 };
-							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
+	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
 	int chaty = 0;
@@ -2958,7 +3027,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	float fontsize2 = 35.0;
 	TTF_Font * Font;
 	TTF_Font * topicFont;
-//	SDL_Surface *Text;
+	//	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128];
 
@@ -2987,7 +3056,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
 		return 0;
 	}
-	
+
 	// À©µµ¿ìÃ¢ 3°³·Î ³ª´©´Â ±âÁØ xÁÂÇ¥´Â 1920 - 1310/4-10ÀÌ°í, 1080-900/4-10Àº yÁÂÇ¥ÀÇ ±âÁØÀÌ´Ù.
 	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
@@ -3158,7 +3227,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool hangeulinput = false;
 	bool enter = false;
 	bool writemode = false;
-	
+
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
@@ -3205,7 +3274,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			//			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
-			
+
 			happen = true;
 		}
 		if (pastturn != turn)
@@ -3222,10 +3291,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 				SDL_RenderFillRect(Renderer, &Timer2);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			}
-//			han2unicode(query, unicode);
-//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
-	//		SDL_RenderPresent(Renderer);
-	//		SDL_Delay(3000);
+			//			han2unicode(query, unicode);
+			//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
+				//		SDL_RenderPresent(Renderer);
+				//		SDL_Delay(3000);
 			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
@@ -3263,7 +3332,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		else
 			writemode = false;		//X
 	//	CLS;
-		
+
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
@@ -3273,7 +3342,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_TEXTINPUT:
-				if (hangeul == true && (event.text.text[0]==-29||event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
+				if (hangeul == true && (event.text.text[0] == -29 || event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
 				{
 					wstr[2] = L"";
 					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
@@ -3314,7 +3383,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						enter = false;
 						happen = true;
 					}
-					
+
 				}
 				else if (event.key.keysym.sym == SDLK_RALT)
 					hangeul = !(hangeul);
@@ -3347,7 +3416,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					break;
 				}
 			case SDL_MOUSEMOTION: // ¸¶¿ì½º°¡ ¿òÁ÷ÀÎ Å¸ÀÔÀÏ °æ¿ì
-		
+
 				if (event.motion.state == 1 && drag == true) {// ¸¶¿ì½º°¡ ¿òÁ÷¿´À»¶§ ¸¶¿ì½º ¿ÞÂÊ ¹öÆ°ÀÌ ´­·ÁÁ®ÀÖ´Ù¸é Áï, µå·¡±× Çß´Ù¸é
 					if (event.motion.windowID == SDL_GetWindowID(Window)) {// ¸¶¿ì½º°¡ ¿òÁ÷ÀÎ °÷ÀÌ Ã¹¹øÂ° À©µµ¿ì Ã¢ÀÏ°æ¿ì
 						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// µå·¡±×ÇÑ Á¡ÀÇ Áß½É xÁÂÇ¥°¡ Æ®·¢¾È¿¡ ÀÕ°í µå·¡±×ÇÑ Á¡ÀÇ Áß½É yÁÂÇ¥°¡ ¹Ú½ºÀÇ yÁÂÇ¥ ¹üÀ§ ¾È¿¡ ÀÖÀ¸¸é if¹® ½ÇÇà
@@ -3498,8 +3567,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								happen = true;
 							}
 							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
-					
-								sprintf(query, "screenshot\\%d.bmp",time(NULL));
+
+								sprintf(query, "screenshot\\%d.bmp", time(NULL));
 								makebmp(query, Renderer2);
 								SDL_DestroyRenderer(Renderer2);
 								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -3511,7 +3580,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									send(connect_sock, "SDLCLEAR", 45, 0);
 								}
-							//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
+								//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 								clicks.eraser = false;
 								clicks.pencil = true;
 
@@ -3577,7 +3646,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					drag = false;// µå·¡±×·Î ÇÏ´Â ¸ðµç °ÍÀ» ºÒ°¡´ÉÇÏ°Ô ¸¸µê
 			}
 		}
-		
+
 		SDL_GetMouseState(&x, &y);
 		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser¾È¿¡ ¸¶¿ì½º°¡ ÀÖÀ»¶§
 			if (on.eraser == false && clicks.eraser == false) // ±×Àü±îÁö´Â ¸¶¿ì½º°¡ ¿Ã·ÁÁ®ÀÖÁö¾Ê°í Áö¿ì°³°¡ È°¼ºÈ­µÇÁö¾Ê¾ÒÀ»¶§
@@ -3608,7 +3677,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 			on.new = false;
 		}
-		
+
 		if (CHATHAPPEN == true) {
 			RenderTexture(Renderer, ChaTexture, &Chat);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			for (l = 0; l < 15; l++) {
@@ -3620,19 +3689,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			CHATHAPPEN = false;
 			happen = true;
 		}
-		
-	//	han2unicode(query, unicode);
-	//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
-	
+
+		//	han2unicode(query, unicode);
+		//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
+
 		if (happen == true) {
-	//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
-	//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
-		
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,r, g, b);
+			//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+			//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
+
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong, r, g, b);
 			happen = false;
 
 		}
-	
+
 	}
 
 	SDL_DestroyTexture(InpTexture);
