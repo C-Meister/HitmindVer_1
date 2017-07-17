@@ -3929,32 +3929,3 @@ void makebmp(const char *filename, SDL_Renderer * Renderer2) {
 	SDL_SaveBMP(sshot, filename);
 	SDL_FreeSurface(sshot);
 }
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-	//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i = 0, j = 0;
-	for (i = 0; j < len; j++) {
-		if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {
-			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
-			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
-			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
-			i += 3;
-		}
-		else {
-			str[i] = unicode[j];
-			i++;
-		}
-
-	}
-	strcat(str, "\0");
-	return str;
-}
