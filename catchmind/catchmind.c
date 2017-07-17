@@ -2265,27 +2265,7 @@ void jointema(void) {
 	printf("■              ■              ■              ■\n");
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-	//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i;
-	for (i = 0; i < 3 * len; i += 3) {
-		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
-		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
-		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
-	}
-	strcat(str, "\0");
-	return str;
-}
+
 void sendall(char *message, int c) {
 	for (int i = 0; i < 4; i++)
 	{
@@ -3308,24 +3288,38 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				happen = true;
 				break;
 			case SDL_KEYDOWN:
+
 				if (event.key.keysym.sym == SDLK_RETURN) {
+					if (hangeulinput == true && enter == false)
+						enter = true;
+					else {
+						strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
+						
+						UTF8toEUCKR(euckr, 256, str, 256);
+						euckr[strlen(euckr)] = '\0';
+						if (strcmp(euckr, topics[turn - 1]) == 0)
+						{
+							if (myownnumber != turn)
+								send(connect_sock, "right   answer", 35, 0);
+
+						}
+						else {
+							EnterCriticalSection(&cs);
+							sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, euckr);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
+						}
+						
+						wcscpy(inputText, L"");
+						enter = false;
+						happen = true;
+					}
 					cur(0, 20);
 					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
 					
 					UTF8toEUCKR(euckr, 256,str, 256);
 					euckr[strlen(euckr)]='\0';
-					if (strcmp(euckr, topics[turn - 1]) == 0)
-					{
-						if (myownnumber != turn)
-							send(connect_sock, "right   answer", 35, 0);
-							
-					}
-					else {
-						EnterCriticalSection(&cs);
-						sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, euckr);
-						mysql_query(cons, query);
-						LeaveCriticalSection(&cs);
-					}
+					
 					RESET(euckr);
 					wcscpy(inputText, L"");
 					happen = true; 
