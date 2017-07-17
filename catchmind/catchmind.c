@@ -31,7 +31,6 @@
 
 #include <crtdbg.h>
 //#include <WinSock2.h>		//¼ÒÄÏÇÁ·Î±×·¡¹Ö
-
 //Æ¯¼ö Çì´õÆÄÀÏ (µû·Î ¼³Ä¡) 
 #include "SDL/SDL.h"			//SDL - ±×·¡ÇÈ Çì´õÆÄÀÏ
 #include "SDL/SDL_image.h"
@@ -42,7 +41,6 @@
 #include "SDL/SDL.h"
 #include "iconv.h"
 #define nullptr 0
-
 // ¶óÀÌºê·¯¸® ¼±¾ð¹® ¶óÀÌºê·¯¸®ÆÄÀÏÀº µû·Î Ãß°¡¾ÈÇØµµ µË´Ï´Ù.
 // #pragma comment ´Â visual studio¿¡¼­¸¸ »ç¿ë °¡´É *¼Ö·ç¼Ç ÇÃ·¿ÆûÀ» 64ºñÆ®·Î ÇØÁÖ¼¼¿ä
 #pragma comment (lib, "libmysql.lib")	//mysql¶óÀÌºê·¯¸®
@@ -3245,7 +3243,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool hangeulinput = false;
 	bool enter = false;
 	bool writemode = false;
-
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
@@ -3260,6 +3257,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Happen = { 0,0,1310 / 4 + 10,New.y - 10 };// Happen ÀÌ Æ®·çÀÏ¶§ »ç¿ëÇÒ º¯¼ö
 	char click_eraser, click_pencil;
 	char dragging;
+	int len=0;
 	MYSQL_ROW sql_row;
 	int ee = 0;
 	char euckr[256];
@@ -3374,24 +3372,22 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_TEXTINPUT:
-				if (hangeul == true && (event.text.text[0] == -29 || event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
+				if (hangeul == true && (event.text.text[0]==-29||event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// ÇÑ¿µÅ°°¡ ÇÑ±Û·Î µÇ¾îÀÖ°í ÇÑ±ÛÀÌ¶ó¸é event.text.text[0]ÀÇ °ªÀ¸·Î ÇÑ±ÛÆÇ´Ü°¡´ÉÇÔ
 				{
 					wstr[2] = L"";
 					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
 					wstr[0] = sum;
 					wcscat(inputText, wstr);
-					hangeulinput = true;
 				}
-				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
+				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {// ÇÑ±Û¾Æ´Ï°í c³ª v¸¦ ´­·¶À»¶§ ÄÁÆ®·Ñ¸ðµå°¡ ¾Æ´Ï¶ó¸é ÇÑ±ÛÀ» Á¦¿ÜÇÑ ¾î¶² ¹®ÀÚ¸¦ ÀÔ·ÂÇß´Ù´Â °ÍÀÓ
 					wstr[2] = L"";
-					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);
-					wcscat(inputText, wstr);
+					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);// event.text.text ¹®ÀÚ¿­ ±×³É ¿¬°á½ÃÄÑ¹ö¸²
+					wcscat(inputText, wstr);// ¹®ÀÚ¿­ ¿¬°á
 					hangeulinput = false;
 				}
 				happen = true;
 				break;
 			case SDL_KEYDOWN:
-
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					if (hangeulinput == true && enter == false)
 						enter = true;
@@ -3430,7 +3426,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				}
 				else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// ÄÁÆ®·Ñ ¸ðµåÀÌ°í v¸¦ ´­·¶´Ù¸é
 					wcscpy(inputText, UTF82UNICODE(SDL_GetClipboardText(), strlen(SDL_GetClipboardText())));// Å¬¸³º¸µå¿¡¼­ °¡Á®¿È
-				happen = true;
+				else
+					hangeulinput = true;
+					happen = true;
 				break;
 			case SDL_WINDOWEVENT://SDLÁ¾·á Å¸ÀÔÀÏ °æ¿ì
 				send(connect_sock, "exit", 35, 0);
