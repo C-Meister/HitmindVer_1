@@ -3329,7 +3329,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			//			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
-
+			drag = false;
+			clicks.pencil = false;
 			happen = true;
 		}
 		if (pastturn != turn)
@@ -3354,6 +3355,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
 			sprintf(query, "¹®Á¦ %d/15", ee+1);
+			if (ee > 15)
+			{
+				quit = true;
+			}
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 0, 150);
 			pastturn = turn;
@@ -3806,7 +3811,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		}
 
 	}
-
+	
 	SDL_DestroyTexture(InpTexture);
 	SDL_DestroyTexture(UseTexture);
 	SDL_DestroyTexture(RgbTexture);// ÅØ½ºÃÄ ÆÄ±«ÇÏ±â
@@ -3816,7 +3821,30 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(EraTexture);
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
+	SDL_DestroyTexture(QusTexture);
 	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 10);
+
+	int good;
+	int max = 0;
+	for (int j = 0; j < 4; j++)
+	{
+		if (score[j][1] > max)
+		{
+			max = score[j][1];
+			good = j;
+		}
+	}
+	if (myownnumber - 1 == j)
+	{
+		sprintf(query, "update catchmind.login set level = level + 1 where name = '%s'", username);
+		mysql_query(cons, query);
+	}
+	CLS;
+	printf("½ÂÀÚ´Â %sÀÔ´Ï´Ù. ¸ÂÃá°¹¼ö %d°³\n", friendname[good], score[good][1]);
+	for (int k = 0; k < 4; k++)
+	{
+		printf("%s : %d°³\n", friendname[k], score[k][1]);
+	}
 	return 0;// Á¾·á
 }
 HWND GetConsoleHwnd(void)
