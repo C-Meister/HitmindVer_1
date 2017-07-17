@@ -384,7 +384,7 @@ void credit() {
 	printf("개발기간 : 10일");
 
 	gotoxy(50, 6);
-	printf("사용기술 : c언어, SDL, 소켓, mysql");
+	printf("사용기술 : c언어, SDL, 소켓, MySQL");
 
 	gotoxy(50, 8);
 	printf("소속학교 : 대구소프트웨어고등학교");
