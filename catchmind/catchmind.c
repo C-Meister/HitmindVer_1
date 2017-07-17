@@ -3126,10 +3126,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	
 		if (pastturn != turn)
 		{
+
 			han2unicode(topic, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
+//			han2unicode(query, unicode);
+//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);
 			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
@@ -3148,9 +3149,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					han2unicode(friendname[i], unicode);
 					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
 					sprintf(query, "%d", score[i][0]);
-
 					han2unicode(query, unicode);
-					TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
 
 					sprintf(query, "%d", score[i][1]);
 					han2unicode(query, unicode);
@@ -3512,8 +3512,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			happen = true;
 		}
 		
-		han2unicode(query, unicode);
-		TTF_DrawText(Renderer, Font, unicode, 0, 50);
+	//	han2unicode(query, unicode);
+	//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
 		if (happen == true) {
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
