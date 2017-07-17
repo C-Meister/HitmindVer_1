@@ -1888,15 +1888,15 @@ void mainatitleimage(void) {
 	gotoxy(90, 34);
 	printf("■■--공지사항--■■■■■■■■■■■■■■■■■■■"); gotoxy(90, 35);
 	printf("■                                                  ■");  gotoxy(90, 36);
-	printf("■   ● 게임 최초 실행시 해야할 설정들 (클릭)        ■"); gotoxy(90, 37);
+	printf("■   ● 게임 최초 실행시 해야할 설정들 (클릭)       ■"); gotoxy(90, 37);
 	printf("■                                                  ■"); gotoxy(90, 38);
 	printf("■   ● 간단한 설문조사와 피드백 (클릭)             ■"); gotoxy(90, 39);
 	printf("■                                                  ■"); gotoxy(90, 40);
 	printf("■   ● VPN을 끄고 실행 시켜주세요                  ■"); gotoxy(90, 41);
 	printf("■                                                  ■"); gotoxy(90, 42);
-	printf("■   ● 게임 강제종료시 문제가 발생할수 있습니다     ■"); gotoxy(90, 43);
+	printf("■   ● 게임 강제종료시 문제가 발생할수 있습니다    ■"); gotoxy(90, 43);
 	printf("■                                                  ■"); gotoxy(90, 44);
-	printf("■   ● 심각한 문제 발생시 랩실 13으로               ■"); gotoxy(90, 45);
+	printf("■   ● 심각한 문제 발생시 랩실 13으로              ■"); gotoxy(90, 45);
 	printf("■                                                  ■"); gotoxy(90, 46);
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 
@@ -1946,7 +1946,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 		}
 		else if (46 <= xx && xx <= 70 && yy == 36 && lr == 0) {
 			gotoxy(95, 36);
-			HIGH_GREEN printf("●게임 최초 실행시 해야할 설정들 (클릭)");
+			HIGH_GREEN printf("● 게임 최초 실행시 해야할 설정들 (클릭)");
 			gotoxy(95, 38);
 			WHITE printf("● 간단한 설문조사와 피드백 (클릭)");
 		}
