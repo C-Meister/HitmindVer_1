@@ -3545,9 +3545,11 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		{
 			writemode = true;
 		}
-		else
+		else {
+			drag = false;
 			writemode = false;		//X
 	//	CLS;
+		}
 
 		if (buff < SDLCLOCK) {
 			buff++;
@@ -3640,7 +3642,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					break;
 				}
 			case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
-			if (writemode == true) {
+				if (writemode == true) {
 				if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
 					if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
 						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
