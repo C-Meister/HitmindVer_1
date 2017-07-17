@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
+#include "LodePNG.h"
 
 #include <crtdbg.h>
 //#include <WinSock2.h>		//소켓프로그래밍
@@ -197,6 +198,8 @@ void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 int SDL_MAINS(void);
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step);
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int x, int y);
+Uint32 get_pixel32(SDL_Surface *surface, int x, int y);
+void makebmp(const char *filename, SDL_Surface *Surface);
 
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
@@ -3627,4 +3630,25 @@ HWND GetConsoleHwnd(void)
 	hwndFound = FindWindow(NULL, pszNewWindowTitle);		//새 윈도우 타이틀을 적용시킨 윈도우를 찾아 그 핸들값을 적용함
 	SetConsoleTitle(pszOldWindowTitle);					//윈도우타이틀을 원래 타이틀로 저장함
 	return(hwndFound);
+}
+Uint32 get_pixel32(SDL_Surface *surface, int x, int y)
+{
+	//Convert the pixels to 32 bit
+	Uint32 *pixels = (Uint32 *)surface->pixels;
+
+	//Get the requested pixel
+	return pixels[(y * surface->w) + x];
+}
+void makebmp(const char *filename, SDL_Surface *Surface) {
+	FILE *image = fopen(filename, "wb");
+	char tbuffer;
+	if (strcmp(filename, " ") != 0) {
+		for (int y = 0; y < 845; y++) {
+			for (int x = 0; x < 1583; x++) {
+				tbuffer = get_pixel32(Surface, x, y);
+				fputc(tbuffer, image);
+			}
+		}
+		fclose(image);
+	}
 }
