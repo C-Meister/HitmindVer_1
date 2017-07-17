@@ -3123,6 +3123,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	wchar_t inputText[128] = L"";
 	char topic[30];
 	bool hangeul = false;
+	
 	wchar_t wstr[2];
 	long firstclock = clock();
 	turn++;
