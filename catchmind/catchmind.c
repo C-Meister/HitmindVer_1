@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
+
 #include <crtdbg.h>
 //#include <WinSock2.h>		//¼ÒÄÏÇÁ·Î±×·¡¹Ö
 
@@ -39,6 +40,7 @@
 #include "mysql/mysql.h"
 #include "SDL/SDL_mixer.h"
 #include "SDL/SDL.h"
+#include "iconv.h"
 #define nullptr 0
 
 // ¶óÀÌºê·¯¸® ¼±¾ð¹® ¶óÀÌºê·¯¸®ÆÄÀÏÀº µû·Î Ãß°¡¾ÈÇØµµ µË´Ï´Ù.
@@ -50,6 +52,11 @@
 #pragma comment (lib,"SDL2_ttf")
 #pragma comment (lib, "SDL2_mixer.lib")	//±×·¡ÇÈ »ç¿îµå ¶óÀÌºê·¯¸® 4
 #pragma comment (lib, "ws2_32.lib")		//¼ÒÄÏ(³×Æ®¿öÅ©)¶óÀÌºê·¯¸®
+#pragma comment (lib, "libcharset.lib")
+#pragma comment (lib, "libcharset-bcc.lib")
+#pragma comment (lib, "libiconv.a")
+#pragma comment (lib, "libiconv.lib")
+#pragma comment (lib, "libiconv-bcc.lib")
 #pragma comment (lib, "winmm.lib")		//»ç¿îµå ¶óÀÌºê·¯¸®
 #pragma comment (lib, "GDIPlus.lib")		//ÀÌ¹ÌÁö ¶óÀÌºê·¯¸®
 
@@ -204,6 +211,7 @@ void credit();									//Å©·¹µ÷
 
 //-------------------------ÄÜ¼Ö ÇÔ¼öµé------------------------------------
 void checkword(char*nowword, char*scanword);	//´Ü¾î¸¦ È®ÀÎÇÔ
+int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength);
 void click(int *xx, int *yy, int *lr);					//Å¬¸¯ÇÔ¼ö µÎ¹øÂ°, xx°ª°ú yy°ªÀ» º¯È¯ÇÔ
 HWND GetConsoleHwnd(void);
 
@@ -237,7 +245,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	//SDL_MAIN();
 	//º¯¼ö ¼±¾ð
 	//int i, j, k, v, result;	
-	
+	InitializeCriticalSection(&cs);
 	unsigned int timeout = 7;
 	char mainchoose = 0;
 	char bangchoose;
@@ -1386,7 +1394,9 @@ void readchating(void) {
 	int last = 0;
 	//	CHATHAPPEN = true;
 	while (1) {
+		EnterCriticalSection(&cs);
 		if (CHATHAPPEN == false) {
+		
 		//	ZeroMemory(sql_result, sizeof(sql_result));
 			ZeroMemory(chatquery, sizeof(chatquery));
 			mysql_query(cons, "select id from catchmind.chating order by id desc limit 1");
@@ -1414,6 +1424,7 @@ void readchating(void) {
 			}
 			
 		}
+		LeaveCriticalSection(&cs);
 		Sleep(30);
 	}
 
@@ -2846,6 +2857,16 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int 
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst); //±×´ë·Î ·»´õ·¯¿¡ ÀúÀåÇÑ´Ù
 	return;
 }
+int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength)
+{
+	iconv_t cd = iconv_open("EUC-KR", "UTF-8");
+
+	int ires = (int)iconv(cd, &inBuf, (size_t*)&inLength, &outBuf, (size_t*)&outLength);
+
+	iconv_close(cd);
+
+	return ires;
+}
 
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
 	
@@ -3107,6 +3128,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	char click_eraser, click_pencil;
 	char dragging;
 	MYSQL_ROW sql_row;
+	char euckr[256];
+	RESET(euckr);
 	int xxx, yyy;
 	float sstrong;
 	float rr, gg, bb;
@@ -3209,8 +3232,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
 					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('test', '%ls')", L"¾È³ç");
+					EnterCriticalSection(&cs);
+					UTF8toEUCKR(euckr, 256,str, 256);
+					euckr[strlen(euckr)]='\0';
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username,euckr);
 					mysql_query(cons, query);
+					LeaveCriticalSection(&cs);
 					wcscpy(inputText, L"");
 					happen = true; 
 				}
@@ -3512,7 +3539,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
-					TTF_DrawText(Renderer, Font, chatquery[(int)l], 30, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 				}
 			}
 			CHATHAPPEN = false;
