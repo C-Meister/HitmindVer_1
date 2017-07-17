@@ -215,7 +215,6 @@ int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength);
 void click(int *xx, int *yy, int *lr);					//클릭함수 두번째, xx값과 yy값을 변환함
 HWND GetConsoleHwnd(void);
 
-//--------------------------미니게임 숫자야구 함수들----------------------
 
 
 wchar_t* UTF82UNICODE(char* UTF8, int len) {
@@ -296,7 +295,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		mainchoose = maintitle();				//main 화면
 		CLS;
 		if (mainchoose == 1) {				//main에서 첫번째를 고르면
-			ConsoleL(30, 30);
+			ConsoleL(25, 14);
 			if (sqllogin() != 1)		//로그인에 성공하지 못하면 처음으로
 				continue;
 
@@ -378,7 +377,7 @@ void credit() {
 	(GetAsyncKeyState(VK_LBUTTON) & 0x0001);
 
 	gotoxy(50, 2);
-	printf("히트마인드 with c project");
+	printf("히트마인드 with C project");
 
 	gotoxy(50, 4);
 	printf("개발기간 : 10일");
@@ -1824,6 +1823,7 @@ int sqlsignup(void) {
 
 }
 void mainatitleimage(void) {
+	SetConsoleTitle(L"히트마인드 with C      Powered by  C Meister TEAM");
 	WHITE
 		gotoxy(6, 3);
 	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
