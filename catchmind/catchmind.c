@@ -3123,7 +3123,17 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	long firstclock = clock();
 	turn++;
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
-	
+		if (Gametopic == turn - 1)
+		{
+			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+			strcpy(topic, sql_row[0]);
+			sprintf(query, "topic   %s", sql_row[0]);
+			//			mysql_free_result(sql_result);
+			send(connect_sock, query, 45, 0);
+			Gametopic++;
+			happen = true;
+		}
 		if (pastturn != turn)
 		{
 
@@ -3167,17 +3177,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		else
 			writemode = false;
 	//	CLS;
-		if (Gametopic == turn - 1)
-		{
-			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
-			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
-			strcpy(topic, sql_row[0]);
-			sprintf(query, "topic   %s", sql_row[0]);
-//			mysql_free_result(sql_result);
-			send(connect_sock, query, 45, 0);
-			Gametopic++;
-			happen = true;
-		}
+		
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
