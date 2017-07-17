@@ -139,7 +139,7 @@ int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
-char chatquery[15][50];
+wchar_t chatquery[15][50];
 Mix_Music *music, *mainmusic;
 
 //기본 함수들
@@ -210,6 +210,27 @@ HWND GetConsoleHwnd(void);
 //--------------------------미니게임 숫자야구 함수들----------------------
 
 
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i;
+	for (i = 0; i < 3 * len; i += 3) {
+		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
+		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
+		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
+	}
+	strcat(str, "\0");
+	return str;
+}
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 
@@ -1375,6 +1396,8 @@ void readchating(void) {
 					last2 = atoi(sql_row[0]);
 				
 			}
+			wchar_t wstr[128] = L"";
+				wchar_t wstr2[128] = L"";
 			mysql_free_result(sql_result);
 			if (last <= last2)
 			{
@@ -1383,7 +1406,9 @@ void readchating(void) {
 				v = 14;
 				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 				{
-					sprintf(chatquery[v], "%s : %s", sql_row[2], sql_row[3]);
+					wcscpy(wstr, UTF82UNICODE(sql_row[2],strlen(sql_row[2])));
+					wcscpy(wstr2, UTF82UNICODE(sql_row[3], strlen(sql_row[3])));
+					swprintf(chatquery[v], sizeof(chatquery[v]),"%S : %S", wstr, wstr2);
 					v--;
 				}
 				mysql_free_result(sql_result);
@@ -2825,27 +2850,6 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int 
 	return;
 }
 
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i;
-	for (i = 0; i < 3 * len; i += 3) {
-		str[i] = (unicode[i / 3] - 40960) / (64 * 64) - 22;
-		str[i + 1] = (unicode[i / 3] - 40960) % (4096) / 64 - 128;
-		str[i + 2] = (unicode[i / 3] - 40960) % 64 - 128;
-	}
-	strcat(str, "\0");
-	return str;
-}
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	
 	SDL_Window * Window = nullptr;//SDL 윈도우 선언
@@ -3206,8 +3210,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
-					
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, UNICODE2UTF8(inputText, wcslen(inputText)));
+					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username,str);
 					mysql_query(cons, query);
 					wcscpy(inputText, L"");
 					happen = true; 
@@ -3510,7 +3514,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
-					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//최근 15개의 채팅을 불러옴
+					TTF_DrawText(Renderer, Font, chatquery[(int)l], 30, 250 + 25 * l);		//최근 15개의 채팅을 불러옴
 				}
 			}
 			CHATHAPPEN = false;
