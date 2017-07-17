@@ -3355,7 +3355,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
 			sprintf(query, "문제 %d/15", ee+1);
-			if (ee > 15)
+			if (ee > 14)
 			{
 				quit = true;
 			}
