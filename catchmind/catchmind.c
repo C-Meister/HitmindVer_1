@@ -145,6 +145,7 @@ short Userping[4] = { -1, -1, -1, -1 };
 int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
+char pasttopic[20];
 bool CHATHAPPEN = false;
 char chatquery[15][50];
 Mix_Music *music, *mainmusic;
@@ -1659,7 +1660,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
-
+				strcpy(pasttopic, topics[turn]);
 				score[0][1] += 1;
 				turn = 1;
 				RESET(message);
@@ -1669,6 +1670,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
 			{
+				strcpy(pasttopic, topics[turn]);
 				score[1][1] += 1;
 				turn = 2;
 				RESET(message);
@@ -1678,6 +1680,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 3 answer") == 0)
 			{
+				strcpy(pasttopic, topics[turn]);
 				score[2][1] += 1;
 				turn = 3;
 				RESET(message);
@@ -1687,6 +1690,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 4 answer") == 0)
 			{
+				strcpy(pasttopic, topics[turn]);
 				score[3][1] += 1;
 				turn = 4;
 				RESET(message);
@@ -3303,6 +3307,13 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (CurrectHappen == true)
 		{
+			SDL_DestroyRenderer(Renderer2);
+			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+			SDL_RenderClear(Renderer2);
+			sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn], pasttopic);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
 			for (int i = 0; i < 4; i++)
 			{
 
@@ -3322,6 +3333,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 				}
 			}
+			SDL_Delay(2000);
 			happen = true;
 			CurrectHappen = false;
 		}
