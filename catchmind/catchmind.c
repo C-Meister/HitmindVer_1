@@ -347,6 +347,8 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 					{
 						CHOOSEROOM = bangchoose - 2;
 						serverreturn = Connect_Server(connectroom[bangchoose - 2].ip);		//서버 대기방 접속
+						if (serverreturn == -1)
+							continue;
 						if (serverreturn == 3) {											//return값 3이면 종료 버튼
 							exitallthread();
 							if (lead == true)
@@ -355,6 +357,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 								closesocket(connect_sock);
 							continue;
 						}
+						
 						if (serverreturn == 1)												//리턴값 1이면 start
 						{
 							CLS;
@@ -1534,8 +1537,10 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 	connect_addr.sin_family = AF_INET;				//연결할 서버의 주소 설정
 	connect_addr.sin_addr.S_un.S_addr = inet_addr(ServerIP); //서버 IP
 	connect_addr.sin_port = htons(5555);					 //서버 포트
-	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) //서버에 연결
+	if (connect(connect_sock, (SOCKADDR*)&connect_addr, sizeof(connect_addr))) { //서버에 연결
 		ErrorHandling("connect() error");
+		return -1;
+	}
 	threads[0] = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)recieve, NULL, 0, NULL); //서버에서 데이터를 받아오는 쓰레드 시작
 	CLS;
 
@@ -1881,7 +1886,7 @@ void mainatitleimage(void) {
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
 
 	gotoxy(90, 34);
-	printf("■--공지사항--■■■■■■■■■■■■■■■■■■■■"); gotoxy(90, 35);
+	printf("■■--공지사항--■■■■■■■■■■■■■■■■■■■"); gotoxy(90, 35);
 	printf("■                                                  ■");  gotoxy(90, 36);
 	printf("■   ●게임 최초 실행시 해야할 설정들 (클릭)        ■"); gotoxy(90, 37);
 	printf("■                                                  ■"); gotoxy(90, 38);
@@ -1891,7 +1896,7 @@ void mainatitleimage(void) {
 	printf("■                                                  ■"); gotoxy(90, 42);
 	printf("■   ●게임 강제종료시 문제가 발생할수 있습니다     ■"); gotoxy(90, 43);
 	printf("■                                                  ■"); gotoxy(90, 44);
-	printf("■   ●심각한 문제가 발생시 랩실 13으로             ■"); gotoxy(90, 45);
+	printf("■   ●심각한 문제 발생시 랩실 13으로               ■"); gotoxy(90, 45);
 	printf("■                                                  ■"); gotoxy(90, 46);
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 
@@ -1903,14 +1908,17 @@ int maintitle(void) { //게임 메인타이틀 출력
 	int xx = 0, yy = 0, lr = 0;
 	mainatitleimage();
 	while (1) {
+		WHITE
 		gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);
-		WHITE
-			click(&xx, &yy, &lr);
-
+	
+		click(&xx, &yy, &lr);
 		cur(6, 1);
 		printf("MySQL Ping : %dms", mysql_ping(cons));
 		mysql_select_db(cons, "catchmind");
+		
+		if(lr==1)
+			Sleep(50);
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
 			gotoxy(16, 23);
