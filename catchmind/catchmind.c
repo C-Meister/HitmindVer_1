@@ -2364,22 +2364,32 @@ void sendall(char *message, int c) {
 }
 void makeroom(int *count) {
 	int i = 0;
+	char query[100];
 	//	char message[100];
 	//	IN_ADDR serverip = GetDefaultMyIP();
 	listen_sock = socket(PF_INET, SOCK_STREAM, 0); // 소켓 생성 후 소켓에 대한 정보를 listen_sock변수에 대입					
-	if (listen_sock == INVALID_SOCKET)
+	if (listen_sock == INVALID_SOCKET) {
+		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+		mysql_query(cons, query);
 		ErrorHandling("socket() error");
+	}
 	printf("소켓 생성 완료!\n");
 	memset(&listen_addr, 0, sizeof(listen_addr)); // 서버의 주소 초기화
 	listen_addr.sin_family = AF_INET;
 	listen_addr.sin_addr.S_un.S_addr = htonl(INADDR_ANY); // 서버의 주소를 내 주소로 (아마도)
 	listen_addr.sin_port = htons(5555); // 서버 포트 
 	printf("주소 지정 완료!\n");
-	if (bind(listen_sock, (SOCKADDR*)&listen_addr, sizeof(listen_addr)) == SOCKET_ERROR) // 지금까지 설정한 주소를 listen_sock에 bind()로 지정
+	if (bind(listen_sock, (SOCKADDR*)&listen_addr, sizeof(listen_addr)) == SOCKET_ERROR) {// 지금까지 설정한 주소를 listen_sock에 bind()로 지정
+		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+		mysql_query(cons, query);
 		ErrorHandling("bind() error");
+	}
 	printf("bind() 완료!\n");
-	if (listen(listen_sock, 5) == SOCKET_ERROR)	// 클라이언트가 접속할때 까지 기다림
+	if (listen(listen_sock, 5) == SOCKET_ERROR) {	// 클라이언트가 접속할때 까지 기다림
+		sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
+		mysql_query(cons, query);
 		ErrorHandling("listen() error");
+	}
 	printf("listen() 완료!\n");
 	sockaddr_in_size = sizeof(connect_addr);
 	*count = 1;
@@ -3431,10 +3441,9 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					happen = true;
 				break;
 			case SDL_WINDOWEVENT://SDL종료 타입일 경우
-				send(connect_sock, "exit", 35, 0);
 				switch (event.window.event) {
 				case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
-					
+					send(connect_sock, "exit", 35, 0);
 					quit = true;// quit를 true로 변경
 					break;// 브레이크
 				case SDL_WINDOWEVENT_ENTER:// 윈도우
