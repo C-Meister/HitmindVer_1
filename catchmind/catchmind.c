@@ -2554,6 +2554,8 @@ void CheckPing(void)
 		}
 	}
 	
+	printf("엔터를 눌러 시작");
+	getchar();
 	WHITE
 	
 
