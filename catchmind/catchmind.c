@@ -3125,6 +3125,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 		if (Gametopic == turn - 1)
 		{
+			RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
@@ -3521,7 +3522,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (happen == true) {
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
 			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
-			RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
+		
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,&r, &g, &b);
 			happen = false;
 
