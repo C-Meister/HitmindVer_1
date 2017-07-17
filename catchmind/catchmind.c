@@ -1660,6 +1660,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
+				sndPlaySoundA("music\\kill.wav", SND_ASYNC);
 				strcpy(pasttopic, topics[turn-1]);
 				score[0][1] += 1;
 				turn = 1;
@@ -1670,6 +1671,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
 			{
+				sndPlaySoundA("music\\kill.wav", SND_ASYNC);
 				strcpy(pasttopic, topics[turn - 1]);
 				score[1][1] += 1;
 				turn = 2;
@@ -1680,6 +1682,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 3 answer") == 0)
 			{
+				sndPlaySoundA("music\\kill.wav", SND_ASYNC);
 				strcpy(pasttopic, topics[turn - 1]);
 				score[2][1] += 1;
 				turn = 3;
@@ -1690,6 +1693,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "right 4 answer") == 0)
 			{
+				sndPlaySoundA("music\\kill.wav", SND_ASYNC);
 				strcpy(pasttopic, topics[turn - 1]);
 				score[3][1] += 1;
 				turn = 4;
