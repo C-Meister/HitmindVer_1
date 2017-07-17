@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
-#include "LodePNG.h"
 
 #include <crtdbg.h>
 //#include <WinSock2.h>		//¼ÒÄÏÇÁ·Î±×·¡¹Ö
@@ -1663,6 +1662,8 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				score[0][1] += 1;
 				turn = 1;
 				RESET(message);
+				if (myownnumber = 1)
+					Gametopic = 0;
 				CurrectHappen = true;
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
@@ -1670,6 +1671,8 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				score[1][1] += 1;
 				turn = 2;
 				RESET(message);
+				if (myownnumber = 2)
+					Gametopic = 0;
 				CurrectHappen = true;
 			}
 			else if (strcmp(message, "right 3 answer") == 0)
@@ -1677,6 +1680,8 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				score[2][1] += 1;
 				turn = 3;
 				RESET(message);
+				if (myownnumber = 3)
+					Gametopic = 0;
 				CurrectHappen = true;
 			}
 			else if (strcmp(message, "right 4 answer") == 0)
@@ -1684,6 +1689,8 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				score[3][1] += 1;
 				turn = 4;
 				RESET(message);
+				if (myownnumber = 4)
+					Gametopic = 0;
 				CurrectHappen = true;
 			}
 
@@ -2767,11 +2774,12 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	SDL_RenderCopy(Renderer, Texture, &Src, &Dst);//SrcÀÇ Á¤º¸¸¦ °¡Áö°í ÀÖ´Â Texture¸¦ DstÀÇ Á¤º¸¸¦ °¡Áø Texture ·Î º¯È¯ÇÏ¿© ·»´õ·¯¿¡ ÀúÀå
 	return;
 }
-void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
+void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
 	if (SDL_Clear == true) {
+		SDL_DestroyRenderer(Renderer4);
+		Renderer4 = SDL_CreateRenderer(Window4, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 		SDL_SetRenderDrawColor(Renderer4, 255, 255, 255, 0);
 		SDL_RenderClear(Renderer4);
-		SDL_RenderPresent(Renderer4);
 		SDL_Clear = false;
 		return;
 	}
@@ -2959,7 +2967,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
-	SDL_Rect Timer2 = { 0, 100, 1310 / 4 + 10, 200 };
+	SDL_Rect Timer2 = { 0, 60, 400, 100 };
 							// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -2997,7 +3005,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
 		return 0;
 	}
-
+	
 	// À©µµ¿ìÃ¢ 3°³·Î ³ª´©´Â ±âÁØ xÁÂÇ¥´Â 1920 - 1310/4-10ÀÌ°í, 1080-900/4-10Àº yÁÂÇ¥ÀÇ ±âÁØÀÌ´Ù.
 	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
@@ -3204,25 +3212,34 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	long firstclock = clock();
 	turn++;
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
-		/*if ((myownnumber + Gametopic) == turn)
+		if (myownnumber == turn && Gametopic == 0)
 		{
-			
+			EnterCriticalSection(&cs);
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 			strcpy(topic, sql_row[0]);
 			sprintf(query, "topic   %s", sql_row[0]);
+			LeaveCriticalSection(&cs);
 			//			mysql_free_result(sql_result);
 			send(connect_sock, query, 45, 0);
-			myownnumber += 4;
+			Gametopic++;
+			
 			happen = true;
-		}*/
+		}
 		if (pastturn != turn)
 		{
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
-			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-			han2unicode(topic, unicode);
-			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			if (myownnumber == turn) {
+				RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+				han2unicode(topic, unicode);
+				TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
+				SDL_RenderFillRect(Renderer, &Timer2);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
+			}
 //			han2unicode(query, unicode);
 //			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
 	//		SDL_RenderPresent(Renderer);
@@ -3269,7 +3286,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			ReceiveRender(Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 		}
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
@@ -3494,17 +3511,15 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								happen = true;
 							}
 							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
-						/*		SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-								SDL_RenderClear(Renderer2);*/
+					
+								sprintf(query, "screenshot\\%d.bmp",time(NULL));
+								makebmp(query, Renderer2);
 								SDL_DestroyRenderer(Renderer2);
 								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 								SDL_RenderClear(Renderer2);
 								happen = true;
 								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
-							/*	Fonts.w += 2;// ¿Ïº®ÇÑ ¿øÀÌ ¾Æ´Ï¶ó¼­ ÂÉ²û »ßÁ®³ª¿È
-								Fonts.h += 2;
-								newclick = 1;*/
 								//¿©±â~~~~~~~~~~~~~~~~~~
 								if (connect_sock != 0) {
 									send(connect_sock, "SDLCLEAR", 45, 0);
@@ -3667,16 +3682,9 @@ Uint32 get_pixel32(SDL_Surface *surface, int x, int y)
 	//Get the requested pixel
 	return pixels[(y * surface->w) + x];
 }
-void makebmp(const char *filename, SDL_Surface *Surface) {
-	FILE *image = fopen(filename, "wb");
-	char tbuffer;
-	if (strcmp(filename, " ") != 0) {
-		for (int y = 0; y < 845; y++) {
-			for (int x = 0; x < 1583; x++) {
-				tbuffer = get_pixel32(Surface, x, y);
-				fputc(tbuffer, image);
-			}
-		}
-		fclose(image);
-	}
+void makebmp(const char *filename, SDL_Renderer * Renderer2) {
+	SDL_Surface *sshot = SDL_CreateRGBSurface(0, (1920 - 1310 / 4 - 10), (1080 - 900 / 4 - 10), 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+	SDL_RenderReadPixels(Renderer2, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+	SDL_SaveBMP(sshot, filename);
+	SDL_FreeSurface(sshot);
 }
