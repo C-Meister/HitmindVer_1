@@ -1881,6 +1881,16 @@ void mainatitleimage(void) {
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 25);
 	printf("■              ■                      ■              ■                      ■              ■"); gotoxy(12, 26);
 	printf("■■■■■■■■■                      ■■■■■■■■■                      ■■■■■■■■■");
+
+	gotoxy(90, 34);
+	printf("■--공지사항--■■■■■■■■■■■■■■■■■■■■"); gotoxy(90, 36);
+	printf("■   ●게임 최초 실행시 해야할 설정들 (클릭)        ■"); gotoxy(90, 38);
+	printf("■   ● 간단한 설문조사와 피드백 (클릭)              ■"); gotoxy(90, 40);
+	printf("■   ● VPN을 끄고 실행 시켜주세요                   ■"); gotoxy(90, 42);
+	printf("■   ●게임 강제종료시 문제가 발생할수 있습니다     ■"); gotoxy(90, 44);
+	printf("■   ●심각한 문제가 발생시 랩실 13으로                   ■"); gotoxy(90, 46);
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+
 }
 int maintitle(void) { //게임 메인타이틀 출력
 	ConsoleL(80, 50);
@@ -2286,7 +2296,7 @@ void Auto_Update(void)
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
-	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	printf("■■--업데이트기록--■■■■■■■■■■■■■■■■■■■■");
 	while ((sql_row = mysql_fetch_row(sql_result)) != 0)
 	{
 		cur(10, 35 + (i * 3));
