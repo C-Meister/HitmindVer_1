@@ -2766,34 +2766,34 @@ void ReceiveRender(SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag,
 		}
 	}
 }
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts, wchar_t* inputText, float strong, int r, int g, int b) {
-	SDL_SetRenderDrawColor(Renderer2, r, g, b, 0);// »ö±ò¼³Á¤
-	RenderTexture(Renderer, TraTexture, &Track);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-	RenderTexture(Renderer, BoxTexture, &Box);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-	RenderTexture(Renderer, EraTexture, &Eraser);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-	RenderTexture(Renderer, PenTexture, &Pencil);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-	RenderTexture(Renderer, NewTexture, &New);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-	RenderTexture(Renderer, InpTexture, &InputT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int *r, int *g, int *b) {
+	SDL_SetRenderDrawColor(Renderer2, *r, *g, *b, 0);// »ö±ò¼³Á¤
+	RenderTexture(Renderer, TraTexture, Track);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+	RenderTexture(Renderer, BoxTexture, Box);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+	RenderTexture(Renderer, EraTexture, Eraser);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+	RenderTexture(Renderer, PenTexture, Pencil);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+	RenderTexture(Renderer, NewTexture, New);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+	RenderTexture(Renderer, InpTexture, InputT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 	if (on.eraser == true || clicks.eraser == true) { // eraser°¡ Å¬¸¯ µÇ¾î ÀÖ°Å³ª eraser¾ÆÀÌÄÜÀ§¿¡ ¸¶¿ì½º°¡ ÀÖÀ¸¸é
-		SDL_RenderRemoveEdge(Renderer, &Eraser);
-		RenderTexture(Renderer, EraTexture, &Eraser);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-		SDL_RenderDrawEdge(Renderer, &Eraser, clicks.eraser);
+		SDL_RenderRemoveEdge(Renderer, Eraser);
+		RenderTexture(Renderer, EraTexture, Eraser);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+		SDL_RenderDrawEdge(Renderer, Eraser, clicks.eraser);
 	}
 	if (on.pencil == true || clicks.pencil == true) { // pencilÀÌ Å¬¸¯ µÇ¾î ÀÖ°Å³ª pencil¾ÆÀÌÄÜÀ§¿¡ ¸¶¿ì½º°¡ ÀÖÀ¸¸é
-		SDL_RenderRemoveEdge(Renderer, &Pencil);
-		RenderTexture(Renderer, PenTexture, &Pencil);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-		SDL_RenderDrawEdge(Renderer, &Pencil, clicks.pencil);
+		SDL_RenderRemoveEdge(Renderer, Pencil);
+		RenderTexture(Renderer, PenTexture, Pencil);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+		SDL_RenderDrawEdge(Renderer, Pencil, clicks.pencil);
 	}
 	if (on.new == true) {
-		SDL_RenderRemoveEdge(Renderer, &New);
-		RenderTexture(Renderer, NewTexture, &New);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-		SDL_RenderDrawEdge(Renderer, &New, 0);
+		SDL_RenderRemoveEdge(Renderer, New);
+		RenderTexture(Renderer, NewTexture, New);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+		SDL_RenderDrawEdge(Renderer, New, 0);
 	}
 	if (clicks.eraser == true || clicks.pencil == true)
-		SDL_FontUpdate(Renderer, Font, Track, strong, r, g, b);
+		SDL_FontUpdate(Renderer, Font, *Track, *strong, r, g, b);
 
 	if (wcscmp(inputText, L"") != 0) {
-		RenderTexture(Renderer, InpTexture, &InputT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+		RenderTexture(Renderer, InpTexture, InputT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 
 		TTF_DrawText(Renderer, Fonts, inputText, 10, 672);
 	}
@@ -2803,10 +2803,9 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 	SDL_RenderPresent(Renderer);// ·»´õ·¯ Ãâ·Â
 	SDL_RenderPresent(Renderer2);
 	SDL_RenderPresent(Renderer3);
-	SDL_RenderRemoveEdge(Renderer, &Eraser);
-	SDL_RenderRemoveEdge(Renderer, &Pencil);
-	SDL_RenderRemoveEdge(Renderer, &New);
-
+	SDL_RenderRemoveEdge(Renderer, Eraser);
+	SDL_RenderRemoveEdge(Renderer, Pencil);
+	SDL_RenderRemoveEdge(Renderer, New);
 }
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font,wchar_t* sentence, int x, int y) {
 	SDL_Color Color = { 0,0,0 };
@@ -3157,6 +3156,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 				}
 			}
+			happen = true;
 			CurrectHappen = false;
 		}
 		if (myownnumber == turn)
@@ -3166,7 +3166,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		else
 			writemode = false;
 	//	CLS;
-		if (Gametopic == 0)
+		if (Gametopic == turn - 1)
 		{
 			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
@@ -3201,6 +3201,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				happen = true;
 				break;
 			case SDL_KEYDOWN:
+			
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
 					
@@ -3518,8 +3519,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-			
-			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, Track, Box, Eraser, Pencil, New, &Fonts, Chat, InputT, Font, inputText, strong, r, g, b);
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong,&r, &g, &b);
 			happen = false;
 
 		}
