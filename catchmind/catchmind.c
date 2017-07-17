@@ -3392,7 +3392,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
 			SDL_RenderFillRect(Renderer, &Timer3);// 지우개같이 흰색으로 칠함
 			first++;
-			if (first == 61)
+			if (first == 11)
 			{
 				if (turn == myownnumber)
 				{
@@ -3413,7 +3413,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				first = 0;
 				timeout = false;
 			}
-			sprintf(query, "%d초 남음", 60 - first);
+			sprintf(query, "%d초 남음", 10 - first);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 150, 150);
 			happen = true;
