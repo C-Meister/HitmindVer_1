@@ -1906,8 +1906,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 		printf("MySQL Ping : %dms", mysql_ping(cons));
 		mysql_select_db(cons, "catchmind");
 		
-		if(lr==1)
-			Sleep(50);
+			
 
 		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
 			gotoxy(16, 23);
@@ -1946,9 +1945,11 @@ int maintitle(void) { //게임 메인타이틀 출력
 			WHITE printf("● 게임 최초 실행시 해야할 설정들 (Enter키 입력)");
 		}
 		else if (46 <= xx && xx <= 70 && yy == 36 && lr == 1) {
+			Sleep(100);
 			system("start https://blog.naver.com/soohan530/221053393169");
 		}
 		else if (46 <= xx && xx <= 70 && yy == 38 && lr == 1) {
+			Sleep(100);
 			system("start https://goo.gl/forms/0x4Vbro3dWqcO4213");
 		}
 		else {
