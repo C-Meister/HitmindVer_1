@@ -139,7 +139,7 @@ int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
 bool CHATHAPPEN = false;
-wchar_t chatquery[15][50];
+char chatquery[15][50];
 Mix_Music *music, *mainmusic;
 
 //기본 함수들
@@ -180,7 +180,7 @@ void SDL_ExceptionRoutine(SDL_Renderer* Renderer, SDL_Window* Window, char* msg,
 SDL_Texture * LoadTexture(SDL_Renderer * Renderer, const char *file);						  // 텍스쳐에 이미지파일 로드하는 함수 선언
 SDL_Texture * LoadTextureEx(SDL_Renderer * Renderer, const char *file, int r, int g, int b, int angle, SDL_Rect * center, SDL_RendererFlip flip);  // 텍스쳐에 이미지파일 다양하게 로드하는 함수 선언
 void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rect);	//텍스쳐를 출력하는 함수 선언
-void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect Track, SDL_Rect Box, SDL_Rect Eraser, SDL_Rect Pencil, SDL_Rect New, SDL_Rect *Font, SDL_Rect Chat, SDL_Rect InputT, TTF_Font* Fonts, wchar_t* inputText, float strong, int r, int g, int b);
+void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Texture* TraTexture, SDL_Texture* BoxTexture, SDL_Texture* EraTexture, SDL_Texture* PenTexture, SDL_Texture* NewTexture, SDL_Texture* ChaTexture, SDL_Texture* InpTexture, SDL_Rect *Track, SDL_Rect *Box, SDL_Rect *Eraser, SDL_Rect *Pencil, SDL_Rect *New, SDL_Rect *Font, SDL_Rect* Chat, SDL_Rect *InputT, TTF_Font* Fonts, wchar_t* inputText, float *strong, int *r, int *g, int *b);
 void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, float strong, int r, int g, int b);
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
@@ -1396,8 +1396,6 @@ void readchating(void) {
 					last2 = atoi(sql_row[0]);
 				
 			}
-			wchar_t wstr[128] = L"";
-				wchar_t wstr2[128] = L"";
 			mysql_free_result(sql_result);
 			if (last <= last2)
 			{
@@ -1406,9 +1404,8 @@ void readchating(void) {
 				v = 14;
 				while ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 				{
-					wcscpy(wstr, UTF82UNICODE(sql_row[2],strlen(sql_row[2])));
-					wcscpy(wstr2, UTF82UNICODE(sql_row[3], strlen(sql_row[3])));
-					swprintf(chatquery[v], sizeof(chatquery[v]),"%S : %S", wstr, wstr2);
+			
+					sprintf(chatquery[v],"%s : %s", sql_row[2], sql_row[3]);
 					v--;
 				}
 				mysql_free_result(sql_result);
@@ -2815,7 +2812,7 @@ void SDL_RenderUpdate(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Rende
 		SDL_RenderDrawEdge(Renderer, New, 0);
 	}
 	if (clicks.eraser == true || clicks.pencil == true)
-		SDL_FontUpdate(Renderer, Font, *Track, *strong, r, g, b);
+		SDL_FontUpdate(Renderer, Font, *Track, *strong, *r, *g, *b);
 
 	if (wcscmp(inputText, L"") != 0) {
 		RenderTexture(Renderer, InpTexture, InputT);// 렌더러에 저장하기
@@ -3212,7 +3209,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
 					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username,str);
+					sprintf(query, "insert into catchmind.chating (name, mean) values ('test', '%ls')", L"안녕");
 					mysql_query(cons, query);
 					wcscpy(inputText, L"");
 					happen = true; 
