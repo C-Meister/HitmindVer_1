@@ -1697,7 +1697,6 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
-				printf("SDLCLEAR");
 				SDL_Clear = true;
 				SDLCLOCK+=2;
 				continue;
@@ -3399,10 +3398,11 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					while (1)
 					{
 						turn++;
+						if (turn == 5)
+							turn = 1;
 						if (status[turn - 1] != 0)
 							break;
-						else if (turn == 5)
-							turn = 1;
+						
 					}
 					sprintf(query, "time out %d", turn);
 					send(connect_sock, query, 45, 0);
