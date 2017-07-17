@@ -463,7 +463,7 @@ void sqlmakeroom(void) {
 		WHITE
 			printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■                                              ■\n");
-		printf("■            캐치마인드 방 만들기              ■\n");
+		printf("■            히트마인드 방 만들기              ■\n");
 		printf("■          내 ip :  %s \n", myip);
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 		printf("■    제목    □                              □■\n");
@@ -2218,7 +2218,7 @@ int chooseroom(int roomnum) {
 	WHITE
 		printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■                                              ■\n");
-	printf("■              캐치마인드 방 접속              ■\n");
+	printf("■              히트마인드 방 접속              ■\n");
 	printf("■          접속 ip :  %s\n", connectroom[roomnum].ip);
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("■  방 제목   □                              □■\n");			// x = 17 y = 5
