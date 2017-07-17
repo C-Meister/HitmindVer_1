@@ -1487,6 +1487,7 @@ void loadmysql(char mysqlip[])	//MYSQL 서버 불러오기
 		fprintf(stderr, "%s\n", mysql_error(cons));
 		printf("새로운 ip를 설정해 주세요.\n윈도우 10이 안되면 윈도우7 ip는 10.80.162.92입니다.\n->");
 		scanf("%s", mysqlip);
+		getchar();
 		loadmysql(mysqlip);					//재귀함수 호출
 	}
 	else {
@@ -2377,7 +2378,7 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.3";
+	char version[] = "0.0.2";
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
@@ -2404,7 +2405,7 @@ void Auto_Update(void)
 	{
 		CLS;
 		cur(0, 0);
-		printf("서버 버전과 현재 버전이 다릅니다. 업데이트 하시겠습니까? 안되면 관리자권한으로 실행해주세요 서버 버전 : %s 내 버전 : %s\n안되면 홈페이지에서 다운바독 실행해주세요\n 1. 예 2. 아니요", serverversion, version);
+		printf("서버 버전과 현재 버전이 다릅니다. 업데이트 하시겠습니까? 안되면 관리자권한으로 실행해주세요 서버 버전 : %s 내 버전 : %s\n안되면 홈페이지에서 다운받아 실행해주세요\n 1. 예 2. 아니요", serverversion, version);
 		choose = getch();
 		if (choose != '1')
 			return;
