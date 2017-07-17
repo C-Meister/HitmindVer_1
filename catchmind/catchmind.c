@@ -223,7 +223,35 @@ HWND GetConsoleHwnd(void);
 
 
 
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i=0,j=0;
+	for (i = 0; j < len; j++) {
+		if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {
+			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
+			str[i+1] = (unicode[j] - 40960) % (4096) / 64 - 128;
+			str[i+2] = (unicode[j] - 40960) % 64 - 128;
+			i += 3;
+		}
+		else {
+			str[i] = unicode[j];
+			i ++;
+		}
 
+	}
+	strcat(str, "\0");
+	return str;
+}
 int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ 
 {
 
@@ -3137,7 +3165,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	bool quit = false;//ºÒ º¯¼ö ¼±¾ð
 	bool drag = false;// µå·¡±×ÁßÀÎÁö È®ÀÎÇÏ´Â º¯¼ö ¼±¾ð
 	bool happen = true;
-	
+	bool hangeulinput = false;
+	bool enter = false;
 	bool writemode = false;
 	
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
@@ -3171,7 +3200,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	wchar_t inputText[128] = L"";
 	char topic[30];
 	bool hangeul = false;
-	
 	wchar_t wstr[2];
 	long firstclock = clock();
 	turn++;
@@ -3246,22 +3274,23 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_TEXTINPUT:
-				if (hangeul == true && event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237)// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
+				if (hangeul == true && (event.text.text[0]==-29||event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// c³ª v¸¦ ´­·¶¾ú´Âµ¥ ÄÁÆ®·Ñ ¸ðµå°¡ ¾Æ´Ñ°æ¿ì Áï ´ëºÎºÐÀÇ ÀÚÆÇÀÔ·ÂÀÇ °æ¿ì
 				{
 					wstr[2] = L"";
 					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
 					wstr[0] = sum;
 					wcscat(inputText, wstr);
+					hangeulinput = true;
 				}
 				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {
 					wstr[2] = L"";
 					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);
 					wcscat(inputText, wstr);
+					hangeulinput = false;
 				}
 				happen = true;
 				break;
 			case SDL_KEYDOWN:
-			
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
 					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
@@ -3330,7 +3359,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
 						if (length == 0) break;
 						if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
-
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
