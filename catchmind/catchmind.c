@@ -3294,7 +3294,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						enter = true;
 					else {
 						strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
-						
 						UTF8toEUCKR(euckr, 256, str, 256);
 						euckr[strlen(euckr)] = '\0';
 						if (strcmp(euckr, topics[turn - 1]) == 0)
@@ -3309,20 +3308,11 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							mysql_query(cons, query);
 							LeaveCriticalSection(&cs);
 						}
-						
 						wcscpy(inputText, L"");
 						enter = false;
 						happen = true;
 					}
-					cur(0, 20);
-					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
 					
-					UTF8toEUCKR(euckr, 256,str, 256);
-					euckr[strlen(euckr)]='\0';
-					
-					RESET(euckr);
-					wcscpy(inputText, L"");
-					happen = true; 
 				}
 				else if (event.key.keysym.sym == SDLK_RALT)
 					hangeul = !(hangeul);
