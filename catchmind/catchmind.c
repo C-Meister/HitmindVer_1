@@ -2192,7 +2192,7 @@ int chooseroom(int roomnum) {
 	sql_row = mysql_fetch_row(mysql_store_result(cons));
 	connectroom[roomnum].people = atoi(sql_row[0]);
 //	mysql_free_result(sql_result);
-	if (connectroom[roomnum].people == 4)
+	if (connectroom[roomnum].people == 4 || connectroom[roomnum].people == 0)
 		return -1;
 
 	if (!(strcmp(connectroom[roomnum].password, roompassword)))
