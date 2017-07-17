@@ -1639,21 +1639,25 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
 				score[0][1] += 1;
+				turn = 1;
 				RESET(message);
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
 			{
 				score[1][1] += 1;
+				turn = 2;
 				RESET(message);
 			}
 			else if (strcmp(message, "right 2 answer") == 0)
 			{
 				score[2][1] += 1;
+				turn = 3;
 				RESET(message);
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
 			{
 				score[3][1] += 1;
+				turn = 4;
 				RESET(message);
 			}
 
@@ -2867,7 +2871,6 @@ int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength)
 
 	return ires;
 }
-
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 	
 	SDL_Window * Window = nullptr;//SDL 윈도우 선언
@@ -3232,13 +3235,22 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				if (event.key.keysym.sym == SDLK_RETURN) {
 					cur(0, 20);
 					strcpy(str,UNICODE2UTF8(inputText, wcslen(inputText)));
-					EnterCriticalSection(&cs);
+					
 					UTF8toEUCKR(euckr, 256,str, 256);
 					euckr[strlen(euckr)]='\0';
+					if (strcmp(euckr, topics[turn]) == 0)
+					{
+						if (myownnumber != turn)
+							send(connect_sock, "right   answer", 35, 0);
 				
-					sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username,euckr);
-					mysql_query(cons, query);
-					LeaveCriticalSection(&cs);
+					}
+					else {
+						EnterCriticalSection(&cs);
+						sprintf(query, "insert into catchmind.chating (name, mean) values ('%s', '%s')", username, euckr);
+						mysql_query(cons, query);
+						LeaveCriticalSection(&cs);
+					}
+					
 					wcscpy(inputText, L"");
 					happen = true; 
 				}
