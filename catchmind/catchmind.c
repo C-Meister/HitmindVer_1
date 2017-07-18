@@ -864,7 +864,9 @@ int waitroom(void)
 			{
 				sprintf(query, "delete from catchmind.chating where room = '%s'", inet_ntoa(GetDefaultMyIP()));
 				mysql_query(cons, query);
-				sprintf(query, "insert into catchmind.chating (name, mean, room) values ('관리자', '%s방 게임을 시작합니다', '%s')", connectroom[CHOOSEROOM].roomname, connectroom[CHOOSEROOM].ip);
+				sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[관리자]', '%s방 게임을 시작합니다.', '%s')", connectroom[CHOOSEROOM].roomname, connectroom[CHOOSEROOM].ip);
+				mysql_query(cons, query);
+				sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[관리자]', '/?를 통해 명령어를 볼수 있습니다.', '%s')",connectroom[CHOOSEROOM].ip);
 				mysql_query(cons, query);
 				signalmode = 3;
 				sprintf(query, "delete from catchmind.room where ip = '%s'", inet_ntoa(GetDefaultMyIP()));
@@ -2929,9 +2931,13 @@ void getlevel(void)
 void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font,TTF_Font *topicFont,FILE* out[], int step) {
 	switch (step) {
 	case 10:
+		if (out[0] != NULL)
 		fclose(out[0]);
+		if (out[1] != NULL)
 		fclose(out[1]);
+		if (out[2] != NULL)
 		fclose(out[2]);
+		if (out[3] != NULL)
 		fclose(out[3]);
 		SDL_StopTextInput();
 	case 9:
