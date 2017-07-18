@@ -3478,6 +3478,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (CurrectHappen == true)
 		{
 			CurrectHappen = false;
+			firstclock = clock();
+			first = 0;
 			SDL_DestroyRenderer(Renderer2);
 			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
@@ -3632,6 +3634,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
 					send(connect_sock, "exit", 35, 0);
 					quit = true;// quit를 true로 변경
+					Sleep(100);
 					break;// 브레이크
 				case SDL_WINDOWEVENT_ENTER:// 윈도우
 					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
