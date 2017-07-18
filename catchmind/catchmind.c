@@ -110,17 +110,6 @@ struct on {
 	bool pencil;
 	bool new;
 }on = { false,false,false };
-struct RECEIBE {
-	char click_eraser;
-	char click_pencil;
-	char dragging;
-	int xxx;
-	int yyy;
-	float sstrong;
-	float rr;
-	float gg;
-	float bb;
-}Hi;
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
@@ -1596,7 +1585,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				cur(10, 31);
 				printf("recieve = %d                    ", i++);
-				sscanf(message, "%hhd %hhd %hhd %d %d %f %f %f %f", &Hi.click_eraser, &Hi.click_pencil, &Hi.dragging, &Hi.xxx, &Hi.yyy, &Hi.sstrong, &Hi.rr, &Hi.gg, &Hi.bb);
+				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
 				continue;
@@ -3619,11 +3608,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 
 		if (buff < SDLCLOCK) {
-		//	sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-		//	ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
-			ReceiveRender(Window2, Renderer2, (bool)Hi.click_eraser, (bool)Hi.click_pencil, (bool)Hi.dragging, Hi.xxx, Hi.yyy, Hi.sstrong, (float)Hi.rr, (float)Hi.gg, (float)Hi.bb);
 			buff++;
-			
+			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 		}
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
