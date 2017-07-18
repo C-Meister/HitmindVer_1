@@ -1585,6 +1585,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
+				continue;
 			}
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
@@ -1606,7 +1607,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[3] = 1;
 				ZeroMemory(message, sizeof(message));
 			}
-			if (strncmp("player 1 ready", message, 13) == 0) {
+			else if (strncmp("player 1 ready", message, 13) == 0) {
 				sscanf(message, "player 1 ready %s", friendname[0]);
 				status[0] = 2;
 				ZeroMemory(message, sizeof(message));
@@ -1626,7 +1627,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				status[3] = 2;
 				ZeroMemory(message, sizeof(message));
 			}
-			if (strncmp("player 1 not ready", message, 16) == 0) {
+			else if (strncmp("player 1 not ready", message, 16) == 0) {
 				sscanf(message, "player 1 not ready %s", friendname[0]);
 				status[0] = 1;
 				ZeroMemory(message, sizeof(message));
@@ -2411,6 +2412,8 @@ void Auto_Update(void)
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
 	printf("■■--업데이트기록--■■■■■■■■■■■■■■■■■■■■");
+	cur(50, 34);
+	printf("--현재 : %s--", version);
 	while ((sql_row = mysql_fetch_row(sql_result)) != 0)
 	{
 		cur(10, 35 + (i * 3));
@@ -2431,12 +2434,18 @@ void Auto_Update(void)
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 	if (strcmp(serverversion, version) != 0)
 	{
-		CLS;
 		cur(0, 0);
 		printf("서버 버전과 현재 버전이 다릅니다. 업데이트 하시겠습니까? 안되면 관리자권한으로 실행해주세요 서버 버전 : %s 내 버전 : %s\n안되면 홈페이지에서 다운받아 실행해주세요\n 1. 예 2. 아니요", serverversion, version);
 		choose = getch();
 		if (choose != '1')
-			return;
+		{
+			cur(0, 0);
+			printf("                                                                                                                                    \n ");
+			printf("                                                                                                                                    \n ");
+			printf("                                                                                                                                     \n ");
+			printf("                                                                                                                                     \n ");
+			return ;
+		}
 		else
 		{
 			FILE *ftp, *fftp;
@@ -2464,7 +2473,7 @@ void Auto_Update(void)
 			exit(1);
 
 		}
-
+		
 	}
 }
 void sendall(char *message, int c) {
@@ -2630,7 +2639,7 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 				RESET(message);
-			
+				continue;
 			}
 			else if (strcmp("right   answer", message) == 0)
 			{
