@@ -25,6 +25,7 @@
 #include <winapifamily.h>
 #include <stdbool.h>
 #include <signal.h>
+#include <direct.h>
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
@@ -166,6 +167,7 @@ void disablecursor(bool a);						//Ä¿¼­ º¸ÀÌ±â, ¼û±â±â  0 = º¸ÀÌ±â 1 = ¼û±â±â
 wchar_t* UTF82UNICODE(char* UTF8, int len);
 char* UNICODE2UTF8(wchar_t* unicode, int len);
 void usermain(void);
+
 //--------------------- ³×Æ®¿öÅ© ÇÔ¼öµé -----------------------------------
 void ErrorHandling(char *Message);				//¼ÒÄÏ ¿¡·¯ Ãâ·Â ÇÏ´Â ÇÔ¼ö
 int Connect_Server(char *ServerIP);			//¼­¹ö ¿¬°á ÇØÁÖ´Â ÇÔ¼ö
@@ -264,6 +266,7 @@ void Auto_Update(void);
 void checkword(char*nowword, char*scanword);	//´Ü¾î¸¦ È®ÀÎÇÔ
 wchar_t* UTF82UNICODE(char* UTF8, int len);
 int UTF8toEUCKR(char *outBuf, int outLength, char *inBuf, int inLength);
+char* getDesktopFolderName();
 char* UNICODE2UTF8(wchar_t* unicode, int len);
 void click(int *xx, int *yy, int *lr);					//Å¬¸¯ÇÔ¼ö µÎ¹øÂ°, xx°ª°ú yy°ªÀ» º¯È¯ÇÔ
 HWND GetConsoleHwnd(void);
@@ -313,8 +316,8 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 {
 	//SDL_MAIN();
 	//º¯¼ö ¼±¾ð
-	//int i, j, k, v, result;	
-	
+	//int i, j, k, v, result;
+
 	InitializeCriticalSection(&cs);
 	unsigned int timeout = 15;
 	char mainchoose = 0;
@@ -2003,7 +2006,7 @@ int sqlsignup(void) {
 
 }
 void mainatitleimage(void) {
-	SetConsoleTitle(L"È÷Æ®¸¶ÀÎµå with C      Powered by  C Meister TEAM");
+	SetConsoleTitle("È÷Æ®¸¶ÀÎµå with C      Powered by  C Meister TEAM");
 	WHITE
 		gotoxy(136, 1);
 	printf("¹è°æÀ½¾Ç ON   ");
@@ -3450,7 +3453,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
-	Chat.w = (1310 / 4);
+	Chat.w = (1310 / 4) + 20;
 	Chat.h = Eraser.y - 262;
 	Chat.x = 0;
 	Chat.y = 200;
@@ -3459,7 +3462,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
-	InputT.w = (1310 / 4);
+	InputT.w = (1310 / 4) + 20;
 	InputT.h = 41;
 	InputT.x = 0;
 	InputT.y = Eraser.y - 71;
@@ -3513,6 +3516,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	MYSQL_ROW sql_row;
 	int ee = 0;
 	char euckr[256];
+	char query2[50];
 	Gametopic = 0;
 	RESET(euckr);
 	int xxx, yyy;
@@ -3748,7 +3752,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						han2unicode(euckr, unicode);
 						if (unicodehan(unicode, wcslen(unicode)) != unicodehan(inputText, wcslen(inputText)))
 							strcpy(euckr, "[Error] invalid conversion");
-						if (strcmp(euckr, topics[turn - 1]) == 0)
+						else if (strcmp(euckr, topics[turn - 1]) == 0)
 						{
 							if (myownnumber != turn)
 								send(connect_sock, "right   answer", 35, 0);
@@ -3765,6 +3769,60 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						else if (strcmp(euckr, "/myturn") == 0)
 						{
 							send(connect_sock, "right   answer", 35, 0);
+							Gametopic = 0;
+						}
+						else if (strcmp(euckr, "/help") == 0)
+						{
+							RESET(chatquery);
+							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç È­¸éÀ» Ä¸ÃÄÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+
+							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							CHATHAPPEN = true;
+						}
+						else if (strcmp(euckr, "/?") == 0)
+						{
+							RESET(chatquery);
+							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç È­¸éÀ» Ä¸ÃÄÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+
+							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							CHATHAPPEN = true;
+						}
+						else if (strncmp(euckr, "/capture ", 9) == 0)
+						{			
+							RESET(chatquery);
+							
+							printf("%s", chatquery[12]);
+							sscanf(euckr, "/capture %s", query);
+							
+							sprintf(query2, "screenshot//%s.png", query);
+							makebmp(query2, Renderer2);
+							sprintf(chatquery[13], "%s\\screenshot", _getcwd(NULL, 0));
+							sprintf(chatquery[14], "Æú´õ ¾È¿¡ %s.png°¡ ÀúÀåÀÌ µÇ¾ú½À´Ï´Ù", query);
+							RESET(chatquery[12]);
+							RESET(euckr);
+							CHATHAPPEN = true;
+							
+						}
+						else if (strcmp(euckr, "/stopmusic") == 0)
+						{
+
+							Mix_PauseMusic();
+						}
+						else if (strcmp(euckr, "/startmusic") == 0)
+						{
+							Mix_ResumeMusic();
 						}
 						else {
 							EnterCriticalSection(&cs);
@@ -4087,7 +4145,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
-					TTF_DrawText(Renderer, Font, unicode, 30, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font, unicode, 10, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 					ZeroMemory(unicode, sizeof(unicode));// Ãß°¡
 				}
 			}
@@ -4153,7 +4211,7 @@ HWND GetConsoleHwnd(void)
 	WCHAR pszNewWindowTitle[MY_BUFSIZE]; // »õ À©µµ¿ì Å¸ÀÌÆ²
 	WCHAR pszOldWindowTitle[MY_BUFSIZE]; // ¿ø·¡ À©µµ¿ì Å¸ÀÌÆ²
 	GetConsoleTitle(pszOldWindowTitle, MY_BUFSIZE);		//¿ø·¡ À©µµ¿ì Å¸ÀÌÆ²À» ÀúÀå½ÃÅ´
-	wsprintf(pszNewWindowTitle, L"%d/%d", GetTickCount(), GetCurrentProcessId());	//»õ À©µµ¿ì Å¸ÀÌÆ²À» Æ¯º°ÇÏ°Ô ÀúÀå½ÃÅ´
+	wsprintf(pszNewWindowTitle, "%d/%d", GetTickCount(), GetCurrentProcessId());	//»õ À©µµ¿ì Å¸ÀÌÆ²À» Æ¯º°ÇÏ°Ô ÀúÀå½ÃÅ´
 	SetConsoleTitle(pszNewWindowTitle);				//»õ À©µµ¿ì Å¸ÀÌÆ²À» Àû¿ë½ÃÅ´
 	Sleep(10);			//Àá½Ã ´ë±â
 	hwndFound = FindWindow(NULL, pszNewWindowTitle);		//»õ À©µµ¿ì Å¸ÀÌÆ²À» Àû¿ë½ÃÅ² À©µµ¿ì¸¦ Ã£¾Æ ±× ÇÚµé°ªÀ» Àû¿ëÇÔ
@@ -4174,4 +4232,88 @@ void makebmp(const char *filename, SDL_Renderer * Renderer2) {
 	IMG_SavePNG(sshot, filename);
 	SDL_FreeSurface(sshot);
 }
+char* getDesktopFolderName()     //c:\Users\UserName\Desktop\ ¹ÝÈ¯
+
+{
+	ULONG ulDataType;
+	HKEY hKey;
+	DWORD dwToRead = 100;
+	static char strPath[100];
+	char strKey[] = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
+	//cannot use in unicode, use multi-byte code  http://blog.naver.com/stormor/70171786787
+	RegOpenKeyEx(HKEY_CURRENT_USER,
+		strKey,   //¿©±â unicode ¾ÈµÊ		
+
+		0, KEY_READ, &hKey);
+
+	RegQueryValueEx(hKey, "Desktop", NULL,
+
+		&ulDataType, (LPBYTE)strPath, &dwToRead);
+
+	strPath[dwToRead] = '\0';
+
+	RegCloseKey(hKey);
+
+
+
+	return strPath;
+
+
+
+
+}
+void strintrude(char *s, char *t, int i)
+
+
+
+{
+	/*¹®ÀÚ¿­ sÀÇ i ¹øÂ° À§Ä¡¿¡ ¹®ÀÚ¿­ t¸¦ »ðÀÔ*/
+
+
+
+	int cnt;
+
+	char string[300], *temp = string;
+
+
+
+	for (cnt = 0; cnt < 300; cnt++) // init 
+
+		string[cnt] = '\0';
+
+
+
+	if (i < 0 && i >(int)strlen(s))
+
+	{
+		fprintf(stderr, "position is out of bounds \n");
+
+		exit(1);
+
+	}
+
+
+
+	if (!strlen(s))
+
+	{
+		strcpy(s, t);
+
+	}
+
+
+
+	else if (strlen(t))
+
+	{
+		strcat(t, (s + i));
+//		if ((s+i) != 0)
+			strcpy((s + i), t);
+
+	}
+
+}
+
+
+
 //4012
