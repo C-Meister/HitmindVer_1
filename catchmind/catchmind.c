@@ -761,7 +761,10 @@ void sqlmakeroom(void) {
 				gotoxy(18, 10);
 				printf("°€¿œπ›");
 				if (lr == 1)
+				{
 					gamo = 1;
+					connectroom[0].mode = 1;
+				}
 			}
 			else if (yy == 10 && 13 <= xx && xx <= 17 && gamo != 2) {
 				gotoxy(26, 10);
@@ -975,28 +978,28 @@ void sqlmakeroom(void) {
 		}*/
 
 		if (gamo == 1)
-			roommode.mode = 1;
+			connectroom[0].mode = 1;
 		else if (gamo == 2)
-			roommode.mode = 2;
+			connectroom[0].mode = 2;
 		else if (gamo == 3)
-			roommode.mode = 3;
+			connectroom[0].mode = 3;
 
 		if (time == 1)
-			roommode.time = 60;
+			connectroom[0].time = 60;
 		else if (time == 2)
-			roommode.time = 90;
+			connectroom[0].time = 90;
 		else if (time == 3)
-			roommode.time = 120;
+			connectroom[0].time = 120;
 
 		if (ex == 1)
-			roommode.question = 5;
+			connectroom[0].question = 5;
 		else if (ex == 2)
-			roommode.question = 10;
+			connectroom[0].question = 10;
 		else if (ex == 3)
-			roommode.question = 15;
+			connectroom[0].question = 15;
 
 		char query[300];
-		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s', '%d', '%d', '%d')", myip, myroom.roomname, myroom.password, roommode.mode, roommode.time, roommode.question);
+		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s', '%d', '%d', '%d')", myip, myroom.roomname, myroom.password, connectroom[0].mode, connectroom[0].time, connectroom[0].question);
 		if (!(mysql_query(cons, query)))
 		{
 			cur(10, 1);
