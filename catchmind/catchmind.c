@@ -1583,8 +1583,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 		if (recv(connect_sock, message, 45, 0) > 0) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ¸¦ ¹Þ¾Æ¿Í messageº¯¼ö¿¡ ÀúÀå
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				cur(10, 31);
-				printf("recieve = %d                    ", i++);
+			
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
@@ -2641,8 +2640,6 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				cur(10, 30);
-				printf("Clnt_1 = %d                     ", i++);
 				sendall(message, v);
 				RESET(message);
 				continue;
@@ -3718,7 +3715,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
-								printf("Senddata = %d", senddata++);
+							
 							}
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3740,7 +3737,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
-								printf("Senddata = %d", senddata++);
+							
 							}
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
 							i = (event.motion.x - Rect.x) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3895,8 +3892,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
-									cur(10, 29);
-									printf("Senddata = %d", senddata++);
+								
+								
 								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
@@ -3921,7 +3918,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
-									printf("Senddata = %d", senddata++);
+								 
 								}
 								strong *= 50.0 / 80;
 								drag = true;
