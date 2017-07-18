@@ -4118,7 +4118,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				writemode = false;		//X
 		//	CLS;
 			}
-		if (connectroom[CHOOSEROOM].mode == 2) {
+		if (connectroom[CHOOSEROOM].mode != 2) {
 			if (buff < SDLCLOCK) {
 				buff++;
 				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
