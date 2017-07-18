@@ -748,8 +748,13 @@ void sqlmakeroom(void) {
 			HIGH_GREEN if (yy == 7 && 9 <= xx && xx <= 12 && bibun != 1) {               //비밀번호
 				gotoxy(18, 7);
 				printf("○미사용");
-				if (lr == 1)
+				if (lr == 1) {
 					bibun = 1;
+					gotoxy(6, 8);
+					WHITE printf("        □                        ");
+					ZeroMemory(myroom.password, sizeof(myroom.password));
+					ni = 0;
+				}
 			}
 			else if (yy == 7 && 15 <= xx && xx <= 17 && bibun != 2) {
 				gotoxy(30, 7);
@@ -761,10 +766,7 @@ void sqlmakeroom(void) {
 				gotoxy(18, 10);
 				printf("○일반");
 				if (lr == 1)
-				{
 					gamo = 1;
-					connectroom[0].mode = 1;
-				}
 			}
 			else if (yy == 10 && 13 <= xx && xx <= 17 && gamo != 2) {
 				gotoxy(26, 10);
@@ -781,50 +783,90 @@ void sqlmakeroom(void) {
 			else if (yy == 12 && 9 <= xx && xx <= 10 && time != 1) {         //문제당시간
 				gotoxy(18, 12);
 				printf("○60");
-				if (lr == 1)
+				if (lr == 1) {
 					time = 1;
+					gotoxy(43, 12);
+					printf("   ");
+					ZeroMemory(timedata, sizeof(timedata));
+					ti = 0;
+				}
 			}
 			else if (yy == 12 && 12 <= xx && xx <= 13 && time != 2) {
 				gotoxy(24, 12);
 				printf("○90");
-				if (lr == 1)
+				if (lr == 1) {
 					time = 2;
+					gotoxy(43, 12);
+					printf("   ");
+					ZeroMemory(timedata, sizeof(timedata));
+					ti = 0;
+				}
 			}
 			else if (yy == 12 && 15 <= xx && xx <= 17 && time != 3) {
 				gotoxy(30, 12);
 				printf("○120");
-				if (lr == 1)
+				if (lr == 1) {
 					time = 3;
+					gotoxy(43, 12);
+					printf("   ");
+					ZeroMemory(timedata, sizeof(timedata));
+					ti = 0;
+				}
 			}
 			else if (yy == 12 && 18 <= xx && xx <= 20 && time != 4) {
 				gotoxy(36, 12);
 				printf("○입력");
-				if (lr == 1)
+				if (lr == 1) {
 					time = 4;
+					gotoxy(43, 12);
+					printf("   ");
+					ZeroMemory(timedata, sizeof(timedata));
+					ti = 0;
+				}
 			}
 			else if (yy == 14 && 9 <= xx && xx <= 10 && ex != 1) {         //문제수
 				gotoxy(18, 14);
 				printf("○5");
-				if (lr == 1)
+				if (lr == 1) {
 					ex = 1;
+					gotoxy(43, 14);
+					printf("   ");
+					ZeroMemory(exdata,sizeof(exdata));
+					ei = 0;
+				}
 			}
 			else if (yy == 14 && 12 <= xx && xx <= 13 && ex != 2) {
 				gotoxy(24, 14);
 				printf("○10");
-				if (lr == 1)
+				if (lr == 1) {
 					ex = 2;
+					gotoxy(43, 14);
+					printf("   ");
+					ZeroMemory(exdata, sizeof(exdata));
+					ei = 0;
+				}
 			}
 			else if (yy == 14 && 15 <= xx && xx <= 17 && ex != 3) {
 				gotoxy(30, 14);
 				printf("○15");
-				if (lr == 1)
+				if (lr == 1) {
 					ex = 3;
+					gotoxy(43, 14);
+					printf("   ");
+					ZeroMemory(exdata, sizeof(exdata));
+					ei = 0;
+				}
 			}
 			else if (yy == 14 && 18 <= xx && xx <= 20 && ex != 4) {
 				gotoxy(36, 14);
 				printf("○입력");
-				if (lr == 1)
+				if (lr == 1) {
 					ex = 4;
+					gotoxy(43, 14);
+					printf("   ");
+					ZeroMemory(exdata, sizeof(exdata));
+					ei = 0;
+				}
 			}
 
 			//자주색 출력
@@ -838,7 +880,7 @@ void sqlmakeroom(void) {
 				gotoxy(6, 8);
 				WHITE printf("입력    □");
 				gotoxy(17 + ni, 8);
-				scanning(myroom.roomname, &ni);
+				scanning(myroom.password, &ni);
 				YELLOW
 			}
 			if (gamo == 1) {         //게임모드
@@ -883,6 +925,7 @@ void sqlmakeroom(void) {
 			else if (ex == 3) {
 				gotoxy(30, 14);
 				printf("●15");
+				
 			}
 			else if (ex == 4) {
 				gotoxy(36, 14);
@@ -990,6 +1033,8 @@ void sqlmakeroom(void) {
 			connectroom[0].time = 90;
 		else if (time == 3)
 			connectroom[0].time = 120;
+		else if (time == 4)
+			connectroom[0].time = atoi(timedata);
 
 		if (ex == 1)
 			connectroom[0].question = 5;
@@ -997,6 +1042,8 @@ void sqlmakeroom(void) {
 			connectroom[0].question = 10;
 		else if (ex == 3)
 			connectroom[0].question = 15;
+		else if (ex == 4)
+			connectroom[0].question = atoi(exdata);
 
 		char query[300];
 		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s', '%d', '%d', '%d')", myip, myroom.roomname, myroom.password, connectroom[0].mode, connectroom[0].time, connectroom[0].question);
@@ -2376,7 +2423,7 @@ int sqlsignup(void) {
 
 }
 void mainatitleimage(void) {
-	SetConsoleTitle("히트마인드 with C      Powered by  C Meister TEAM");
+	SetConsoleTitle(L"히트마인드 with C      Powered by  C Meister TEAM");
 	WHITE
 		gotoxy(136, 1);
 	printf("배경음악 ON   ");
