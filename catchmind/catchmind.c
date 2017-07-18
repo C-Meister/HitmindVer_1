@@ -3153,6 +3153,7 @@ void Clnt_1(int v)
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
 				sendall(message, v);
+				continue;
 			}
 			else if (strncmp(message, "cont   ", 7) == 0)
 			{
@@ -3712,14 +3713,16 @@ void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
 	while (!feof(in)) {
 		fscanf(in, "%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil, &drag, &x, &y, &strong, &r, &g, &b);
 		if (i == 1)
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2, strong, r, g, b);
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2, strong/4.0, r, g, b);
 		else if (i == 2)
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2, strong, r, g, b);
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2, strong/4.0, r, g, b);
 		else if (i == 3)
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong/4.0, r, g, b);
 		else if (i == 4)
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong/4.0, r, g, b);
 	}
+	SDL_RenderPresent(Renderer);
+	SDL_Delay(5000);
 	fclose(in);
 	return;
 }
