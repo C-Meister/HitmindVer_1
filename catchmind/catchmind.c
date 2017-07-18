@@ -1605,80 +1605,96 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			else if (strncmp("player 2 connect", message, 15) == 0) {
 				sscanf(message, "player 2 connect %s", friendname[1]);
 				status[1] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 connect", message, 15) == 0) {
 				sscanf(message, "player 3 connect %s", friendname[2]);
 				status[2] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 connect", message, 15) == 0) {
 				sscanf(message, "player 4 connect %s", friendname[3]);
 				status[3] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 1 ready", message, 13) == 0) {
 				sscanf(message, "player 1 ready %s", friendname[0]);
 				status[0] = 2;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 ready", message, 13) == 0) {
 				sscanf(message, "player 2 ready %s", friendname[1]);
 				status[1] = 2;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 ready", message, 13) == 0) {
 				sscanf(message, "player 3 ready %s", friendname[2]);
 				status[2] = 2;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 ready", message, 13) == 0) {
 				sscanf(message, "player 4 ready %s", friendname[3]);
 				status[3] = 2;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 1 not ready", message, 16) == 0) {
 				sscanf(message, "player 1 not ready %s", friendname[0]);
 				status[0] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 not ready", message, 16) == 0) {
 				sscanf(message, "player 2 not ready %s", friendname[1]);
 				status[1] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 not ready", message, 16) == 0) {
 				sscanf(message, "player 3 not ready %s", friendname[2]);
 				status[2] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 not ready", message, 16) == 0) {
 				sscanf(message, "player 4 not ready %s", friendname[3]);
 				status[3] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 1 exit", message, 12) == 0) {
 				status[0] = 0;
+				ShowWindow(GetConsoleWindow(), 1);
 				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 exit", message, 12) == 0) {
 				status[1] = 0;
+				ShowWindow(GetConsoleWindow(), 1);
 				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 3 exit", message, 12) == 0) {
 				status[2] = 0;
+				ShowWindow(GetConsoleWindow(), 1);
 				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 4 exit", message, 12) == 0) {
 				status[3] = 0;
+				ShowWindow(GetConsoleWindow(), 1);
 				ExitHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strcmp("game start", message) == 0) {
 				status[0] = 10;
+				ShowWindow(GetConsoleWindow(), 1);
 				CurrectHappen = true;
 				ZeroMemory(message, sizeof(message));
 			}
@@ -1816,10 +1832,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				cur(0, 11);
 				//		printf("4번 사람 주제 : %s", topics[3]);
 			}
-			if (strncmp(message, "player", 6) == 0)
-			{
-				ShowWindow(GetConsoleWindow(), 1);
-			}
+		
 		}
 		//	Sleep(100);
 	}
@@ -1980,12 +1993,12 @@ int maintitle(void) { //게임 메인타이틀 출력
 		WHITE
 	/*	gotoxy(0, 0);
 		printf("%3d %3d\n", xx, yy);*/
-	
+			
 		click(&xx, &yy, &lr);
 		cur(6, 1);
 		printf("MySQL Ping : %dms", mysql_ping(cons));
 		mysql_select_db(cons, "catchmind");
-		
+	//	MoveWindow(GetConsoleWindow(), xx * 20, yy * 20, 1000,1000, false);
 		
 			
 
