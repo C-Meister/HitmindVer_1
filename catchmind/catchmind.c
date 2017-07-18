@@ -3723,8 +3723,6 @@ void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
 	int eraser = 0, pencil = 0, drag = 0;
 	int x = 0, y = 0;
 	float strong = 0, r = 0, g = 0, b = 0;
-	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
-	SDL_RenderClear(Renderer);
 	while (!feof(in)) {
 		fscanf(in, "%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil, &drag, &x, &y, &strong, &r, &g, &b);
 		if (i == 1)
@@ -3737,7 +3735,6 @@ void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
 			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong/4.0, r, g, b);
 	}
 	SDL_RenderPresent(Renderer);
-	SDL_Delay(5000);
 	fclose(in);
 	return;
 }
@@ -4048,6 +4045,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			if (first == connectroom[CHOOSEROOM].time + 1)
 			{
 				if (connectroom[CHOOSEROOM].mode == 2) {
+					SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+					SDL_RenderClear(Renderer);
 					for (i = 1; i <= 4; i++) {
 						if (status[(int)i-1] != 0)
 							contest(Window2, Renderer2, i);
