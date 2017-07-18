@@ -166,7 +166,6 @@ void disablecursor(bool a);						//Ä¿¼­ º¸ÀÌ±â, ¼û±â±â  0 = º¸ÀÌ±â 1 = ¼û±â±â
 wchar_t* UTF82UNICODE(char* UTF8, int len);
 char* UNICODE2UTF8(wchar_t* unicode, int len);
 void usermain(void);
-
 //--------------------- ³×Æ®¿öÅ© ÇÔ¼öµé -----------------------------------
 void ErrorHandling(char *Message);				//¼ÒÄÏ ¿¡·¯ Ãâ·Â ÇÏ´Â ÇÔ¼ö
 int Connect_Server(char *ServerIP);			//¼­¹ö ¿¬°á ÇØÁÖ´Â ÇÔ¼ö
@@ -205,7 +204,47 @@ void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Rendere
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int x, int y);
 Uint32 get_pixel32(SDL_Surface *surface, int x, int y);
 void makebmp(const char *filename, SDL_Renderer * Renderer2);
-
+void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b);
+void contest(SDL_Window* Window,SDL_Renderer* Renderer,int i) {
+	char inputfile[50]="";
+	char str[100] = "";
+	sprintf(inputfile,".\\text\\user%d.txt", i);
+	FILE *in = fopen(inputfile,"r+");
+	if (in == NULL) {
+		return;
+	}
+	int j=0,max = 0,line =0;
+	while (!feof(in)) {
+		line++;
+		fscanf(in, "%[^\n]s",str);
+		fgetc(in);
+		if (strcmp(str, "SDLCLEAR") == 0) {
+			max = line;
+		}
+	}
+	fclose(in);
+	in = fopen(inputfile, "r+");
+	for (j = 0; j < max; j++) {
+		fscanf(in, "%[^\n]s", str);
+		fgetc(in);
+	}
+	int eraser=0, pencil=0, drag=0;
+		int x=0, y=0;
+	float strong=0, r=0, g=0, b=0;
+	while(!feof(in)){
+		fscanf(in,"%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil,&drag, &x, &y, &strong, &r, &g, &b);
+		if (i == 1) 
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x/2, y/2, strong, r, g, b);
+		else if (i == 2) 
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2+(1920-1310/4-10)/2, y / 2, strong, r, g, b);
+		else if (i == 3) 
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2+(1080-900/4-10)/2, strong, r, g, b);
+		else if (i == 4) 
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2+(1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
+	}
+	fclose(in);
+	return;
+}
 // -------------------- °ÔÀÓ ³»ºÎ ÇÔ¼öµé ----------------------------------
 void mainatitleimage(void);						//°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â
 int maintitle(void);							//°ÔÀÓ ¸ÞÀÎÅ¸ÀÌÆ² Ãâ·Â¹× ¼±ÅÃ
@@ -2884,9 +2923,13 @@ void getlevel(void)
 	}
 	//	mysql_free_result(sql_result);
 }
-void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step) {
+void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font,TTF_Font *topicFont,FILE* out[], int step) {
 	switch (step) {
 	case 10:
+		fclose(out[0]);
+		fclose(out[1]);
+		fclose(out[2]);
+		fclose(out[3]);
 		SDL_StopTextInput();
 	case 9:
 		SDL_DestroyRenderer(Renderer3);// SDL ·»´õ·¯ ÆÄ±«
@@ -2901,7 +2944,8 @@ void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Rendere
 	case 4:
 		SDL_DestroyWindow(Window);
 	case 3:
-		TTF_CloseFont(Font);
+		TTF_CloseFont(topicFont);
+			TTF_CloseFont(Font);
 	case 2:
 		TTF_Quit();//TTF Á¾·á
 	case 1:
@@ -3054,7 +3098,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 			ReceiveRect.w = ReceiveRect.h = strong;// ±½±â ¼³Á¤
 			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 			SDL_RenderFillRect(Renderer4, &ReceiveRect);// ·»´õ·¯¿¡ ±×¸²
-			SDL_RenderPresent(Renderer4);
+	//		SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == false) {
@@ -3071,7 +3115,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 				SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
 			}
 			strong *= 50.0 / 80;
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (pencil == true && drag == true) {
@@ -3091,7 +3135,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 
 				SDL_RenderFillRect(Renderer4, &ReceiveRect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 			}
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == true) {
@@ -3120,7 +3164,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 				}
 			}
 			strong *= 50 / 80.0;
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 	}
@@ -3203,6 +3247,7 @@ int unicodehan(wchar_t unicode[],int len) {
 }
 int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
 
+	FILE* out[] = { NULL,NULL,NULL,NULL };
 	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
 	SDL_Renderer * Renderer = nullptr;// SDL ·»´õ·¯ ¼±¾ð 
 	SDL_Window * Window2 = nullptr;
@@ -3264,19 +3309,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	//Ãß°¡
 	if (TTF_Init() != 0) {
 		TTF_ErrorLog("TTF_Init");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 1);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 1);
 		return 0;
 	}
 	Font = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize);
 	if (Font == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 2);
 		return 0;
 	}
 	topicFont = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize2);
-	if (Font == nullptr) {
+	if (topicFont == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 2);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont, out,2);
 		return 0;
 	}
 
@@ -3284,35 +3329,35 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ErrorLog("SDL_CreateWindow");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 3);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 3);
 		return 0;//Á¾·á
 	}
 	Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (Renderer == nullptr) {
 		SDL_ErrorLog("SDL_CreateRenderer");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 4);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont, out,4);
 		return 0;
 	}
 	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, (1920 - 1310 / 4 - 10), (1080 - 900 / 4 - 10), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window2 == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ErrorLog("CreateWindow2");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 5);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 5);
 		return 0;//Á¾·á
 	}
-	Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer ÇÔ¼ö·Î SDL Renderer »ý¼º ÇÔ¼ö È£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â SDL_Window *, µå¶óÀÌ¹ö ¼³Á¤(-1ÀÌ¸é ¾Ë¾Æ¼­ ¸ÂÃçÁÜ), ÇÃ·¡±×(Áö±ÝÀº ÇÏµå¿þ¾î°¡¼Ó°ú ¼öÁ÷µ¿±âÈ­ »ç¿ëÀ» Çã¿ëÇÔ)
+	Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer ÇÔ¼ö·Î SDL Renderer »ý¼º ÇÔs¼ö È£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â SDL_Window *, µå¶óÀÌ¹ö ¼³Á¤(-1ÀÌ¸é ¾Ë¾Æ¼­ ¸ÂÃçÁÜ), ÇÃ·¡±×(Áö±ÝÀº ÇÏµå¿þ¾î°¡¼Ó°ú ¼öÁ÷µ¿±âÈ­ »ç¿ëÀ» Çã¿ëÇÔ)
 	if (Renderer2 == nullptr) {// ·»´õ·¯ »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
 		SDL_ErrorLog("CreateRenderer2");
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 6);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 6);
 		return 0;// Á¾·á
 	}
 	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow ÇÔ¼ö·Î SDL À©µµ¿ì »ý¼º ÇÔ¼öÈ£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â Â÷·Ê´ë·Î Ã¢ÀÌ¸§, Ã¢ÀÇ xÃàÀ§Ä¡, Ã¢ÀÇ yÃàÀ§Ä¡, Ã¢ÀÇ ³Êºñ, Ã¢ÀÇ ³ôÀÌ, ÇÃ·¡±×ÀÓ
 	if (Window3 == nullptr) {// À©µµ¿ì »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 7);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont, out,7);
 		return 0;//Á¾·á
 	}
 	Renderer3 = SDL_CreateRenderer(Window3, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer ÇÔ¼ö·Î SDL Renderer »ý¼º ÇÔ¼ö È£Ãâ½Ã ³Ñ°ÜÁÖ´Â ÀÎ¼ö´Â SDL_Window *, µå¶óÀÌ¹ö ¼³Á¤(-1ÀÌ¸é ¾Ë¾Æ¼­ ¸ÂÃçÁÜ), ÇÃ·¡±×(Áö±ÝÀº ÇÏµå¿þ¾î°¡¼Ó°ú ¼öÁ÷µ¿±âÈ­ »ç¿ëÀ» Çã¿ëÇÔ)
 	if (Renderer3 == nullptr) {// ·»´õ·¯ »ý¼º ½ÇÆÐ½Ã if¹® ½ÇÇà
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 8);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 8);
 		return 0;// Á¾·á
 	}
 	// Èò»öÀ¸·Î ¼¼ÆÃ
@@ -3328,7 +3373,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						   // RgbCode ÀÌ¹ÌÁö
 	RgbTexture = LoadTextureEx(Renderer, ".\\image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (RgbTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 9);
 		return 0;
 	}
 	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode ÀÌ¹ÌÁöÀÇ °¡·Î¼¼·Î ÀÐ¾î¿À±â. À©µµ¿ì Ã¢À» 3°³·Î ³ª´©´Â ±âÁØÀÌ µÇ¹Ç·Î À©µµ¿ìÃ¢ ¼±¾ðÀü¿¡ ÀÐ¾î¿È
@@ -3342,7 +3387,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Track ÀÌ¹ÌÁö
 	TraTexture = LoadTextureEx(Renderer, ".\\image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (TraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont,out,9);
 		return 0;
 	}
 	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -3356,7 +3401,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Box ÀÌ¹ÌÁö
 	BoxTexture = LoadTextureEx(Renderer, ".\\image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (BoxTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont,out,9);
 		return 0;
 	}
 	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//ÀÌ¹ÌÁö Á¤º¸ ºÒ·¯¿À±â
@@ -3370,7 +3415,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Pencil ÀÌ¹ÌÁö
 	PenTexture = LoadTexture(Renderer, ".\\image\\Pencil.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (PenTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont,out,9);
 		return 0;
 	}
 	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
@@ -3382,7 +3427,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// Eraser ÀÌ¹ÌÁö
 	EraTexture = LoadTexture(Renderer, ".\\image\\Eraser.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (EraTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font,topicFont,out, 9);
 		return 0;
 	}
 	Eraser.w = Pencil.w;
@@ -3393,7 +3438,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	// New ÀÌ¹ÌÁö
 	NewTexture = LoadTexture(Renderer, ".\\image\\New.jpg"); // ÀÌ¹ÌÁö ºÒ·¯¿À±â
 	if (NewTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
 	New.w = Eraser.w;
@@ -3402,7 +3447,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	New.y = Eraser.y;
 	ChaTexture = LoadTexture(Renderer, ".\\image\\CHAT_BODY.png");												// Ã¤ÆÃ ÀÌ¹ÌÁö
 	if (ChaTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
 	Chat.w = (1310 / 4);
@@ -3411,7 +3456,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	Chat.y = 200;
 	InpTexture = LoadTexture(Renderer, ".\\image\\Track.png");												// Ã¤ÆÃ ÀÌ¹ÌÁö
 	if (InpTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
 	InputT.w = (1310 / 4);
@@ -3421,7 +3466,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	RenderTexture(Renderer, RgbTexture, &RgbCode);
 	UseTexture = LoadTexture(Renderer3, ".\\image\\user.png");
 	if (UseTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
 	UserT.w = (1920 - (1310 / 4 - 10)) / 4;
@@ -3434,7 +3479,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	}*/
 	QusTexture = LoadTexture(Renderer, ".\\image\\question_fix.png");												// Ã¤ÆÃ ÀÌ¹ÌÁö
 	if (QusTexture == nullptr) {// ¿¡·¯ÄÚµå Àâ±â
-		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 9);
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
 	QuesT.w = 400;
@@ -3487,6 +3532,16 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	long firstclock = clock();
 	int first = 0;
 	turn++;
+	/*
+	contest(Window2, Renderer2, 1);
+	contest(Window2, Renderer2, 2);
+	contest(Window2, Renderer2, 3);
+	contest(Window2, Renderer2, 4);
+	*/;
+	out[0] = fopen(".\\text\\user1.txt", "w");
+	out[1] = fopen(".\\text\\user2.txt", "w");
+	out[2] = fopen(".\\text\\user3.txt", "w");
+	out[3] = fopen(".\\text\\user4.txt", "w");
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 		if ((clock() - firstclock) / 1000 > first)
 		{
@@ -3499,7 +3554,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				first = 0;
 				if (turn == myownnumber)
 				{
-					firstclock = clock();
 					first = 0;
 					while (1)
 					{
@@ -3698,7 +3752,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						{
 							if (myownnumber != turn)
 								send(connect_sock, "right   answer", 35, 0);
-
 						}
 						else if (strcmp(euckr, "/clear") == 0)
 						{
@@ -3783,7 +3836,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
-							
 							}
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3805,7 +3857,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
-							
 							}
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
 							i = (event.motion.x - Rect.x) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3918,7 +3969,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							}
 							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New ÀÌ¹ÌÁö¸¦ Å¬¸¯ÇßÀ»¶§
 
-						//		sprintf(query, "screenshot\\%d.bmp", time(NULL));
+							//	sprintf(query, "screenshot\\%d.png", time(NULL));
 						//		makebmp(query, Renderer2);
 						
 
@@ -3960,8 +4011,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
-								
-								
 								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
@@ -4070,7 +4119,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_DestroyTexture(PenTexture);
 	SDL_DestroyTexture(NewTexture);
 	SDL_DestroyTexture(QusTexture);
-	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, 10);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont,out,10);
 
 	int good;
 	int max = 0;
