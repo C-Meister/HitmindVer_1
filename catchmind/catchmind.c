@@ -1997,39 +1997,39 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strncmp(message, "cont 1 ", 7) == 0)
 			{
-				sscanf(message, "cont 1 %s", query);
+				sscanf(message, "cont 1 %[^\n]s", query);
 				fprintf(out[0], "%s\n", query);
 			}
 			else if (strncmp(message, "cont 2 ", 7) == 0)
 			{
-				sscanf(message, "cont 2 %s", query);
+				sscanf(message, "cont 2 %[^\n]s", query);
 				fprintf(out[1], "%s\n", query);
 			}
 			else if (strncmp(message, "cont 3 ", 7) == 0)
 			{
-				sscanf(message, "cont 3 %s", query);
+				sscanf(message, "cont 3 %[^\n]s", query);
 				fprintf(out[2], "%s\n", query);
 			}
 			else if (strncmp(message, "cont 4 ", 7) == 0)
 			{
-				sscanf(message, "cont 4 %s", query);
+				sscanf(message, "cont 4 %[^\n]s", query);
 				fprintf(out[3], "%s\n", query);
 			}
 			else if (strcmp(message, "Con 1 SDLCLEAR") == 0)
 			{
-				fprintf(out[0], "SDLCLEAR");
+				fprintf(out[0], "SDLCLEAR\n");
 			}
 			else if (strcmp(message, "Con 2 SDLCLEAR") == 0)
 			{
-				fprintf(out[1], "SDLCLEAR");
+				fprintf(out[1], "SDLCLEAR\n");
 			}
 			else if (strcmp(message, "Con 3 SDLCLEAR") == 0)
 			{
-				fprintf(out[2], "SDLCLEAR");
+				fprintf(out[2], "SDLCLEAR\n");
 			}
 			else if (strcmp(message, "Con 4 SDLCLEAR") == 0)
 			{
-				fprintf(out[3], "SDLCLEAR");
+				fprintf(out[3], "SDLCLEAR\n");
 			}
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
