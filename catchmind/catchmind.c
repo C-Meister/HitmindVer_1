@@ -3723,6 +3723,8 @@ void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
 	int eraser = 0, pencil = 0, drag = 0;
 	int x = 0, y = 0;
 	float strong = 0, r = 0, g = 0, b = 0;
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
+	SDL_RenderClear(Renderer);
 	while (!feof(in)) {
 		fscanf(in, "%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil, &drag, &x, &y, &strong, &r, &g, &b);
 		if (i == 1)
@@ -4215,10 +4217,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (connectroom[CHOOSEROOM].mode != 2) {
 			if (buff < SDLCLOCK) {
 				buff++;
-				cur(20, 0);
-				printf("buff : %d", buff);
-				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+				sscanf(clientcatchmind, "%hhd %hhd %hhd %hhd %hhd %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+		//		ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 				ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 				happen = true;
 			}
