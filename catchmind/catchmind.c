@@ -4045,8 +4045,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			if (first == connectroom[CHOOSEROOM].time + 1)
 			{
 				if (connectroom[CHOOSEROOM].mode == 2) {
-					SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);
-					SDL_RenderClear(Renderer);
+					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+					SDL_RenderClear(Renderer2);
 					for (i = 1; i <= 4; i++) {
 						if (status[(int)i-1] != 0)
 							contest(Window2, Renderer2, i);
