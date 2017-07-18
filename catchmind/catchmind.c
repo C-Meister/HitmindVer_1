@@ -2015,6 +2015,22 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				sscanf(message, "cont 4 %s", query);
 				fprintf(out[3], "%s\n", query);
 			}
+			else if (strcmp(message, "Con 1 SDLCLEAR") == 0)
+			{
+				fprintf(out[0], "SDLCLEAR");
+			}
+			else if (strcmp(message, "Con 2 SDLCLEAR") == 0)
+			{
+				fprintf(out[1], "SDLCLEAR");
+			}
+			else if (strcmp(message, "Con 3 SDLCLEAR") == 0)
+			{
+				fprintf(out[2], "SDLCLEAR");
+			}
+			else if (strcmp(message, "Con 4 SDLCLEAR") == 0)
+			{
+				fprintf(out[3], "SDLCLEAR");
+			}
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -3096,6 +3112,12 @@ void Clnt_1(int v)
 				message[5] = v + '0' + 1;
 				sendall(message, 5);
 			}
+			else if (strcmp(message, "Con   SDLCLEAR") == 0)
+			{
+				message[4] = v + '0' + 1;
+				sendall(message, 5);
+				RESET(message);
+			}
 			else if (strcmp("right   answer", message) == 0)
 			{
 				message[6] = v + '0' + 1;
@@ -3960,6 +3982,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			first++;
 			if (first == connectroom[CHOOSEROOM].time + 1)
 			{
+				if (connectroom[CHOOSEROOM].mode == 2) {
+					for (i = 1; i <= 4; i++) {
+						if (status[(int)i-1] != 0)
+							contest(Window2, Renderer2, i);
+					}
+				}
 				firstclock = clock();
 				first = 0;
 				if (turn == myownnumber)
@@ -4125,8 +4153,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			if (buff < SDLCLOCK) {
 				buff++;
 				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-				cur(0, 30);
-				printf("sscanf : %d", buff);
 				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 				ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			}
@@ -4300,7 +4326,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						if (length == 0) break;
 						if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -4321,7 +4352,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
 							strong *= 80 / (float)50.0;
 							if (connect_sock != 0) {
-								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
@@ -4447,6 +4483,11 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
 								//¿©±â~~~~~~~~~~~~~~~~~~
 								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										send(connect_sock, "Con   SDLCLEAR", 45, 0);
+									}
+									else
 									send(connect_sock, "SDLCLEAR", 45, 0);
 								}
 								//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
@@ -4475,7 +4516,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderFillRect(Renderer2, &Rect);// ·»´õ·¯¿¡ ±×¸²
 																	 // ¿©±â~~~~~~~~~
 								if (connect_sock != 0) {
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
 								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
@@ -4499,7 +4545,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								}
 								// ¿©±â~~~~~~~~~~~~~~
 								if (connect_sock != 0) {
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
 
 								}
