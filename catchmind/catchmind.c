@@ -2378,7 +2378,7 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.2";
+	char version[] = "0.0.3";
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
@@ -3400,7 +3400,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
 			SDL_RenderFillRect(Renderer, &Timer3);// 지우개같이 흰색으로 칠함
 			first++;
-			if (first == 11)
+			if (first == 61)
 			{
 				firstclock = clock();
 				first = 0;
@@ -3432,7 +3432,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				SDL_RenderClear(Renderer2);
 		
 			}
-			sprintf(query, "%d초 남음", 10 - first);
+			sprintf(query, "%d초 남음", 60 - first);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 150, 150);
 			happen = true;
