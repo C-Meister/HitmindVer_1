@@ -1551,8 +1551,8 @@ void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
 	//SetWindowPos(GetConsoleWindow(), HWND_TOP, 0, 0, x * 20, y * 20, SWP_);
 	DWORD Style;
 	Style = GetWindowLong(GetConsoleWindow(), GWL_STYLE); //부모윈도우의 윈도스타일 값을 Style에 저장.
-	Style &= ~WS_THICKFRAME;
-	Style &= ~WS_MAXIMIZEBOX;
+	Style &= ~WS_THICKFRAME;							  //윈도우 창조절 방지
+	Style &= ~WS_MAXIMIZEBOX;							  //윈도우 최대화 방지
 	SetWindowLong(GetConsoleWindow(), GWL_STYLE, Style); //새로 바꾼 윈도우 스타일을 부모 윈도우의 윈도우스타일에 적용한 상태.
 
 }
@@ -1606,7 +1606,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-			
+				cur(0, 29);
+				printf("receive = %d", i++);
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
@@ -3654,6 +3655,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			cur(0, 30);
+			printf("sscanf : %d", buff);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 		}
