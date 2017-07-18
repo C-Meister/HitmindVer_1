@@ -4078,23 +4078,26 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			}
 
 		}
-		if (myownnumber == turn)
-		{
-			writemode = true;
-		}
-		else {
-			drag = false;
-			writemode = false;		//X
-	//	CLS;
-		}
-
-		if (buff < SDLCLOCK) {
-			buff++;
-			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-			cur(0, 30);
-			printf("sscanf : %d", buff);
-			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+		if (roommode.mode!=2){// contest모드
+			if (myownnumber == turn)
+			{
+				writemode = true;
+			}
+			else {
+				drag = false;
+				writemode = false;		//X
+		//	CLS;
+			}
+	}
+		if (roommode.mode != 2) {
+			if (buff < SDLCLOCK) {
+				buff++;
+				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+				cur(0, 30);
+				printf("sscanf : %d", buff);
+				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+				ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+			}
 		}
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
 			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
