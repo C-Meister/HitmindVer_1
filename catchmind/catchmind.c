@@ -3452,39 +3452,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			clicks.pencil = false;
 			happen = true;
 		}
-		if (pastturn != turn)
-		{
-			firstclock = clock();
-			first = 0;
-			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
-			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
-			if (myownnumber == turn) {
-				RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
-				han2unicode(topic, unicode);
-				TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
-			}
-			else
-			{
-				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
-				SDL_RenderFillRect(Renderer, &Timer2);// 지우개같이 흰색으로 칠함
-			}
-			//			han2unicode(query, unicode);
-			//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
-				//		SDL_RenderPresent(Renderer);
-				//		SDL_Delay(3000);
-			sprintf(query, "%s 차례입니다", friendname[turn - 1]);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
-			sprintf(query, "문제 %d/15", ee+1);
-			if (ee > 14)
-			{
-				quit = true;
-			}
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer, Font, unicode, 0, 150);
-			pastturn = turn;
-			happen = true;
-		}
+		
 		if (CurrectHappen == true)
 		{
 			CurrectHappen = false;
@@ -3526,6 +3494,39 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				happen = true;
 				
 			
+		}
+		if (pastturn != turn)
+		{
+			firstclock = clock();
+			first = 0;
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
+			if (myownnumber == turn) {
+				RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
+				han2unicode(topic, unicode);
+				TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+				SDL_RenderFillRect(Renderer, &Timer2);// 지우개같이 흰색으로 칠함
+			}
+			//			han2unicode(query, unicode);
+			//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
+			//		SDL_RenderPresent(Renderer);
+			//		SDL_Delay(3000);
+			sprintf(query, "%s 차례입니다", friendname[turn - 1]);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+			sprintf(query, "문제 %d/15", ee);
+			if (ee > 14)
+			{
+				quit = true;
+			}
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 0, 150);
+			pastturn = turn;
+			happen = true;
 		}
 		if (ExitHappen == true)
 		{
