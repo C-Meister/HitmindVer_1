@@ -2645,6 +2645,9 @@ void banglist(int j) {
 		strcpy(connectroom[i].roomname, sql_row[1]);
 		strcpy(connectroom[i].password, sql_row[2]);
 		connectroom[i].people = atoi(sql_row[3]);
+		connectroom[i].mode = atoi(sql_row[4]);
+		connectroom[i].time = atoi(sql_row[5]);
+		connectroom[i].question = atoi(sql_row[6]);
 		i++;
 
 	}
