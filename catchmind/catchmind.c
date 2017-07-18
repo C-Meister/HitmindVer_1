@@ -101,6 +101,7 @@ typedef struct {
 }ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
+
 struct {
 	bool eraser;
 	bool pencil;
@@ -110,6 +111,11 @@ struct on {
 	bool pencil;
 	bool new;
 }on = { false,false,false };
+struct {
+	int time;
+	int question;
+	int mode;
+};
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
@@ -267,6 +273,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	//SDL_MAIN();
 	//변수 선언
 	//int i, j, k, v, result;	
+	
 	InitializeCriticalSection(&cs);
 	unsigned int timeout = 15;
 	char mainchoose = 0;
@@ -2409,7 +2416,7 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.3";
+	char version[] = "0.0.4";
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
@@ -2649,6 +2656,10 @@ void Clnt_1(int v)
 				message[6] = v + '0' + 1;
 				sendall(message, 5);
 				RESET(message);
+			}
+			else if (strncmp("setting", message, 7) == 0)
+			{
+				sendall(message, 5);
 			}
 			else if (strncmp("first   ping", message, 12) == 0)
 			{
