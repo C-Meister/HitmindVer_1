@@ -1599,6 +1599,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
+				ShowWindow(GetConsoleWindow(), 1);
 				ZeroMemory(message, sizeof(message));
 			}
 			else if (strncmp("player 2 connect", message, 15) == 0) {
@@ -1815,6 +1816,10 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				cur(0, 11);
 				//		printf("4번 사람 주제 : %s", topics[3]);
 			}
+			if (strncmp(message, "player", 6) == 0)
+			{
+				ShowWindow(GetConsoleWindow(), 1);
+			}
 		}
 		//	Sleep(100);
 	}
@@ -1967,6 +1972,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 	Auto_Update();
 	disablecursor(true);
 	int xx = 0, yy = 0, lr = 0, bae = 1;
+	
 	mainatitleimage();
 	while (1) {
 		if(GetAsyncKeyState(VK_RETURN) & 0x0001)
@@ -1979,6 +1985,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 		cur(6, 1);
 		printf("MySQL Ping : %dms", mysql_ping(cons));
 		mysql_select_db(cons, "catchmind");
+		
 		
 			
 
