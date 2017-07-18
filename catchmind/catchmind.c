@@ -2565,7 +2565,7 @@ void banglist(int j) {
 	MYSQL_RES *sql_result;					//mysql 결과의 한줄을 저장하는 변수
 	MYSQL_ROW sql_row;						//mysql 결과의 데이터 하나를 저장하는 변수
 	short i = 0;
-	mysql_query(cons, "select ip, name, password, people from catchmind.room");
+	mysql_query(cons, "select ip, name, password, people, mode, time, question from catchmind.room");
 	sql_result = mysql_store_result(cons);
 
 	memset(connectroom, 0, sizeof(connectroom));
