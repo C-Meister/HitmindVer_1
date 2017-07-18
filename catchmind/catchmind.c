@@ -3441,7 +3441,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer3);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			first++;
-			if (first == 61)
+			if (first == 101)
 			{
 				firstclock = clock();
 				first = 0;
@@ -3471,9 +3471,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 				SDL_RenderClear(Renderer2);
-		
+				ee++;
 			}
-			sprintf(query, "%dÃÊ ³²À½", 60 - first);
+			sprintf(query, "%dÃÊ ³²À½", 100 - first);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 150, 150);
 			happen = true;
@@ -3560,7 +3560,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
 			sprintf(query, "¹®Á¦ %d/15", ee);
-			if (ee > 14)
+			if (ee > 15)
 			{
 				quit = true;
 			}
