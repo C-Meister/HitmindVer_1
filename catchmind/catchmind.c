@@ -1431,6 +1431,7 @@ void readchating(void) {
 	MYSQL_ROW sql_row;
 	int last2 = 0;
 	int last = 0;
+	int last3 = 0;
 	char query[100];
 	//	CHATHAPPEN = true;
 	while (1) {
@@ -1439,7 +1440,7 @@ void readchating(void) {
 
 			//	ZeroMemory(sql_result, sizeof(sql_result));
 			ZeroMemory(chatquery, sizeof(chatquery));
-			
+			last3 = last2;
 			sprintf(query, "select id from catchmind.chating where room = '%s' order by id desc limit 1", connectroom[CHOOSEROOM].ip);
 		//	printf("\n%s", query);
 		//	getchar();
@@ -1449,6 +1450,11 @@ void readchating(void) {
 				if ((sql_row = mysql_fetch_row(sql_result)) != NULL)
 					last2 = atoi(sql_row[0]);
 
+			}
+			else
+			{
+				RESET(chatquery);
+				CHATHAPPEN = true;
 			}
 			mysql_free_result(sql_result);
 			if (last < last2)
@@ -3549,7 +3555,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 			SDL_RenderClear(Renderer2);
 			if (ee != 0) {
-				
+				firstclock = clock();
+				first = 0;
 				sprintf(query, "%s ´ÔÀÌ ¸ÂÃß¾ú½À´Ï´Ù! Á¤´äÀº %s ÀÔ´Ï´Ù", friendname[turn - 1], pasttopic);
 				han2unicode(query, unicode);
 				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
@@ -3693,6 +3700,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								send(connect_sock, "right   answer", 35, 0);
 
 						}
+						else if (strcmp(euckr, "/clear") == 0)
+						{
+							EnterCriticalSection(&cs);
+							sprintf(query, "delete from catchmind.chating where room = '%s'", connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[¸í·É]', 'Ã¤ÆÃÀ» ÃÊ±âÈ­ ÇÕ´Ï´Ù.', '%s')",connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
+						}
+						else if (strcmp(euckr, "/myturn") == 0)
+						{
+							send(connect_sock, "right   answer", 35, 0);
+						}
 						else {
 							EnterCriticalSection(&cs);
 							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '%s', '%s')", username, euckr, connectroom[CHOOSEROOM].ip);
@@ -3811,7 +3831,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						happen = true;
 						//		send(connect_sock, "", 45, 0);
 								//¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+						
 					}
 				}
 				break;
