@@ -1915,6 +1915,8 @@ int sqlsignup(void) {
 void mainatitleimage(void) {
 	SetConsoleTitle(L"히트마인드 with C      Powered by  C Meister TEAM");
 	WHITE
+		gotoxy(136, 1);
+	printf("배경음악 ON   ");
 		gotoxy(6, 3);
 	printf("        ■              ■■■■■      ■■■■■  ■        ■■■    ■      ■■■■■                                           ■■■"); gotoxy(6, 4);
 	printf("    ■■■■■  ■      ■              ■      ■  ■      ■      ■  ■      ■                                                 ■      ■"); gotoxy(6, 5);
@@ -1954,7 +1956,7 @@ int maintitle(void) { //게임 메인타이틀 출력
 	ConsoleL(80, 50);
 	Auto_Update();
 	disablecursor(true);
-	int xx = 0, yy = 0, lr = 0;
+	int xx = 0, yy = 0, lr = 0, bae = 1;
 	mainatitleimage();
 	while (1) {
 		if(GetAsyncKeyState(VK_RETURN) & 0x0001)
@@ -1970,7 +1972,29 @@ int maintitle(void) { //게임 메인타이틀 출력
 		
 			
 
-		if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
+		if ( 68<= xx && xx <= 73 && yy==1) {
+			gotoxy(136, 1);
+
+			if (lr == 0) {
+				HIGH_GREEN 
+					if (bae == 1) 
+						printf("배경음악 ON   ");	
+					else 
+						printf("배경음악 OFF");
+					
+			}
+			else if (lr == 1) {
+					if (bae == 1) {
+						Mix_PauseMusic();
+						bae *= -1;
+					}
+					else {			
+						Mix_ResumeMusic();
+						bae *= -1;
+					}
+			}
+		}
+		else if (7 <= xx && xx <= 13 && 21 <= yy && yy <= 25 && lr == 0) {
 			gotoxy(16, 23);
 			HIGH_GREEN printf("게임 시작");
 		}
@@ -2026,7 +2050,11 @@ int maintitle(void) { //게임 메인타이틀 출력
 			printf("주제 추가");
 			gotoxy(98, 23);
 			printf("크레딧");
-
+			gotoxy(136, 1);
+			if (bae == 1)
+				printf("배경음악 ON   ");
+			else
+				printf("배경음악 OFF");
 		}
 
 
@@ -4009,3 +4037,4 @@ void makebmp(const char *filename, SDL_Renderer * Renderer2) {
 	SDL_SaveBMP(sshot, filename);
 	SDL_FreeSurface(sshot);
 }
+//4012
