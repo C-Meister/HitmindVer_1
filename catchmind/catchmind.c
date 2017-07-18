@@ -3146,8 +3146,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 150 };
-	SDL_Rect Timer2 = { 0, 60, 400, 200};
+	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 180 };
+	SDL_Rect Timer2 = { 0, 60, 400, 150};
 	SDL_Rect Timer3 = { 150, 150, 100, 30 };
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
@@ -3426,6 +3426,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				firstclock = clock();
 				first = 0;
 				timeout = false;
+				SDL_DestroyRenderer(Renderer2);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+				SDL_RenderClear(Renderer2);
 		
 			}
 			sprintf(query, "%dÃÊ ³²À½", 10 - first);
@@ -3532,7 +3536,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 				if (status[i] != 0)
 				{
-				
 
 					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
 					RenderTexture(Renderer3, UseTexture, &UserT);
