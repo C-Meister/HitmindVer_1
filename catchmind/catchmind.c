@@ -2643,7 +2643,7 @@ void Clnt_1(int v)
 			{
 				cur(10, 30);
 				printf("Clnt_1 = %d                     ", i++);
-				sendall(message, 5);
+				sendall(message, v);
 				RESET(message);
 				continue;
 			}
