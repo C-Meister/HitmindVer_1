@@ -626,7 +626,7 @@ void sqlmakeroom(void) {
 		}
 
 		char query[100];
-		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password, roommode.mode, roommode.time, roommode.question);
+		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s', '%s', '%s', '%s')", myip, myroom.roomname, myroom.password, roommode.mode, roommode.time, roommode.question);
 		if (!(mysql_query(cons, query)))
 		{
 			cur(10, 1);
