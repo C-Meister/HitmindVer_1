@@ -207,46 +207,8 @@ void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int
 Uint32 get_pixel32(SDL_Surface *surface, int x, int y);
 void makebmp(const char *filename, SDL_Renderer * Renderer2);
 void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b);
-void contest(SDL_Window* Window,SDL_Renderer* Renderer,int i) {
-	char inputfile[50]="";
-	char str[100] = "";
-	sprintf(inputfile,".\\text\\user%d.txt", i);
-	FILE *in = fopen(inputfile,"r+");
-	if (in == NULL) {
-		return;
-	}
-	int j=0,max = 0,line =0;
-	while (!feof(in)) {
-		line++;
-		fscanf(in, "%[^\n]s",str);
-		fgetc(in);
-		if (strcmp(str, "SDLCLEAR") == 0) {
-			max = line;
-		}
-	}
-	fclose(in);
-	in = fopen(inputfile, "r+");
-	for (j = 0; j < max; j++) {
-		fscanf(in, "%[^\n]s", str);
-		fgetc(in);
-	}
-	int eraser=0, pencil=0, drag=0;
-		int x=0, y=0;
-	float strong=0, r=0, g=0, b=0;
-	while(!feof(in)){
-		fscanf(in,"%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil,&drag, &x, &y, &strong, &r, &g, &b);
-		if (i == 1) 
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x/2, y/2, strong, r, g, b);
-		else if (i == 2) 
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2+(1920-1310/4-10)/2, y / 2, strong, r, g, b);
-		else if (i == 3) 
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2+(1080-900/4-10)/2, strong, r, g, b);
-		else if (i == 4) 
-			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2+(1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
-	}
-	fclose(in);
-	return;
-}
+void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i);
+
 // -------------------- 게임 내부 함수들 ----------------------------------
 void mainatitleimage(void);						//게임 메인타이틀 출력
 int maintitle(void);							//게임 메인타이틀 출력및 선택
@@ -3321,7 +3283,7 @@ void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Rendere
 		TTF_CloseFont(topicFont);
 			TTF_CloseFont(Font);
 	case 2:
-		TTF_Quit();//TTF 종료
+		TTF_Quit();//TTF 종료s
 	case 1:
 		SDL_Quit();
 	}
@@ -3618,6 +3580,46 @@ int unicodehan(wchar_t unicode[], int len) {
 			cnt++;
 	}
 	return cnt;
+}
+void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
+	char inputfile[50] = "";
+	char str[100] = "";
+	sprintf(inputfile, ".\\text\\user%d.txt", i);
+	FILE *in = fopen(inputfile, "r+");
+	if (in == NULL) {
+		return;
+	}
+	int j = 0, max = 0, line = 0;
+	while (!feof(in)) {
+		line++;
+		fscanf(in, "%[^\n]s", str);
+		fgetc(in);
+		if (strcmp(str, "SDLCLEAR") == 0) {
+			max = line;
+		}
+	}
+	fclose(in);
+	in = fopen(inputfile, "r+");
+	for (j = 0; j < max; j++) {
+		fscanf(in, "%[^\n]s", str);
+		fgetc(in);
+	}
+	int eraser = 0, pencil = 0, drag = 0;
+	int x = 0, y = 0;
+	float strong = 0, r = 0, g = 0, b = 0;
+	while (!feof(in)) {
+		fscanf(in, "%d %d %d %d %d %f %f %f %f\n", &eraser, &pencil, &drag, &x, &y, &strong, &r, &g, &b);
+		if (i == 1)
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2, strong, r, g, b);
+		else if (i == 2)
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2, strong, r, g, b);
+		else if (i == 3)
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
+		else if (i == 4)
+			ReceiveRender(Window, Renderer, (bool)eraser, (bool)pencil, (bool)drag, x / 2 + (1920 - 1310 / 4 - 10) / 2, y / 2 + (1080 - 900 / 4 - 10) / 2, strong, r, g, b);
+	}
+	fclose(in);
+	return;
 }
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 
