@@ -115,7 +115,7 @@ struct {
 	int time;
 	int question;
 	int mode;
-}roommode;
+}roommode = { 90, 15, 1 };
 //전역 변수들 (사용 비추천)
 
 CRITICAL_SECTION cs;	//이벤트
