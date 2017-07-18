@@ -3402,8 +3402,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			first++;
 			if (first == 11)
 			{
+				firstclock = clock();
+				first = 0;
 				if (turn == myownnumber)
 				{
+					firstclock = clock();
+					first = 0;
 					while (1)
 					{
 						turn++;
@@ -3446,7 +3450,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 		if (pastturn != turn)
 		{
-		
+			firstclock = clock();
+			first = 0;
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
 			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
 			if (myownnumber == turn) {
