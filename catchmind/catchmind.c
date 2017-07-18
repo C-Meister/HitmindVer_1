@@ -4051,6 +4051,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						if (status[(int)i-1] != 0)
 							contest(Window2, Renderer2, i);
 					}
+					SDL_Delay(5000);
 				}
 				firstclock = clock();
 				first = 0;
