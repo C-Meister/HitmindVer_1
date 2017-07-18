@@ -292,7 +292,7 @@ int main(int argc, char **argv) //mainÇÔ¼ö SDL¿¡¼­´Â ÀÎ¼ö¿Í ¸®ÅÏÀ» ²À ÇØÁà¾ßÇÔ
 	//SDL_MAINS();
 	// ÃÊ±âÈ­ ³¡
 	signalall();
-
+	
 	if (Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
 	{
 		printf("ÃÊ±âÈ­ ½ÇÆÐ");
@@ -1577,11 +1577,14 @@ int Connect_Server(char *ServerIP) { //¼­¹ö ¿¬°á ÇØÁÖ´Â ÇÔ¼ö
 }
 void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 	char message[50] = { 0, };
+	int i = 0;
 	while (1) {
 
 		if (recv(connect_sock, message, 45, 0) > 0) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ¸¦ ¹Þ¾Æ¿Í messageº¯¼ö¿¡ ÀúÀå
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
+				cur(10, 31);
+				printf("recieve = %d                    ", i++);
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
@@ -2623,6 +2626,7 @@ void Clnt_1(int v)
 		if (Sconnect_sock[i] != 0)
 			send(Sconnect_sock[v], querys[i], 45, 0);
 	}
+	i = 0;
 	/*if (Sconnect_sock[1] != 0)
 		send(Sconnect_sock[v], querys[1], 40, 0);
 	if (Sconnect_sock[2] != 0)
@@ -2637,7 +2641,9 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				sendall(message, v);
+				cur(10, 30);
+				printf("Clnt_1 = %d                     ", i++);
+				sendall(message, 5);
 				RESET(message);
 				continue;
 			}
@@ -3157,6 +3163,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect center = { 0 };
 	char query[256];
 	Mix_PauseMusic();
+	int senddata = 0;
 	Mix_VolumeMusic(120);
 	Mix_PlayMusic(music, -1);
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð
@@ -3711,6 +3718,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
+								printf("Senddata = %d", senddata++);
 							}
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3732,6 +3740,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							if (connect_sock != 0) {
 								sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
+								printf("Senddata = %d", senddata++);
 							}
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
 							i = (event.motion.x - Rect.x) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -3846,6 +3855,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 						//		sprintf(query, "screenshot\\%d.bmp", time(NULL));
 						//		makebmp(query, Renderer2);
+						
+
 								SDL_DestroyRenderer(Renderer2);
 								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
@@ -3884,6 +3895,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
+									cur(10, 29);
+									printf("Senddata = %d", senddata++);
 								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
@@ -3908,6 +3921,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								if (connect_sock != 0) {
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.button.x, event.button.y, strong, r, g, b);
 									send(connect_sock, query, 45, 0);
+									printf("Senddata = %d", senddata++);
 								}
 								strong *= 50.0 / 80;
 								drag = true;
