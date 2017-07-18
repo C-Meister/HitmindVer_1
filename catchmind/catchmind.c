@@ -1551,16 +1551,9 @@ void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
 	//SetWindowPos(GetConsoleWindow(), HWND_TOP, 0, 0, x * 20, y * 20, SWP_);
 	DWORD Style;
 	Style = GetWindowLong(GetConsoleWindow(), GWL_STYLE); //부모윈도우의 윈도스타일 값을 Style에 저장.
-	Style &= ~WS_THICKFRAME; //비트연산자로 Style안에 있는 WS_HSCROLL 윈도우스타일을 제거한 상태.
-
+	Style &= ~WS_THICKFRAME;
+	Style &= ~WS_MAXIMIZEBOX;
 	SetWindowLong(GetConsoleWindow(), GWL_STYLE, Style); //새로 바꾼 윈도우 스타일을 부모 윈도우의 윈도우스타일에 적용한 상태.
-
-
-
-
-
-
-
 
 }
 void disablecursor(bool a) {
