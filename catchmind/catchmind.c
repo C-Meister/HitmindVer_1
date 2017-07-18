@@ -624,7 +624,7 @@ void sqlmakeroom(void) {
 		}
 
 		char query[100];
-		sprintf(query, "insert into catchmind.room (ip, name, password) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password);
+		sprintf(query, "insert into catchmind.room (ip, name, password, mode, time, question) values ('%s', '%s', '%s')", myip, myroom.roomname, myroom.password, roommode.mode, roommode.time, roommode.question);
 		if (!(mysql_query(cons, query)))
 		{
 			cur(10, 1);
@@ -3472,7 +3472,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer3);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			first++;
-			if (first == 101)
+			if (first == roommode.time + 1)
 			{
 				firstclock = clock();
 				first = 0;
@@ -3504,7 +3504,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				SDL_RenderClear(Renderer2);
 				ee++;
 			}
-			sprintf(query, "%dÃÊ ³²À½", 100 - first);
+			sprintf(query, "%dÃÊ ³²À½", roommode.time - first);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 150, 150);
 			happen = true;
@@ -3590,8 +3590,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
-			sprintf(query, "¹®Á¦ %d/15", ee);
-			if (ee > 15)
+			sprintf(query, "¹®Á¦ %d/%d", ee, roommode.question);
+			if (ee > roommode.question)
 			{
 				quit = true;
 			}
