@@ -138,6 +138,7 @@ char signalmode;
 char querys[10][100];
 long Ping = 0;
 bool lead = false;
+FILE* out[] = { NULL,NULL,NULL,NULL };
 char SOCKETCOUNT = 0;
 char clientcatchmind[50];
 char topics[4][30];
@@ -1979,8 +1980,9 @@ int Connect_Server(char *ServerIP) { //서버 연결 해주는 함수
 void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 	char message[50] = { 0, };
 	int i = 0;
+	char query[50];
 	while (1) {
-
+		
 		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
@@ -1989,6 +1991,26 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				SDLCLOCK++;
 				ZeroMemory(message, sizeof(message));
 				continue;
+			}
+			else if (strncmp(message, "cont 1 ", 7) == 0)
+			{
+				sscanf(message, "cont 1 %s", query);
+				fprintf(out[0], "%s\n", query);
+			}
+			else if (strncmp(message, "cont 2 ", 7) == 0)
+			{
+				sscanf(message, "cont 2 %s", query);
+				fprintf(out[1], "%s\n", query);
+			}
+			else if (strncmp(message, "cont 3 ", 7) == 0)
+			{
+				sscanf(message, "cont 3 %s", query);
+				fprintf(out[2], "%s\n", query);
+			}
+			else if (strncmp(message, "cont 4 ", 7) == 0)
+			{
+				sscanf(message, "cont 4 %s", query);
+				fprintf(out[3], "%s\n", query);
 			}
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
@@ -3063,6 +3085,11 @@ void Clnt_1(int v)
 			{
 				sendall(message, v);
 			}
+			else if (strncmp(message, "cont   ", 7) == 0)
+			{
+				message[5] = v + '0' + 1;
+				sendall(message, 5);
+			}
 			else if (strcmp("right   answer", message) == 0)
 			{
 				message[6] = v + '0' + 1;
@@ -3623,7 +3650,7 @@ void contest(SDL_Window* Window, SDL_Renderer* Renderer, int i) {
 }
 int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
 
-	FILE* out[] = { NULL,NULL,NULL,NULL };
+	
 	SDL_Window * Window = nullptr;//SDL 윈도우 선언
 	SDL_Renderer * Renderer = nullptr;// SDL 렌더러 선언 
 	SDL_Window * Window2 = nullptr;
