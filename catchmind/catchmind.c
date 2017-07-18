@@ -3152,6 +3152,8 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
+				cur(21, 0);
+				printf("receive : %d", i++);
 				sendall(message, v);
 				continue;
 			}
@@ -4202,9 +4204,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (connectroom[CHOOSEROOM].mode != 2) {
 			if (buff < SDLCLOCK) {
 				buff++;
+				cur(20, 0);
+				printf("buff : %d", buff);
 				sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 				ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 				ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+				happen = true;
 			}
 		}
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
