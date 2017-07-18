@@ -28,7 +28,7 @@
 #include <stdint.h>
 #include <Digitalv.h>
 #include <mmsystem.h>
-
+#include <gl/GL.h>
 #include <crtdbg.h>
 //#include <WinSock2.h>		//소켓프로그래밍
 //특수 헤더파일 (따로 설치) 
@@ -98,6 +98,9 @@ typedef struct {
 	char password[30];
 	char ip[20];
 	int people;
+	int time;
+	int question;
+	int mode;
 }ROOM;
 typedef struct tagPOINT *PPOINT;
 typedef struct tagPOINT *LPPOINT;
@@ -152,7 +155,6 @@ bool CHATHAPPEN = false;
 bool ExitHappen = false;
 char chatquery[15][50];
 Mix_Music *music, *mainmusic;
-
 //기본 함수들
 void gotoxy(short x, short y);
 void cur(short x, short y);
@@ -1539,6 +1541,27 @@ void ConsoleL(int x, int y) {			//콘솔창의 크기를 설정해주는 함수
 	char buff[50];
 	sprintf(buff, "mode con cols=%d lines=%d", x * 2, y);
 	system(buff);
+	/*SDL_SetWindowMaximumSize(GetConsoleWindow(), x, y);
+	SDL_SetWindowMinimumSize(GetConsoleWindow(), x, y);
+	MINMAXINFO *lpMMI;
+	lpMMI->ptMinTrackSize.x = x;
+	lpMMI->ptMinTrackSize.y = y;
+	lpMMI->ptMaxTrackSize.x = x;
+	lpMMI->ptMaxTrackSize.y = y;*/
+	//SetWindowPos(GetConsoleWindow(), HWND_TOP, 0, 0, x * 20, y * 20, SWP_);
+	DWORD Style;
+	Style = GetWindowLong(GetConsoleWindow(), GWL_STYLE); //부모윈도우의 윈도스타일 값을 Style에 저장.
+	Style &= ~WS_THICKFRAME; //비트연산자로 Style안에 있는 WS_HSCROLL 윈도우스타일을 제거한 상태.
+
+	SetWindowLong(GetConsoleWindow(), GWL_STYLE, Style); //새로 바꾼 윈도우 스타일을 부모 윈도우의 윈도우스타일에 적용한 상태.
+
+
+
+
+
+
+
+
 }
 void disablecursor(bool a) {
 
@@ -4085,7 +4108,7 @@ Uint32 get_pixel32(SDL_Surface *surface, int x, int y)
 void makebmp(const char *filename, SDL_Renderer * Renderer2) {
 	SDL_Surface *sshot = SDL_CreateRGBSurface(0, (1920 - 1310 / 4 - 10), (1080 - 900 / 4 - 10), 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 	SDL_RenderReadPixels(Renderer2, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-	SDL_SaveBMP(sshot, filename);
+	IMG_SavePNG(sshot, filename);
 	SDL_FreeSurface(sshot);
 }
 //4012
