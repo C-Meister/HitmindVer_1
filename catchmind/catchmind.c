@@ -3623,7 +3623,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		//	ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			ReceiveRender(Window2, Renderer2, (bool)Hi.click_eraser, (bool)Hi.click_pencil, (bool)Hi.dragging, Hi.xxx, Hi.yyy, Hi.sstrong, (float)Hi.rr, (float)Hi.gg, (float)Hi.bb);
 			buff++;
-			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 			
 		}
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
