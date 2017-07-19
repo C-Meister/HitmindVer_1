@@ -5090,13 +5090,12 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	contest(Window2, Renderer2, 3);
 	contest(Window2, Renderer2, 4);
 	*/;
-	if (connectroom[CHOOSEROOM].mode == 2)
-	{
-		out[0] = fopen(".\\text\\user1.txt", "w");
-		out[1] = fopen(".\\text\\user2.txt", "w");
-		out[2] = fopen(".\\text\\user3.txt", "w");
-		out[3] = fopen(".\\text\\user4.txt", "w");
-	}
+	
+	out[0] = fopen(".\\text\\user1.txt", "w");
+	out[1] = fopen(".\\text\\user2.txt", "w");
+	out[2] = fopen(".\\text\\user3.txt", "w");
+	out[3] = fopen(".\\text\\user4.txt", "w");
+	
 	
 	
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
@@ -5159,97 +5158,24 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			first = 0;
 			TIMESET = false;
 		}
-		if (myownnumber == turn && Gametopic == 0)
+		for (int i = 0; i < 4; i++)
 		{
-			EnterCriticalSection(&cs);
-			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
-			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
-			strcpy(topic, sql_row[0]);
-			sprintf(query, "topic   %s", sql_row[0]);
-			LeaveCriticalSection(&cs);
-			//			mysql_free_result(sql_result);
-			send(connect_sock, query, 45, 0);
-			Gametopic++;
-			drag = false;
-			clicks.pencil = false;
-			happen = true;
-		}
-		if (CurrectHappen == true)
-		{
-			CurrectHappen = false;
 
-			SDL_DestroyRenderer(Renderer2);
-			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-			SDL_RenderClear(Renderer2);
-			if (ee != 0) {
-				firstclock = clock();
-				first = 0;
-				sprintf(query, "%s ´ÔÀÌ ¸ÂÃß¾ú½À´Ï´Ù! Á¤´äÀº %s ÀÔ´Ï´Ù", friendname[turn - 1], pasttopic);
+			if (status[i] != 0)
+			{
+
+				UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+				RenderTexture(Renderer3, UseTexture, &UserT);
+				han2unicode(friendname[i], unicode);
+				TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+				sprintf(query, "%d", score[i][0]);
 				han2unicode(query, unicode);
-				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
-				SDL_RenderPresent(Renderer2);
+				TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+				sprintf(query, "%d", score[i][1]);
+				han2unicode(query, unicode);
+				TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
 			}
-			ee++;
-			for (int i = 0; i < 4; i++)
-			{
-
-				if (status[i] != 0)
-				{
-
-					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
-					RenderTexture(Renderer3, UseTexture, &UserT);
-					han2unicode(friendname[i], unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
-					sprintf(query, "%d", score[i][0]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
-
-					sprintf(query, "%d", score[i][1]);
-					han2unicode(query, unicode);
-					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
-				}
-			}
-
-
-
-			happen = true;
-
-
-		}
-		if (pastturn != turn)
-		{
-			firstclock = clock();
-			first = 0;
-			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
-			SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
-			if (myownnumber == turn) {
-				RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
-				han2unicode(topic, unicode);
-				TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
-			}
-			else
-			{
-				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
-				SDL_RenderFillRect(Renderer, &Timer2);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
-			}
-			//			han2unicode(query, unicode);
-			//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
-			//		SDL_RenderPresent(Renderer);
-			//		SDL_Delay(3000);
-
-			sprintf(query, "%s Â÷·ÊÀÔ´Ï´Ù", friendname[turn - 1]);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
-			sprintf(query, "¹®Á¦ %d/%d", ee, connectroom[CHOOSEROOM].question);
-			if (ee > connectroom[CHOOSEROOM].question)
-			{
-				quit = true;
-			}
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer, Font, unicode, 0, 150);
-			pastturn = turn;
-			happen = true;
 		}
 		if (ExitHappen == true)
 		{
@@ -5278,25 +5204,12 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		}
 
 		// contest¸ðµå
-		if (myownnumber == turn)
-		{
+		if (vote == false)
 			writemode = true;
-		}
-		else {
-			drag = false;
-			writemode = false;		//X
-	//	CLS;
-		}
-		if (buff < SDLCLOCK) {
-			buff++;
-			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			cur(18, 10);
-			printf("buff : %d", buff);
-			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
-			happen = true;
-		}
+		else
+		{
 
+		}
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
 			case SDL_TEXTINPUT:
@@ -5351,15 +5264,17 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 							
 							RESET(chatquery);
 					//		EnterCriticalSection(&cs);
-							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+							strcpy(chatquery[9], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+							strcpy(chatquery[10], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
+							strcpy(chatquery[11], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
-							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+							strcpy(chatquery[12], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
-							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							strcpy(chatquery[13], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[14], "[6] /vote : »ç¶÷À» ÅõÇ¥ÇÕ´Ï´Ù. ÀÚ±â ÅõÇ¥ X");
 					//		LeaveCriticalSection(&cs);
 							CHATHAPPEN = true;
 							
@@ -5369,15 +5284,17 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 							
 							RESET(chatquery);
 					//		EnterCriticalSection(&cs);
-							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+							strcpy(chatquery[9], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+							strcpy(chatquery[10], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
+							strcpy(chatquery[11], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
-							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+							strcpy(chatquery[12], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
-							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							strcpy(chatquery[13], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[14], "[6] /vote : »ç¶÷À» ÅõÇ¥ÇÕ´Ï´Ù. ÀÚ±â ÅõÇ¥ X");
 					//		LeaveCriticalSection(&cs);
 							CHATHAPPEN = true;
 							
@@ -5396,7 +5313,6 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 							{
 								RESET(chatquery);
 								strcpy(chatquery[14], "[¾Ë¸²] ¾ÆÁ÷ ÅõÇ¥½Ã°£ÀÌ ¾Æ´Õ´Ï´Ù.");
-								
 							}
 							else
 							{
@@ -5524,13 +5440,8 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 							if (connect_sock != 0) {
-								if (connectroom[CHOOSEROOM].mode == 2)
-								{
-									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								}
-								else
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 35, 0);
+							sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+							send(connect_sock, query, 35, 0);
 								ccount++;
 
 							}
@@ -5559,12 +5470,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 							}
 							strong *= 50 / 80.0;
 							if (connect_sock != 0) {
-								if (connectroom[CHOOSEROOM].mode == 2)
-								{
-									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								}
-								else
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 35, 0);
 							
 								ccount++;
@@ -5707,12 +5613,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 								SDL_RenderFillRect(Renderer2, &Rect);// ·»´õ·¯¿¡ ±×¸²
 																	 // ¿©±â~~~~~~~~~
 								if (connect_sock != 0) {
-									if (connectroom[CHOOSEROOM].mode == 2)
-									{
-										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-									}
-									else
-										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 									send(connect_sock, query, 35, 0);
 									ccount++;
 
@@ -5738,13 +5639,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 								}
 								// ¿©±â~~~~~~~~~~~~~~
 								if (connect_sock != 0) {
-									if (connectroom[CHOOSEROOM].mode == 2)
-									{
-										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-									
-									}
-									else
-										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 									send(connect_sock, query, 35, 0);
 									ccount++;
 
@@ -5806,18 +5701,10 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			CHATHAPPEN = false;
 			happen = true;
 		}
-
-		//	han2unicode(query, unicode);
-		//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
-
 		if (happen == true) {
-			//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
-			//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
-		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong, r, g, b);
 			happen = false;
-	//		cur(30, 30);
-	//		printf("send :%d", ccount);
+
 
 		}
 
