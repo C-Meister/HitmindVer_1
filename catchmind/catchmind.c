@@ -3823,7 +3823,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	char query[256];
 	Mix_PauseMusic();
 	int senddata = 0;
-	bool SENDHAPPEN = false;
 	Mix_VolumeMusic(120);
 	Mix_PlayMusic(music, -1);
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð
@@ -4447,7 +4446,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					send(connect_sock, "exit", 35, 0);
 					quit = true;// quit¸¦ true·Î º¯°æ
 					Sleep(100);
-					exit(1);
 					break;// ºê·¹ÀÌÅ©
 				case SDL_WINDOWEVENT_ENTER:// À©µµ¿ì
 					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//Æ÷Ä¿½º ÀÌµ¿½ÃÅ´
@@ -4490,7 +4488,16 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderFillRect(Renderer2, &Rect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-							SENDHAPPEN = true;
+							if (connect_sock != 0) {
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 35, 0);
+								ccount++;
+							}
 						}
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
 							strong *= 80 / (float)50.0;
@@ -4515,7 +4522,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								}
 							}
 							strong *= 50 / 80.0;
-							SENDHAPPEN = true;
+							if (connect_sock != 0) {
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 35, 0);
+							
+								ccount++;
+							}
 						}
 						happen = true;
 						//		send(connect_sock, "", 45, 0);
@@ -4618,7 +4635,14 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								happen = true;
 								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
 								//¿©±â~~~~~~~~~~~~~~~~~~
-								SENDHAPPEN = true;
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										send(connect_sock, "Con   SDLCLEAR", 35, 0);
+									}
+									else
+										send(connect_sock, "SDLCLEAR", 35, 0);
+								}
 								//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 								clicks.eraser = false;
 								clicks.pencil = true;
@@ -4644,7 +4668,16 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								Rect.w = Rect.h = strong;// ±½±â ¼³Á¤
 								SDL_RenderFillRect(Renderer2, &Rect);// ·»´õ·¯¿¡ ±×¸²
 																	 // ¿©±â~~~~~~~~~
-								
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									send(connect_sock, query, 35, 0);
+									ccount++;
+								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
 
@@ -4665,7 +4698,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
 								}
 								// ¿©±â~~~~~~~~~~~~~~
-								SENDHAPPEN = true;
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									send(connect_sock, query, 35, 0);
+									ccount++;
+
+								}
 								strong *= 50.0 / 80;
 								drag = true;
 								happen = true;
@@ -4728,20 +4771,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
 
 		if (happen == true) {
-			if (SENDHAPPEN == true)
-			{
-				if (connect_sock != 0) {
-					if (connectroom[CHOOSEROOM].mode == 2)
-					{
-						sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-					}
-					else
-						sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-					send(connect_sock, query, 35, 0);
-					ccount++;
-				}
-				SENDHAPPEN = false;
-			}
 			//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
