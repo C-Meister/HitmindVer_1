@@ -4981,7 +4981,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	//	SDL_Surface *Text;
 	SDL_Rect  Word = { 0 };
 	unsigned short unicode[128] = L"";
-
+	
 	//
 	getlevel();
 	// Ãß°¡
@@ -5206,6 +5206,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	bool hangeulinput = false;
 	bool enter = false;
 	bool writemode = false;
+	bool firsttopic = false;
 	MYSQL_ROW sql_row;
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
@@ -5861,6 +5862,15 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 								clicks.pencil = true;
 								sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
 								happen = true;
+							}
+							else if ((event.button.x >= Pass.x - 10 && event.button.x <= Pass.x + Pass.w + 10) && (event.button.y >= Pass.y - 10 && event.button.y <= Pass.y + Pass.h + 10)) {// ÆÐ½º¹öÆ° Å¬¸¯½Ã
+
+							}
+							else if ((event.button.x >= Magnifying.x - 10 && event.button.x <= Magnifying.x + Magnifying.w + 10) && (event.button.y >= Magnifying.y - 10 && event.button.y <= Magnifying.y + Magnifying.h + 10)) {
+
+							}
+							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
+
 							}
 						}
 						else if (event.button.windowID == SDL_GetWindowID(Window2)) {
