@@ -189,7 +189,7 @@ char **onemysqlquery(char *query); //mysql명령어의 결과하나를 바로 반환해주는 함
 void writechating(void);					//mysql에 채팅을 입력하는 함수
 void readchating(void);					//mysql의 채팅을 읽는 함수
 void inserttopic(void);
-void sqlmakeroom(void);					//방을 만드는 함수
+int sqlmakeroom(void);					//방을 만드는 함수
 
 // -------------------- SDL 그래픽 함수들 ---------------------------------
 void SDL_ErrorLog(const char * msg);//에러코드 출력 함수			//그래픽에러코드 출력 함수
@@ -298,6 +298,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 	char nowword[30] = { 0, };              //랜덤선택 단어
 	char scanword[30] = { 0, };             //내가 친 단어
 	int bangnum = 0;						//고른 방의 번호
+	int bangmake = 0;                       //방만들기
 	char serverreturn = 0;					//Connect_Server가 반환한 값을 저장하는곳
 	mysql_options(cons, MYSQL_OPT_CONNECT_TIMEOUT, (const char *)&timeout);
 	loadmysql(mysqlip);
@@ -343,8 +344,11 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 				gotoxy(0, 0);
 				bangchoose = bangchose();	//방을 고름	
 				if (bangchoose == 0) {			//방만들기를 클릭하면 방만들기로 이동
-					sqlmakeroom();
-					break;
+					bangmake=sqlmakeroom();
+					if (bangmake == 0)
+						break;
+					else
+						continue;
 				}
 				else                            //방 선택 접속
 				{
@@ -501,6 +505,8 @@ void makeroomtema() {
 	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
 	printf("■   문제수   □  ○5   ○10  ○15  ○입력:     ■\n"); //9~10 , 12~13, 15~16, 18~20
 	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("■        나가기        ■       방만들기       ■\n");
+	printf("■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 }
 void roomprintwhite(int xx, int yy, int lr, int bibun, int gamo, int time, int ex) {
 	WHITE if (!(yy == 7 && 9 <= xx && xx <= 12) && bibun != 1) {               //비밀번호
@@ -555,7 +561,14 @@ void roomprintwhite(int xx, int yy, int lr, int bibun, int gamo, int time, int e
 		gotoxy(36, 14);
 		printf("○입력:");
 	}
-
+	if (!(yy == 16 && 1 <= xx && xx <= 11)) {
+		gotoxy(10, 16);
+		printf("나가기");
+	}
+	if (!(yy == 16 && 13 <= xx && xx <= 23)) {
+		gotoxy(33, 16);
+		printf("방만들기");
+	}
 	//--------------------------------------
 
 
@@ -655,7 +668,7 @@ void scanning(char *s, int *tmpi) {
 	*tmpi = i;
 	disablecursor(1);
 }
-void sqlmakeroom(void) {
+int sqlmakeroom(void) {
 	int count = 0;
 	int i = 0;
 	int c = 0;
@@ -732,18 +745,18 @@ void sqlmakeroom(void) {
 			printf("%3d %3d %3d", xx, yy, lr);
 
 			if (buff < 20) {
-				tmp=checkkeyborad(tmp, -1);
+				tmp = checkkeyborad(tmp, -1);
 				GetAsyncKeyState(VK_RETURN);
 				buff++;
 			}
-			
+
 
 			if (GetAsyncKeyState(VK_RETURN) & 0x0001)
 				break;
 
 
 			roomprintwhite(xx, yy, lr, bibun, gamo, time, ex); //흰색
-			
+
 			//녹색출력
 			HIGH_GREEN if (yy == 7 && 9 <= xx && xx <= 12 && bibun != 1) {               //비밀번호
 				gotoxy(18, 7);
@@ -756,11 +769,20 @@ void sqlmakeroom(void) {
 					ni = 0;
 				}
 			}
-			else if (yy == 7 && 15 <= xx && xx <= 17 && bibun != 2 && bibun != 3) {
+			else if (yy == 7 && 15 <= xx && xx <= 17 && bibun == 1) {
 				gotoxy(30, 7);
 				printf("○사용");
-				if (lr == 1)
+				if (lr == 1) {
 					bibun = 2;
+					if (bibun == 3) bibun = 2;
+					if (ex == 4) ex = 5;
+					if (time == 4) time = 5;
+				}
+			}
+			else if (yy == 7 && 15 <= xx && xx <= 17 && lr == 1) {
+				if (bibun == 3) bibun = 2;
+				if (ex == 4) ex = 5;
+				if (time == 4) time = 5;
 			}
 			else if (yy == 10 && 9 <= xx && xx <= 11 && gamo != 1) {         //게임모드
 				gotoxy(18, 10);
@@ -813,7 +835,7 @@ void sqlmakeroom(void) {
 					ti = 0;
 				}
 			}
-			else if (yy == 12 && 18 <= xx && xx <= 20 && time != 4 && time !=5) {
+			else if (yy == 12 && 18 <= xx && xx <= 20 && time != 4 && time != 5) {
 				gotoxy(36, 12);
 				printf("○입력");
 				if (lr == 1) {
@@ -822,7 +844,16 @@ void sqlmakeroom(void) {
 					printf("   ");
 					ZeroMemory(timedata, sizeof(timedata));
 					ti = 0;
+					if (time == 5) time = 4;
+					if (bibun == 2) bibun = 3;
+					if (ex == 4) ex = 5;
 				}
+
+			}
+			else if (yy == 12 && 18 <= xx && xx <= 20 && lr == 1) {
+				if (time == 5) time = 4;
+				if (bibun == 2) bibun = 3;
+				if (ex == 4) ex = 5;
 			}
 			else if (yy == 14 && 9 <= xx && xx <= 10 && ex != 1) {         //문제수
 				gotoxy(18, 14);
@@ -831,7 +862,7 @@ void sqlmakeroom(void) {
 					ex = 1;
 					gotoxy(43, 14);
 					printf("   ");
-					ZeroMemory(exdata,sizeof(exdata));
+					ZeroMemory(exdata, sizeof(exdata));
 					ei = 0;
 				}
 			}
@@ -857,7 +888,7 @@ void sqlmakeroom(void) {
 					ei = 0;
 				}
 			}
-			else if (yy == 14 && 18 <= xx && xx <= 20 && ex != 4 && ex !=5) {
+			else if (yy == 14 && 18 <= xx && xx <= 20 && ex != 4 && ex != 5) {
 				gotoxy(36, 14);
 				printf("○입력");
 				if (lr == 1) {
@@ -866,7 +897,29 @@ void sqlmakeroom(void) {
 					printf("   ");
 					ZeroMemory(exdata, sizeof(exdata));
 					ei = 0;
+					if (time == 4) time = 5;
+					if (bibun == 2) bibun = 3;
+					if (ex == 5) ex = 4;
 				}
+
+			}
+			else if (yy == 14 && 18 <= xx && xx <= 20 && lr == 1) {
+				if (time == 4) time = 5;
+				if (bibun == 2) bibun = 3;
+				if (ex == 5) ex = 4;
+			}
+			else if (yy == 16 && 1 <= xx && xx <= 11) {
+				gotoxy(10, 16);
+				printf("나가기");
+				if (lr == 1)
+					return -1;
+			}
+			else if (yy == 16 && 13 <= xx && xx <= 23) {
+				
+				gotoxy(33, 16);
+				printf("방만들기");
+				if (lr == 1)
+					break;
 			}
 
 			//자주색 출력
@@ -878,11 +931,17 @@ void sqlmakeroom(void) {
 				gotoxy(30, 7);
 				printf("●사용");
 				gotoxy(6, 8);
-				WHITE printf("입력    □");
+				WHITE printf("입력    □%s",myroom.password);
 				gotoxy(17 + ni, 8);
 				scanning(myroom.password, &ni);
-				if(ex==4) ex = 5;
-				if (time == 4) time = 5;
+
+				YELLOW
+			}
+			else if (bibun == 3) {
+				gotoxy(30, 7);
+				GREEN printf("●사용");
+				gotoxy(17, 8);
+				printf("%s", myroom.password);
 				YELLOW
 			}
 			if (gamo == 1) {         //게임모드
@@ -911,12 +970,15 @@ void sqlmakeroom(void) {
 			}
 			else if (time == 4) {
 				gotoxy(36, 12);
-				printf("●입력:");
+				printf("●입력:%s",timedata);
 				gotoxy(43+ti, 12);
 				scannum(timedata,&ti);
 				disablecursor(1);
-				if (ex == 4) ex = 5;
-				if (bibun == 2) bibun == 3;
+			}
+			else if (time == 5) {
+				gotoxy(36, 12);
+				GREEN printf("●입력:"); 
+				printf("%s",timedata ); YELLOW
 			}
 			if (ex == 1) {         //문제수
 				gotoxy(18, 14);
@@ -933,17 +995,17 @@ void sqlmakeroom(void) {
 			}
 			else if (ex == 4) {
 				gotoxy(36, 14);
-				printf("●입력:");
+				printf("●입력:%s",exdata);
 				gotoxy(43 + ei, 14);
 				scannum(exdata, &ei);
 				disablecursor(1);
 
-				if (time == 4) time = 5;
-				if (bibun == 2) bibun == 3;
 			}
 			else if (ex == 5) {
 				gotoxy(36, 14);
 				GREEN printf("●입력:");
+				printf("%s", exdata);
+				YELLOW
 			}
 		
 
@@ -1079,7 +1141,7 @@ void sqlmakeroom(void) {
 				lead = true;
 				CLS;
 				Connect_Server(myip);
-				return;
+				return 0;
 			}
 			Sleep(1000);
 		}
