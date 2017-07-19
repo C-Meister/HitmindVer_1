@@ -4811,7 +4811,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 									sprintf(query, "%d글자", strlen(topic) / 2);
 									TTF_DrawText(Renderer, topicFont, query, 20, 25);
 								}
-							}
+							} 
 							//change버튼
 							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
 								if (turn == myownnumber) {
