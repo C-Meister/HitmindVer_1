@@ -2117,7 +2117,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
-				cur(0, 22);
+				cur(10, 22);
 				printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
 				continue;
