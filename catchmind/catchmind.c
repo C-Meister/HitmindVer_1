@@ -4488,16 +4488,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderFillRect(Renderer2, &Rect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-							if (connect_sock != 0) {
-								if (connectroom[CHOOSEROOM].mode == 2)
-								{
-									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								}
-								else
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 35, 0);
-								ccount++;
+							/*		if (connect_sock != 0) {
+							if (connectroom[CHOOSEROOM].mode == 2)
+							{
+							sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 							}
+							else
+							sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+							send(connect_sock, query, 35, 0);
+							ccount++;
+
+							}*/
 						}
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
 							strong *= 80 / (float)50.0;
@@ -4522,17 +4523,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								}
 							}
 							strong *= 50 / 80.0;
-							if (connect_sock != 0) {
-								if (connectroom[CHOOSEROOM].mode == 2)
-								{
-									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								}
-								else
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 35, 0);
-							
-								ccount++;
+							/*		if (connect_sock != 0) {
+							if (connectroom[CHOOSEROOM].mode == 2)
+							{
+							sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 							}
+							else
+							sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+							send(connect_sock, query, 35, 0);
+							ccount++;
+
+							}*/
 						}
 						happen = true;
 						//		send(connect_sock, "", 45, 0);
@@ -4668,16 +4669,17 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								Rect.w = Rect.h = strong;// ±½±â ¼³Á¤
 								SDL_RenderFillRect(Renderer2, &Rect);// ·»´õ·¯¿¡ ±×¸²
 																	 // ¿©±â~~~~~~~~~
-								if (connect_sock != 0) {
-									if (connectroom[CHOOSEROOM].mode == 2)
-									{
-										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-									}
-									else
-										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-									send(connect_sock, query, 35, 0);
-									ccount++;
-								}
+																	 /*		if (connect_sock != 0) {
+																	 if (connectroom[CHOOSEROOM].mode == 2)
+																	 {
+																	 sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+																	 }
+																	 else
+																	 sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+																	 send(connect_sock, query, 35, 0);
+																	 ccount++;
+
+																	 }*/
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
 
@@ -4698,7 +4700,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
 								}
 								// ¿©±â~~~~~~~~~~~~~~
-								if (connect_sock != 0) {
+						/*		if (connect_sock != 0) {
 									if (connectroom[CHOOSEROOM].mode == 2)
 									{
 										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
@@ -4708,7 +4710,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									send(connect_sock, query, 35, 0);
 									ccount++;
 
-								}
+								}*/
 								strong *= 50.0 / 80;
 								drag = true;
 								happen = true;
@@ -4775,10 +4777,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			//		SDL_RenderFillRect(Renderer, &Timer);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong, r, g, b);
+			sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+			send(connect_sock, query, 35, 0);
 			happen = false;
-			cur(30, 30);
-			printf("send :%d", ccount);
-
+	//		cur(30, 30);
+//			printf("send :%d", ccount);
+//
 		}
 
 	}
