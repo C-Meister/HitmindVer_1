@@ -4792,8 +4792,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 										break;
 									
 								}
+								EnterCriticalSection(&cs);
 								sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[알림]', '[%s]님이 pass를 사용하였습니다.','%s')", username, connectroom[CHOOSEROOM].ip);
 								mysql_query(cons, query);
+								LeaveCriticalSection(&cs);
 								sprintf(query, "pass %d", turn);
 								turn = pastturn;
 								send(connect_sock, query, 35, 0);
