@@ -2042,11 +2042,31 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				TIMESET = true;
 				RESET(message);
 			}
+			else if (strcmp(message, "cont 1 end") == 0)
+			{
+				status[0] = 7;
+				RESET(message);
+
+			}
+			else if (strcmp(message, "cont 2 end") == 0)
+			{
+				status[1] = 7;
+				RESET(message);
+			}
+			else if (strcmp(message, "cont 3 end") == 0)
+			{
+				status[2] = 7;
+				RESET(message);
+			}
+			else if (strcmp(message, "cont 4 end") == 0)
+			{
+				status[3] = 7;
+				RESET(message);
+			}
 			else if (strncmp(message, "cont 1 ", 7) == 0)
 			{
 				sscanf(message, "cont 1 %[^\n]s", query);
 				fprintf(out[0], "%s\n", query);
-
 			}
 			else if (strncmp(message, "cont 2 ", 7) == 0)
 			{
@@ -2086,23 +2106,7 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				fprintf(out[3], "SDLCLEAR\n");
 				continue;
 			}
-			else if (strcmp(message, "cont 1 end") == 0)
-			{
-				status[0] = 7;
-
-			}
-			else if (strcmp(message, "cont 2 end") == 0)
-			{
-				status[1] = 7;
-			}
-			else if (strcmp(message, "cont 3 end") == 0)
-			{
-				status[2] = 7;
-			}
-			else if (strcmp(message, "cont 4 end") == 0)
-			{
-				status[3] = 7;
-			}
+			
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -4170,6 +4174,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				SDL_RenderClear(Renderer2);
 				ee++;
 			}
+			
 			sprintf(query, "%dÃÊ ³²À½", connectroom[CHOOSEROOM].time - first);
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 155, 155);
@@ -4909,18 +4914,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	return 0;// Á¾·á
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀÎÀÌ ¾Æ´Ô, µû¶ó¼­ ¸Å°³º¯¼öµµ ¸ÂÃçÁà¾ßÇÔ
 	SDL_Window * Window = nullptr;//SDL À©µµ¿ì ¼±¾ð
 	SDL_Renderer * Renderer = nullptr;// SDL ·»´õ·¯ ¼±¾ð 
@@ -5189,7 +5182,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	bool vote = false;
 	char click_eraser, click_pencil;
 	int len = 0;
-
+	MYSQL_ROW sql_row;
 	int ee = 0;
 	char euckr[256];
 	char query2[50];
@@ -5212,6 +5205,21 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	long firstclock = clock();
 	int first = 0;
 	turn++;
+	if (lead == true)
+	{
+		EnterCriticalSection(&cs);
+		mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+		sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+		strcpy(topic, sql_row[0]);
+		sprintf(query, "topic   %s", sql_row[0]);
+		LeaveCriticalSection(&cs);
+		//			mysql_free_result(sql_result);
+		send(connect_sock, query, 45, 0);
+		Gametopic++;
+		drag = false;
+		clicks.pencil = false;
+		happen = true;
+	}
 	/*
 	contest(Window2, Renderer2, 1);
 	contest(Window2, Renderer2, 2);
@@ -5235,8 +5243,13 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			first++;
 			if (first == connectroom[CHOOSEROOM].time + 1)				//1ÃÊ¸¶´Ù È­¸éÀ» ÃÊ±âÈ­ÇÏ¿©¼­ ¿Ã¸²
 			{
+				drag = false;
 				send(connect_sock, "cont   end", 35, 0);
-				each
+				for (int k = 0; k < 4; k++)
+				{
+					fclose(out[k]);
+				}
+
 				//mode°¡ ÄÁÅ×½ºÆ®ÀÌ¸é ¼­·ÎÀÇ È­¸éÀ» 4µîºÐÇØ¼­ º¸¿©ÁÜ
 				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 				SDL_RenderClear(Renderer2);
@@ -5262,18 +5275,18 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer3);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 
+			for (int k = 0; k < 4; k++)
+			{
+				fclose(out[k]);
+			}
+			out[0] = fopen(".\\text\\user1.txt", "w");
+			out[1] = fopen(".\\text\\user2.txt", "w");
+			out[2] = fopen(".\\text\\user3.txt", "w");
+			out[3] = fopen(".\\text\\user4.txt", "w");
 
 			first++;
 			if (first > 10)
 			{
-				for (int k = 0; k < 4; k++)
-				{
-					fclose(out[k]);
-				}
-				out[0] = fopen(".\\text\\user1.txt", "w");
-				out[1] = fopen(".\\text\\user2.txt", "w");
-				out[2] = fopen(".\\text\\user3.txt", "w");
-				out[3] = fopen(".\\text\\user4.txt", "w");
 				SDL_DestroyRenderer(Renderer2);
 				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
