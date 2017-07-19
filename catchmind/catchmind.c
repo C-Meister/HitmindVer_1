@@ -4382,7 +4382,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							strcpy(chatquery[14], "[5] /startmusic : 현재 음악을 재실행합니다.");
 							CHATHAPPEN = true;
 						}
-						else if (strncmp(euckr, "/vote ", 6) == 0)
+						/*else if (strncmp(euckr, "/vote ", 6) == 0)
 						{
 							if (vote == false)
 							{
@@ -4407,7 +4407,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 								}
 							}
 							CHATHAPPEN = true;
-						}
+						}*/
 						else if (strncmp(euckr, "/capture ", 9) == 0)
 						{
 							RESET(chatquery);
