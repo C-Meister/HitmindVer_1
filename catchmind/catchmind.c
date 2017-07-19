@@ -2953,10 +2953,10 @@ void Auto_Update(void)
 	char serverversion[10];
 	char choose;
 	char version[] = "0.0.5";
-	mysql_query(cons, "sele
-	cur(10, 34);
-	printf("■■--업데이트기록--■■■■■■■■■■■■■■■■■■■■");ct * from catchmind.autoupdate order by version");
+	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
+	cur(10, 34);
+	printf("■■--업데이트기록--■■■■■■■■■■■■■■■■■■■■");
 	cur(50, 34);
 	printf("--현재 : %s--", version);
 	while ((sql_row = mysql_fetch_row(sql_result)) != 0)
