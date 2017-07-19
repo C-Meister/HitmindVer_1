@@ -160,6 +160,7 @@ int SDLCLOCK = 0;
 char pasttopic[20];
 bool CHATHAPPEN = false;
 bool ExitHappen = false;
+bool PASS = false;
 char chatquery[15][50];
 Mix_Music *music, *mainmusic;
 //±âº» ÇÔ¼öµé
@@ -2063,6 +2064,30 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				status[3] = 7;
 				RESET(message);
 			}
+			else if (strcmp(message, "pass 1") == 0)
+			{
+				turn = 1;
+				PASS = true;
+
+			}
+			else if (strcmp(message, "pass 2") == 0)
+			{
+				turn = 2;
+				PASS = true;
+
+			}
+			else if (strcmp(message, "pass 3") == 0)
+			{
+				turn = 3;
+				PASS = true;
+
+			}
+			else if (strcmp(message, "pass 4") == 0)
+			{
+				turn = 4;
+				PASS = true;
+
+			}
 			else if (strncmp(message, "cont 1 ", 7) == 0)
 			{
 				sscanf(message, "cont 1 %[^\n]s", query);
@@ -3206,6 +3231,9 @@ void Clnt_1(int v)
 				sendall(message, 5);
 
 			}
+			else if (strncmp(message, "pass ", 5) == 0) {
+				sendall(message, 5);
+			}
 			else if (strcmp(message, "con   SDLCLEAR") == 0)
 			{
 				message[4] = v + '0' + 1;
@@ -3289,7 +3317,7 @@ void Clnt_1(int v)
 			}
 			else
 			{
-				sendall(message, v);
+				sendall(message, 5);
 			}
 			ZeroMemory(message, sizeof(message));
 		}
@@ -4136,6 +4164,51 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
+		if (PASS == true)
+		{
+			firstclock = clock();						//½Ã°£ ÃÊ±âÈ­
+			first = 0;
+			if (turn == myownnumber) {
+				EnterCriticalSection(&cs);
+				mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+				sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+				strcpy(topic, sql_row[0]);
+				sprintf(query, "topic   %s", sql_row[0]);
+				LeaveCriticalSection(&cs);
+			}
+			PASS = false;
+		}
+		if (topichappen == true)
+		{
+			firstclock = clock();						//½Ã°£ ÃÊ±âÈ­
+			first = 0;
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
+			if (myownnumber == turn) {
+				RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+				han2unicode(topic, unicode);
+				TTF_DrawText(Renderer, topicFont, unicode, 100, 84);
+				
+			}
+			topichappen = false;
+		}
 		if ((clock() - firstclock) / 1000 > first)
 		{
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
@@ -4708,6 +4781,33 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								clicks.pencil = true;
 								sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
 								happen = true;
+							}
+							else if ((event.button.x >= Pass.x - 10 && event.button.x <= Pass.x + Pass.w + 10) && (event.button.y >= Pass.y - 10 && event.button.y <= Pass.y + Pass.h + 10)) {// ÆÐ½º¹öÆ° Å¬¸¯½Ã
+								while (1)
+								{
+									turn++;
+									if (turn == 5)
+										turn = 1;
+									if (status[turn - 1] != 0)
+										break;
+									
+								}
+								sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[¾Ë¸²]', '[%s]´ÔÀÌ pass¸¦ »ç¿ëÇÏ¿´½À´Ï´Ù.','%s')", username, connectroom[CHOOSEROOM].ip);
+								mysql_query(cons, query);
+								sprintf(query, "pass %d", turn);
+								turn = pastturn;
+								send(connect_sock, query, 35, 0);
+
+							}
+
+							//µ¸º¸±â¹öÆ°
+							else if ((event.button.x >= Magnifying.x - 10 && event.button.x <= Magnifying.x + Magnifying.w + 10) && (event.button.y >= Magnifying.y - 10 && event.button.y <= Magnifying.y + Magnifying.h + 10)) {
+								sprintf(query, "%d±ÛÀÚ", strlen(topic) / 2);
+								TTF_DrawText(Renderer, topicFont, query, 20, 25);
+							}
+							//change¹öÆ°
+							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
+
 							}
 						}
 						else if (event.button.windowID == SDL_GetWindowID(Window2)) {
@@ -5857,12 +5957,22 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 								sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
 								happen = true;
 							}
+							//pass ¹öÆ°
 							else if ((event.button.x >= Pass.x - 10 && event.button.x <= Pass.x + Pass.w + 10) && (event.button.y >= Pass.y - 10 && event.button.y <= Pass.y + Pass.h + 10)) {// ÆÐ½º¹öÆ° Å¬¸¯½Ã
+								if (turn == 4)
+									sprintf(query, "pass 1");
+								else
+									sprintf(query, "pass %d", turn + 1);
+								send(connect_sock, query, 35, 0);
 
 							}
+
+							//µ¸º¸±â¹öÆ°
 							else if ((event.button.x >= Magnifying.x - 10 && event.button.x <= Magnifying.x + Magnifying.w + 10) && (event.button.y >= Magnifying.y - 10 && event.button.y <= Magnifying.y + Magnifying.h + 10)) {
-
+								sprintf(query, "%d±ÛÀÚ", strlen(topic) / 2);
+								TTF_DrawText(Renderer, topicFont, query, 20, 25);
 							}
+							//change¹öÆ°
 							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
 
 							}
