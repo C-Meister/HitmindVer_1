@@ -2960,7 +2960,7 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.5";
+	char version[] = "0.0.4";
 	mysql_query(cons, "select * from catchmind.autoupdate order by version");
 	sql_result = mysql_store_result(cons);
 	cur(10, 34);
