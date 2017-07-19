@@ -4278,7 +4278,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç È­¸éÀ» Ä¸ÃÄÇÕ´Ï´Ù.");
+							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
 							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
@@ -4292,13 +4292,14 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 
 							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç È­¸éÀ» Ä¸ÃÄÇÕ´Ï´Ù.");
+							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
 							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
 							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
 							CHATHAPPEN = true;
 						}
+						
 						else if (strncmp(euckr, "/capture ", 9) == 0)
 						{			
 							RESET(chatquery);
@@ -4317,7 +4318,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						}
 						else if (strcmp(euckr, "/stopmusic") == 0)
 						{
-
 							Mix_PauseMusic();
 						}
 						else if (strcmp(euckr, "/startmusic") == 0)
