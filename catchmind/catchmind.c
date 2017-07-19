@@ -2908,7 +2908,7 @@ int chooseroom(int roomnum) {
 	}
 	else
 		return 0;
-}
+} 
 void logintema(void) {
 	WHITE
 		printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á\n");
