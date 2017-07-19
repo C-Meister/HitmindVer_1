@@ -4427,32 +4427,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							mysql_query(cons, query);
 							LeaveCriticalSection(&cs);
 						}
-						else if (strncmp(euckr, "/vote ", 6) == 0)
-						{
-							if (vote == false)
-							{
-								RESET(chatquery);
-								strcpy(chatquery[14], "[¾Ë¸²] ¾ÆÁ÷ ÅõÇ¥½Ã°£ÀÌ ¾Æ´Õ´Ï´Ù.");
-
-							}
-							else
-							{
-								sscanf(euckr, "/vote %d", &len);
-								RESET(chatquery);
-								if (len == myownnumber)
-								{
-									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '[¾Ë¸²] ÀÚ±âÀÚ½Å¿¡°Ô´Â ÅõÇ¥°¡ ºÒ°¡ÇÕ´Ï´Ù', '%s')", username, connectroom[CHOOSEROOM].ip);
-									mysql_query(cons, query);
-								}
-								else if (status[len] != 0)
-									strcpy(chatquery[14], "[¾Ë¸²] ÅõÇ¥ ¼º°ø");
-								else
-								{
-									strcpy(chatquery[14], "[¾Ë¸²] ÅõÇ¥ ½ÇÆÐ");
-								}
-							}
-							CHATHAPPEN = true;
-						}
+						
 						else if (strncmp(euckr, "/capture ", 9) == 0)
 						{
 							RESET(chatquery);
@@ -5556,15 +5531,17 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 
 							RESET(chatquery);
 							//		EnterCriticalSection(&cs);
-							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+							strcpy(chatquery[9], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+							strcpy(chatquery[10], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
+							strcpy(chatquery[11], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
-							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+							strcpy(chatquery[12], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
-							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							strcpy(chatquery[13], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[14], "[6] /topic [ÁÖÁ¦]: ÁÖÁ¦¸¦ Á¤ÇÕ´Ï´Ù. ÅõÇ¥ 1µî¸¸ °¡´É");
 							//		LeaveCriticalSection(&cs);
 							CHATHAPPEN = true;
 
@@ -5574,18 +5551,35 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 
 							RESET(chatquery);
 							//		EnterCriticalSection(&cs);
-							strcpy(chatquery[10], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
+							strcpy(chatquery[9], "[1] /help : µµ¿ò¸»À» Ç¥½ÃÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[11], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
+							strcpy(chatquery[10], "[2] /clear : Ã¤ÆÃÃ¢À» ÃÊ±âÈ­ÇÕ´Ï´Ù.");
 
-							strcpy(chatquery[12], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
+							strcpy(chatquery[11], "[3] /capture [ÆÄÀÏ¸í] : ÇöÀç ±×¸²À» Ä¸ÃÄ.");
 
-							strcpy(chatquery[13], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
+							strcpy(chatquery[12], "[4] /stopmusic : ÇöÀç À½¾ÇÀ» ¸ØÃä´Ï´Ù.");
 
-							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+							strcpy(chatquery[13], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
+
+							strcpy(chatquery[14], "[6] /topic [ÁÖÁ¦]: ÁÖÁ¦¸¦ Á¤ÇÕ´Ï´Ù. ÅõÇ¥ 1µî¸¸ °¡´É");
 							//		LeaveCriticalSection(&cs);
 							CHATHAPPEN = true;
 
+						}
+						else if (strncmp(euckr, "/topic ", 7) == 0)
+						{
+							if (firsttopic == false)
+							{
+								RESET(chatquery);
+								strcpy(chatquery[14], "ÁÖÁ¦ ¼±Á¤ ±ÇÇÑÀÌ ¾ø½À´Ï´Ù.");
+							}
+							else
+							{
+								sscanf(euckr, "/topic %s", query);
+								sprintf(unicode, "topic %d %s", myownnumber, query);
+								send(connect_sock, unicode, 35, 0);
+								RESET(unicode);
+							}
 						}
 						else if (strcmp(euckr, "/timeclear") == 0)
 						{
