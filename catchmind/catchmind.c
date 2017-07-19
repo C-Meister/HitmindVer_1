@@ -4161,8 +4161,19 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		out[2] = fopen(".\\text\\user3.txt", "w");
 		out[3] = fopen(".\\text\\user4.txt", "w");
 	}
-
-
+	
+	/*
+	while (1) {
+		if (buff < SDLCLOCK) {
+			buff++;
+			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			cur(18, 10);
+			printf("buff : %d", buff);
+			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+			happen = true;
+		}
+	}*/
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
 		if (PASS == true)
 		{
@@ -5315,7 +5326,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	bool vote = false;
 	char click_eraser, click_pencil;
 	int len = 0;
-	
+	bool canvote = true;
 	int ee = 0;
 	char euckr[256];
 	char query2[50];
@@ -5598,7 +5609,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			case SDL_TEXTINPUT:
 				if (hangeul == true && (event.text.text[0] == -29 || event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// ÇÑ¿µÅ°°¡ ÇÑ±Û·Î µÇ¾îÀÖ°í ÇÑ±ÛÀÌ¶ó¸é event.text.text[0]ÀÇ °ªÀ¸·Î ÇÑ±ÛÆÇ´Ü°¡´ÉÇÔ
 				{
-					wcscpy(wstr,L"");
+					wcscpy(wstr, L"");
 					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
 					wstr[0] = sum;
 					wcscat(inputText, wstr);
@@ -5859,7 +5870,25 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				if (writemode == true) {
+				if (vote == true) {
+					if (canvote == true && (event.button.x >= 0 && event.button.x <= (1920 - 1310 / 4 - 10) / 2) && (event.button.y >= 0 && event.button.y <= (1080 - 900 / 4 - 10) / 2)) {
+						canvote = false;
+						printf("1¹ø ÅõÇ¥\n");
+					}
+					if (canvote == true && (event.button.x > (1920 - 1310 / 4 - 10) / 2 && event.button.x <= 1920 - 1310 / 4 - 10) && (event.button.y >= 0 && event.button.y <= (1080 - 900 / 4 - 10) / 2)) {
+						canvote = false;
+						printf("2¹ø ÅõÇ¥\n");
+					}
+					if (canvote == true && (event.button.x >= 0 && event.button.x <= (1920 - 1310 / 4 - 10) / 2) && (event.button.y > (1080 - 900 / 4 - 10) / 2 && event.button.y <= 1080 - 900 / 4 - 10)){
+						canvote = false;
+						printf("3¹ø ÅõÇ¥\n");
+					}
+					if (canvote == true && (event.button.x > (1920 - 1310 /4 - 10) / 2 && event.button.x <= 1920 - 1310 / 4 - 10) && (event.button.y > (1080 - 900 / 4 - 10) / 2 && event.button.y <= 1080 - 900 / 4 - 10)) {
+						canvote = false;
+						printf("4¹ø ÅõÇ¥\n");
+					}
+				}
+				else if (writemode == true) {
 					if (event.button.button == 1) {
 						if (event.button.windowID == SDL_GetWindowID(Window)) {
 							if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode ÀÌ¹ÌÁö ¾ÈÀÌ¸é if¹® ½ÇÇà
