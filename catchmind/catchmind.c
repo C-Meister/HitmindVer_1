@@ -4064,6 +4064,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
 	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
 	float i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
+	turn = 0;
 	int pastturn = turn;
 	int newclick = 0;
 	float xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언 
@@ -4333,9 +4334,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 						UTF8toEUCKR(euckr, 256, str, 256);
 						euckr[strlen(euckr)] = '\0';
 						han2unicode(euckr, unicode);
-						if (unicodehan(unicode, wcslen(unicode)) != unicodehan(inputText, wcslen(inputText)))
+						if (unicodehan(unicode, wcslen(unicode)) != unicodehan(inputText, wcslen(inputText))) {
 							strcpy(euckr, "[Error] invalid conversion");
-						else if (strcmp(euckr, topics[turn - 1]) == 0)
+						}
+						if (strcmp(euckr, topics[turn - 1]) == 0)
 						{
 							if (myownnumber != turn)
 								send(connect_sock, "right   answer", 35, 0);
