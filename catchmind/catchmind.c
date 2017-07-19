@@ -1,4 +1,3 @@
-
 /*
 캐치 마인드 with C
 프로젝트 제작 일자 : 2017-07-10
@@ -501,7 +500,7 @@ void makeroomtema() {
 	printf("■  비밀번호  □  ○미사용    ○사용	        ■\n"); //9~12 , 7    15~17, 7
 	printf("■            □                                ■\n");
 	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
-	printf("■  게임모드  □  ○일반  ○콘테스트  ○fps     ■\n"); //9~11 , 10   13~17, 10   19~21, 10
+	printf("■  게임모드  □  ○일반  ○콘테스트            ■\n"); //9~11 , 10   13~17, 10   19~21, 10
 	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
 	printf("■한문제당시간□  ○60  ○90  ○120 ○입력:     ■\n"); //9~10 , 12~13, 15~17, 18~20
 	printf("■□□□□□□□□□□□□□□□□□□□□□□□■\n");
@@ -527,10 +526,10 @@ void roomprintwhite(int xx, int yy, int lr, int bibun, int gamo, int time, int e
 		gotoxy(26, 10);
 		printf("○콘테스트");
 	}
-	if (!(yy == 10 && 19 <= xx && xx <= 21) && gamo != 3) {
+	/*if (!(yy == 10 && 19 <= xx && xx <= 21) && gamo != 3) {
 		gotoxy(38, 10);
 		printf("○fps");
-	}
+	}*/
 	if (!(yy == 12 && 9 <= xx && xx <= 10) && time != 1) {         //문제당시간
 		gotoxy(18, 12);
 		printf("○60");
@@ -740,11 +739,9 @@ int sqlmakeroom(void) {
 
 
 		while (1) {
-			gotoxy(0, 0);
 			GetCursorPos(&a);
 			SetCursorPos(a.x, a.y);
 			click(&xx, &yy, &lr);
-			printf("%3d %3d %3d", xx, yy, lr);
 
 			if (buff < 20) {
 				tmp = checkkeyborad(tmp, -1);
@@ -792,18 +789,18 @@ int sqlmakeroom(void) {
 				if (lr == 1)
 					gamo = 1;
 			}
-			else if (yy == 10 && 13 <= xx && xx <= 17 && gamo != 2) {
+			/*else if (yy == 10 && 13 <= xx && xx <= 17 && gamo != 2) {
 				gotoxy(26, 10);
 				printf("○콘테스트");
 				if (lr == 1)
 					gamo = 2;
-			}
-			else if (yy == 10 && 19 <= xx && xx <= 21 && gamo != 3) {
+			}*/
+			/*else if (yy == 10 && 19 <= xx && xx <= 21 && gamo != 3) {
 				gotoxy(38, 10);
 				printf("○fps");
 				if (lr == 1)
 					gamo = 3;
-			}
+			}*/
 			else if (yy == 12 && 9 <= xx && xx <= 10 && time != 1) {         //문제당시간
 				gotoxy(18, 12);
 				printf("○60");
@@ -1889,9 +1886,9 @@ void readchating(void) {
 	char query[100];
 	//	CHATHAPPEN = true;
 	while (1) {
-	
+		EnterCriticalSection(&cs);
 		if (CHATHAPPEN == false) {
-			EnterCriticalSection(&cs);
+		
 			//	ZeroMemory(sql_result, sizeof(sql_result));
 		//	ZeroMemory(chatquery, sizeof(chatquery));
 			last3 = last2;
@@ -1926,10 +1923,10 @@ void readchating(void) {
 			}
 			else
 				CHATHAPPEN = false;
-			LeaveCriticalSection(&cs);
+			
 		}
-		
-	//	Sleep(30);
+		LeaveCriticalSection(&cs);
+		Sleep(30);
 	}
 
 }
