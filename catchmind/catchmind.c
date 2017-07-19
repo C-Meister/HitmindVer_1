@@ -1153,7 +1153,9 @@ int sqlmakeroom(void) {
 }
 void waitroomtema() {
 	WHITE
-		gotoxy(0, 3);
+	gotoxy(0, 1);
+	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	printf("      ■  방제목 : %s   방모드 : %s   문제수 : %d   한문제당 시간 : %d \n", connectroom[CHOOSEROOM].roomname, connectroom[CHOOSEROOM].mode == 1 ? "일반" : "콘테스트", connectroom[CHOOSEROOM].question, connectroom[CHOOSEROOM].time);
 	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
 	printf("      ■                                                                                            ■\n");
 	printf("      ■                                                                                            ■\n");
@@ -1195,6 +1197,8 @@ void waitroomtema() {
 	printf("      ■     ready      ■                                                        ■     exit       ■\n");
 	printf("      ■                ■                                                        ■                ■\n");		// 4, 42		//11, 42		//42, 42		49, 42
 	printf("      ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n");
+	gotoxy(100, 2);
+	printf("■");
 }
 int waitroom(void)
 {
@@ -4909,4 +4913,3 @@ void strintrude(char *s, char *t, int i)
 	}
 
 }
-
