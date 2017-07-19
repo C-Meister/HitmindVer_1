@@ -142,7 +142,7 @@ char SOCKETCOUNT = 0;
 char clientcatchmind[50];
 char topics[4][30];
 char myownnumber;
-
+bool TIMESET = false;
 bool timeout = false;
 MYSQL *cons;
 char CHOOSEROOM = 0;
@@ -1886,9 +1886,9 @@ void readchating(void) {
 	char query[100];
 	//	CHATHAPPEN = true;
 	while (1) {
-		EnterCriticalSection(&cs);
+	
 		if (CHATHAPPEN == false) {
-		
+			EnterCriticalSection(&cs);
 			//	ZeroMemory(sql_result, sizeof(sql_result));
 		//	ZeroMemory(chatquery, sizeof(chatquery));
 			last3 = last2;
@@ -1923,9 +1923,9 @@ void readchating(void) {
 			}
 			else
 				CHATHAPPEN = false;
-			
+			LeaveCriticalSection(&cs);
 		}
-		LeaveCriticalSection(&cs);
+		
 		Sleep(30);
 	}
 
@@ -2067,6 +2067,11 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 				printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
 				continue;
+			}
+			else if (strcmp(message, "timeclear") == 0)
+			{
+				TIMESET = true;
+				RESET(message);
 			}
 			else if (strncmp(message, "cont 1 ", 7) == 0)
 			{
@@ -2947,11 +2952,11 @@ void Auto_Update(void)
 	int i = 0;
 	char serverversion[10];
 	char choose;
-	char version[] = "0.0.4";
-	mysql_query(cons, "select * from catchmind.autoupdate order by version");
-	sql_result = mysql_store_result(cons);
+	char version[] = "0.0.5";
+	mysql_query(cons, "sele
 	cur(10, 34);
-	printf("¡á¡á--¾÷µ¥ÀÌÆ®±â·Ï--¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");
+	printf("¡á¡á--¾÷µ¥ÀÌÆ®±â·Ï--¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");ct * from catchmind.autoupdate order by version");
+	sql_result = mysql_store_result(cons);
 	cur(50, 34);
 	printf("--ÇöÀç : %s--", version);
 	while ((sql_row = mysql_fetch_row(sql_result)) != 0)
@@ -3191,6 +3196,11 @@ void Clnt_1(int v)
 			else if (strcmp(message, "Con   SDLCLEAR") == 0)
 			{
 				message[4] = v + '0' + 1;
+				sendall(message, 5);
+				RESET(message);
+			}
+			else if (strcmp("timeclear", message) == 0)
+			{
 				sendall(message, 5);
 				RESET(message);
 			}
@@ -4065,9 +4075,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
 			SDL_RenderFillRect(Renderer, &Timer3);// Áö¿ì°³°°ÀÌ Èò»öÀ¸·Î Ä¥ÇÔ
 			first++;
-			if (first == connectroom[CHOOSEROOM].time + 1)
+			if (first == connectroom[CHOOSEROOM].time + 1)				//1ÃÊ¸¶´Ù È­¸éÀ» ÃÊ±âÈ­ÇÏ¿©¼­ ¿Ã¸²
 			{
-				if (connectroom[CHOOSEROOM].mode == 2) {
+				if (connectroom[CHOOSEROOM].mode == 2) {				//mode°¡ ÄÁÅ×½ºÆ®ÀÌ¸é ¼­·ÎÀÇ È­¸éÀ» 4µîºÐÇØ¼­ º¸¿©ÁÜ
 					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 					SDL_RenderClear(Renderer2);
 					for (i = 1; i <= 4; i++) {
@@ -4076,9 +4086,9 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					}
 					
 				}
-				firstclock = clock();
+				firstclock = clock();						//½Ã°£ ÃÊ±âÈ­
 				first = 0;
-				if (turn == myownnumber)
+				if (turn == myownnumber)						//³»ÅÏÀÏ¶§ ½Ã°£ÀÌ ³¡³µ´Ù¸é
 				{
 					first = 0;
 					while (1)
@@ -4086,7 +4096,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						turn++;
 						if (turn == 5)
 							turn = 1;
-						if (status[turn - 1] != 0)
+						if (status[turn - 1] != 0)				//´ÙÀ½ÅÏÀ¸·Î ³Ñ±è
 							break;
 
 					}
@@ -4103,7 +4113,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 				first = 0;
 				timeout = false;
 				SDL_DestroyRenderer(Renderer2);
-				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);	//·£´õ·¯ ÃÊ±âÈ­
 				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
 				SDL_RenderClear(Renderer2);
 				ee++;
@@ -4112,6 +4122,12 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			han2unicode(query, unicode);
 			TTF_DrawText(Renderer, Font, unicode, 150, 150);
 			happen = true;
+		}
+		if (TIMESET == true)
+		{
+			firstclock = clock();
+			first = 0;
+			TIMESET = false;
 		}
 		if (myownnumber == turn && Gametopic == 0)
 		{
@@ -4335,6 +4351,14 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 					//		LeaveCriticalSection(&cs);
 							CHATHAPPEN = true;
 							
+						}
+						else if (strcmp(euckr, "/timeclear") == 0)
+						{
+							send(connect_sock, "timeclear", 35, 0);
+							EnterCriticalSection(&cs);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[¸í·É]', '½Ã°£À» ÃÊ±âÈ­ÇÕ´Ï´Ù.', '%s')", connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
 						}
 						else if (strncmp(euckr, "/vote ", 6) == 0)
 						{
