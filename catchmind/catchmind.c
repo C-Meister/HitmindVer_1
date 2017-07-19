@@ -4023,7 +4023,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 
 	int pastturn = turn;
 	int newclick = 0;
-	float xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언 
+	double xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언 
 	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기의 선언
 	SDL_Rect Rect = { 0 }; // 그릴 사각형의 변수를 반복문 밖에서 선언
 	SDL_Rect Fonts = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// 색깔, 굵기등을 보여주기 위한 사각형 변수 선언
