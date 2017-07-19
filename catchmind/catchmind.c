@@ -3619,7 +3619,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 			ReceiveRect.w = ReceiveRect.h = strong;// 굵기 설정
 			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 			SDL_RenderFillRect(Renderer4, &ReceiveRect);// 렌더러에 그림
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == false) {
@@ -3636,7 +3636,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 				SDL_RenderDrawLine(Renderer4, x1 + ReceiveRect.x, y1 + ReceiveRect.y, x2 + ReceiveRect.x, y2 + ReceiveRect.y);
 			}
 			strong *= 50.0 / 80;
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (pencil == true && drag == true) {
@@ -3656,7 +3656,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 
 				SDL_RenderFillRect(Renderer4, &ReceiveRect);//사각형 렌더러에 저장
 			}
-			SDL_RenderPresent(Renderer4);
+		//	SDL_RenderPresent(Renderer4);
 			return;
 		}
 		else if (eraser == true && drag == true) {
@@ -3685,7 +3685,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 				}
 			}
 			strong *= 50 / 80.0;
-			SDL_RenderPresent(Renderer4);
+	//		SDL_RenderPresent(Renderer4);
 			return;
 		}
 	}
@@ -4297,6 +4297,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+			happen = true;
 		}
 
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
