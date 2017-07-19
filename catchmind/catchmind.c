@@ -3604,8 +3604,10 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 			i = (x - (ReceiveRect.x + ReceiveRect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 			j = (y - (ReceiveRect.y + ReceiveRect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
 			k = 0;// while문안에 쓸 변수 초기화.
-			xpos = ReceiveRect.x + ReceiveRect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
-			ypos = ReceiveRect.y + ReceiveRect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+//xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+						//	ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+			xpos = ReceiveRect.x;
+			ypos = ReceiveRect.y;
 			ReceiveRect.w = ReceiveRect.h = strong;// 굵기설정
 			SDL_SetRenderDrawColor(Renderer4, r, g, b, 0);
 			for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
@@ -4481,9 +4483,10 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
 							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
 							k = 0;// while문안에 쓸 변수 초기화.
-							xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
-							ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
-
+								  //xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+								  //	ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+							xpos = Rect.x;
+							ypos = Rect.y;
 							Rect.w = Rect.h = strong;// 굵기설정
 							SDL_SetRenderDrawColor(Renderer, r, g, b, 0);
 							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
