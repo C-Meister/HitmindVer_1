@@ -3872,7 +3872,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	if (Font == nullptr) {
 		TTF_ErrorLog("TTF_OpenFont");
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 2);
-		return 0;
 	}
 	topicFont = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize2);
 	if (topicFont == nullptr) {
