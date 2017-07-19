@@ -314,7 +314,7 @@ int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함
 		printf("초기화 실패");
 		Sleep(5000);
 	}
-
+	mkdir("screenshot");
 	sprintf(query, "music\\5.mp3");
 	music = Mix_LoadMUS(query);
 	if (!music) {
@@ -2434,7 +2434,7 @@ int sqlsignup(void) {
 
 }
 void mainatitleimage(void) {
-	SetConsoleTitle(L"히트마인드 with C      Powered by  C Meister TEAM");
+	SetConsoleTitle("히트마인드 with C      Powered by  C Meister TEAM");
 	WHITE
 		gotoxy(136, 1);
 	printf("배경음악 ON   ");
