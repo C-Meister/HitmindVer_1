@@ -5265,7 +5265,7 @@ int SDL_MAINSMODE2(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰�
 				}
 			}
 			RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
-			han2unicode(topics[turn], unicode);
+			han2unicode(topics[turn-1], unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
 			topichappen = false;
 		}
