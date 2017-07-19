@@ -150,6 +150,7 @@ bool topichappen = false;
 bool SDL_Clear = false;
 bool CurrectHappen = true;
 short Userping[4] = { -1, -1, -1, -1 };
+int ccount = 0;
 int Gametopic = 0;
 SDL_Rect ReceiveRect = { 0, };
 int SDLCLOCK = 0;
@@ -3604,6 +3605,8 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	return;
 }
 void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
+	cur(10, 27);
+	printf("ReceiveRender : %d", ccount++);
 	if (SDL_Clear == true) {
 		SDL_DestroyRenderer(Renderer4);
 		Renderer4 = SDL_CreateRenderer(Window4, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -4296,6 +4299,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			cur(18, 10);
+			printf("buff : %d", buff);
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			happen = true;
 		}
@@ -4468,15 +4473,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// µÎÁ¡»çÀÌÀÇ ±æÀÌ¸¦ ÇÇÅ¸°í¶ó½ºÀÇ Á¤¸®·Î ±¸ÇÔ. ÀÌ¶§ µÎÁ¡Àº Àü¿¡ ÂïÈù Á¡°ú µå·¡±×ÇÑ °÷ÀÇ Á¡À» ¸»ÇÔ
 						if (length == 0) break;
 						if (clicks.pencil == true) {// Ææ½½ÀÏ °æ¿ì
-							if (connect_sock != 0) {
-								if (connectroom[CHOOSEROOM].mode == 2)
-								{
-									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								}
-								else
-									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
-								send(connect_sock, query, 45, 0);
-							}
+						
 							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							k = 0;// while¹®¾È¿¡ ¾µ º¯¼ö ÃÊ±âÈ­.
@@ -4491,9 +4488,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								SDL_RenderFillRect(Renderer2, &Rect);//»ç°¢Çü ·»´õ·¯¿¡ ÀúÀå
 							}
 							// ¿©±â~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-						}
-						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
-							strong *= 80 / (float)50.0;
 							if (connect_sock != 0) {
 								if (connectroom[CHOOSEROOM].mode == 2)
 								{
@@ -4503,6 +4497,10 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 45, 0);
 							}
+						}
+						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
+							strong *= 80 / (float)50.0;
+							
 							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// Áö¿ì°³´Ï±ñ ¹«Á¶°Ç ÇÏ¾á»öÀ¸·Î									
 							i = (event.motion.x - Rect.x) / length;// i´Â µÎÁ¡ÀÇ xÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
 							j = (event.motion.y - Rect.y) / length;// j´Â µÎÁ¡ÀÇ yÁÂÇ¥ÀÇ Â÷ÀÌ¸¦ ±æÀÌ·Î ³ª´« °ÍÀÓ.
@@ -4523,6 +4521,15 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								}
 							}
 							strong *= 50 / 80.0;
+							if (connect_sock != 0) {
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 45, 0);
+							}
 						}
 						happen = true;
 						//		send(connect_sock, "", 45, 0);
