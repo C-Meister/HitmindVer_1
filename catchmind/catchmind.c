@@ -4019,7 +4019,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	int alpha;// 명도와 채도를 담기위한 변수 선언
 	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
 	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
-	float i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
+	double i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
 
 	int pastturn = turn;
 	int newclick = 0;
