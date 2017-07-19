@@ -4117,17 +4117,17 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			first++;
 			if (first == connectroom[CHOOSEROOM].time + 1)
 			{
-				/*
-						SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-						SDL_RenderClear(Renderer2);
-						for (i = 1; i <= 4; i++) {
-							if (status[(int)i - 1] != 0)
-								contest(Window2, Renderer2, i);
-						}
-					*/
-
-
-
+				if (connectroom[CHOOSEROOM].mode == 2) {
+					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+					SDL_RenderClear(Renderer2);
+					for (i = 1; i <= 4; i++) {
+						if (status[(int)i-1] != 0)
+							contest(Window2, Renderer2, i);
+					}
+					
+				}
+				firstclock = clock();
+				first = 0;
 				if (turn == myownnumber)
 				{
 					first = 0;
