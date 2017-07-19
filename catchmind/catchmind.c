@@ -4174,6 +4174,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 				sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 				strcpy(topic, sql_row[0]);
 				sprintf(query, "topic   %s", sql_row[0]);
+				send(connect_sock, query, 35, 0);
 				LeaveCriticalSection(&cs);
 			}
 			PASS = false;
