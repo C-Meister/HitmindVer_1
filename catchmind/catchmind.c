@@ -2321,24 +2321,34 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 			}
 			else if (strncmp(message, "topic 1", 7) == 0)
 			{
+				if (connectroom[CHOOSEROOM].mode == 2)
+					turn = 1;
 				sscanf(message, "topic 1 %s", topics[0]);
+				
 				topichappen = true;
 				//		printf("1¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[0]);
 			}
 			else if (strncmp(message, "topic 2", 7) == 0)
 			{
+				if (connectroom[CHOOSEROOM].mode == 2)
+					turn = 2;
 				sscanf(message, "topic 2 %s", topics[1]);
 				topichappen = true;
+			
 				//		printf("2¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[1]);
 			}
 			else if (strncmp(message, "topic 3", 7) == 0)
 			{
+				if (connectroom[CHOOSEROOM].mode == 2)
+				turn = 3;
 				sscanf(message, "topic 3 %s", topics[2]);
 				topichappen = true;
+				
 				//		printf("3¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[2]);
 			}
 			else if (strncmp(message, "topic 4", 7) == 4)
 			{
+				if (connectroom[CHOOSEROOM].mode == 2)
 				sscanf(message, "topic 4 %s", topics[3]);
 				topichappen = true;
 				//		printf("4¹ø »ç¶÷ ÁÖÁ¦ : %s", topics[3]);
@@ -5166,11 +5176,12 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	bool hangeulinput = false;
 	bool enter = false;
 	bool writemode = false;
+	MYSQL_ROW sql_row;
 	int alpha;// ¸íµµ¿Í Ã¤µµ¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	int x, y; // ¿òÁ÷ÀÌ°í ÀÖÁö¾ÊÀº ¸¶¿ì½ºÀÇ ÁÂÇ¥¸¦ ´ã±âÀ§ÇÑ º¯¼ö ¼±¾ð
 	float r = 0, g = 0, b = 0; //rgb°ªÀ» °¡Áú º¯¼ö ¼±¾ð ³ª´©±â ¿¬»êÀ» ÇÏ¹Ç·Î ½Ç¼öÇüÀ¸·Î ¼±¾ð
 	double i = 0, j = 0, k = 0, l = 0, length = 0;// for¹®¿¡¼­ ¾µ º¯¼ö¼±¾ð
-
+	
 	int pastturn = turn;
 	int newclick = 0;
 	double xpos = 0, ypos = 0;// ¸¶¿ì½º xÁÂÇ¥ yÁÂÇ¥¸¦ ÀúÀåÇÏ´Â º¯¼ö¼±¾ð 
@@ -5182,13 +5193,13 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	bool vote = false;
 	char click_eraser, click_pencil;
 	int len = 0;
-	MYSQL_ROW sql_row;
+	
 	int ee = 0;
 	char euckr[256];
 	char query2[50];
 	Gametopic = 0;
 	RESET(euckr);
-
+	
 
 
 	int buff = 0;		  // ³¡
@@ -5215,10 +5226,6 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		LeaveCriticalSection(&cs);
 		//			mysql_free_result(sql_result);
 		send(connect_sock, query, 45, 0);
-		Gametopic++;
-		drag = false;
-		clicks.pencil = false;
-		happen = true;
 	}
 	/*
 	contest(Window2, Renderer2, 1);
@@ -5236,6 +5243,32 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 
 
 	while (!quit) {// quit°¡ true°¡ ¾Æ´Ò¶§ µ¿¾È ¹«ÇÑ¹Ýº¹
+		if (topichappen == true)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
+			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
+			han2unicode(topics[turn], unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			topichappen = false;
+		}
 		if ((clock() - firstclock) / 1000 > first && vote == false)
 		{
 			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// »ö±òÀ» Èò»öÀ¸·Î ¼³Á¤ÇØ¾ßÇÔ ±×·¡¾ß Áö¿ì°³ ¿ªÇÒÀ» ÇÏ¹Ç·Î
