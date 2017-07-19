@@ -143,6 +143,7 @@ char SOCKETCOUNT = 0;
 char clientcatchmind[50];
 char topics[4][30];
 char myownnumber;
+
 bool timeout = false;
 MYSQL *cons;
 char CHOOSEROOM = 0;
@@ -1333,7 +1334,7 @@ int waitroom(void)
 			}
 			//	ExitThread(threads[5]);
 
-			CheckPing();
+		//	CheckPing();
 			_beginthreadex(0, 0, (_beginthreadex_proc_type)readchating, 0, 0, 0);
 			SDL_MAINS();
 			return 1;
@@ -4071,6 +4072,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 	SDL_Rect Fonts = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// »ö±ò, ±½±âµîÀ» º¸¿©ÁÖ±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect Edge = { 0 };// Å×µÎ¸®¸¦ ±×¸®±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð 
 	SDL_Rect Happen = { 0,0,1310 / 4 + 10,New.y - 10 };// Happen ÀÌ Æ®·çÀÏ¶§ »ç¿ëÇÒ º¯¼ö
+	bool vote = false;
 	char click_eraser, click_pencil;
 	char dragging;
 	int len = 0;
@@ -4294,7 +4296,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			writemode = false;		//X
 	//	CLS;
 		}
-
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
@@ -4381,7 +4382,32 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 							strcpy(chatquery[14], "[5] /startmusic : ÇöÀç À½¾ÇÀ» Àç½ÇÇàÇÕ´Ï´Ù.");
 							CHATHAPPEN = true;
 						}
-
+						else if (strncmp(euckr, "/vote ", 6) == 0)
+						{
+							if (vote == false)
+							{
+								RESET(chatquery);
+								strcpy(chatquery[14], "[¾Ë¸²] ¾ÆÁ÷ ÅõÇ¥½Ã°£ÀÌ ¾Æ´Õ´Ï´Ù.");
+								
+							}
+							else
+							{
+								sscanf(euckr, "/ÅõÇ¥ %d", &len);
+								RESET(chatquery);
+								if (len == myownnumber)
+								{
+									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '[¾Ë¸²] ÀÚ±âÀÚ½Å¿¡°Ô´Â ÅõÇ¥°¡ ºÒ°¡ÇÕ´Ï´Ù', '%s')", username, connectroom[CHOOSEROOM].ip);
+									mysql_query(cons, query);
+								}
+								else if (status[len] != 0)
+									strcpy(chatquery[14], "[¾Ë¸²] ÅõÇ¥ ¼º°ø");
+								else
+								{
+									strcpy(chatquery[14], "[¾Ë¸²] ÅõÇ¥ ½ÇÆÐ");
+								}
+							}
+							CHATHAPPEN = true;
+						}
 						else if (strncmp(euckr, "/capture ", 9) == 0)
 						{
 							RESET(chatquery);
@@ -4497,6 +4523,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 								send(connect_sock, query, 35, 0);
 								ccount++;
+
 							}
 						}
 						else if (clicks.eraser == true) {// Áö¿ì°³ °æ¿ì
@@ -4532,6 +4559,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 								send(connect_sock, query, 35, 0);
 							
 								ccount++;
+
 							}
 						}
 						happen = true;
@@ -4642,6 +4670,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									}
 									else
 										send(connect_sock, "SDLCLEAR", 35, 0);
+
 								}
 								//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 								clicks.eraser = false;
@@ -4677,6 +4706,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
 									send(connect_sock, query, 35, 0);
 									ccount++;
+
 								}
 								drag = true; //µå·¡±×·Î ±×¸±¼ö ÀÖ°Ô ¼³Á¤
 								happen = true;
@@ -4702,6 +4732,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									if (connectroom[CHOOSEROOM].mode == 2)
 									{
 										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									
 									}
 									else
 										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
