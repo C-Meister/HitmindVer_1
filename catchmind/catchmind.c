@@ -4446,6 +4446,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 					send(connect_sock, "exit", 35, 0);
 					quit = true;// quit를 true로 변경
 					Sleep(100);
+					exit(1);
 					break;// 브레이크
 				case SDL_WINDOWEVENT_ENTER:// 윈도우
 					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
@@ -4798,7 +4799,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	SDL_DestroyTexture(NewTexture);
 	SDL_DestroyTexture(QusTexture);
 	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 10);
-
+	
 	int good;
 	int max = 0;
 	for (int j = 0; j < 4; j++)
