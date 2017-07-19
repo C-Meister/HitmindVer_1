@@ -4112,7 +4112,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
 	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
 	double i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
-
+	CHOP(username);
 	int pastturn = turn;
 	int newclick = 0;
 	double xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언 
@@ -4784,33 +4784,46 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 								happen = true;
 							}
 							else if ((event.button.x >= Pass.x - 10 && event.button.x <= Pass.x + Pass.w + 10) && (event.button.y >= Pass.y - 10 && event.button.y <= Pass.y + Pass.h + 10)) {// 패스버튼 클릭시
-								while (1)
-								{
-									turn++;
-									if (turn == 5)
-										turn = 1;
-									if (status[turn - 1] != 0)
-										break;
-									
-								}
-								EnterCriticalSection(&cs);
-								sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[알림]', '[%s]님이 pass를 사용하였습니다.','%s')", username, connectroom[CHOOSEROOM].ip);
-								mysql_query(cons, query);
-								LeaveCriticalSection(&cs);
-								sprintf(query, "pass %d", turn);
-								turn = pastturn;
-								send(connect_sock, query, 35, 0);
+								if (turn == myownnumber) {
+									while (1)
+									{
+										turn++;
+										if (turn == 5)
+											turn = 1;
+										if (status[turn - 1] != 0)
+											break;
 
+									}
+
+									EnterCriticalSection(&cs);
+									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[알림]', '[%s]님이 pass를 사용하였습니다.','%s')", username, connectroom[CHOOSEROOM].ip);
+									mysql_query(cons, query);
+									LeaveCriticalSection(&cs);
+									sprintf(query, "pass %d", turn);
+									turn = pastturn;
+									send(connect_sock, query, 35, 0);
+								}
 							}
 
 							//돋보기버튼
 							else if ((event.button.x >= Magnifying.x - 10 && event.button.x <= Magnifying.x + Magnifying.w + 10) && (event.button.y >= Magnifying.y - 10 && event.button.y <= Magnifying.y + Magnifying.h + 10)) {
-								sprintf(query, "%d글자", strlen(topic) / 2);
-								TTF_DrawText(Renderer, topicFont, query, 20, 25);
+								if (turn != myownnumber) {
+									sprintf(query, "%d글자", strlen(topic) / 2);
+									TTF_DrawText(Renderer, topicFont, query, 20, 25);
+								}
 							}
 							//change버튼
 							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
-
+								if (turn == myownnumber) {
+									EnterCriticalSection(&cs);
+									mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+									sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+									strcpy(topic, sql_row[0]);
+									sprintf(query, "topic   %s", sql_row[0]);
+									LeaveCriticalSection(&cs);
+									//			mysql_free_result(sql_result);
+									send(connect_sock, query, 45, 0);
+								}
 							}
 						}
 						else if (event.button.windowID == SDL_GetWindowID(Window2)) {
