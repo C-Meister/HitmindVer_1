@@ -204,7 +204,8 @@ void SDL_FontUpdate(SDL_Renderer * Renderer, SDL_Rect* Font, SDL_Rect Track, flo
 void SDL_RenderRemoveEdge(SDL_Renderer* Renderer, SDL_Rect * Rect);
 void SDL_RenderDrawEdge(SDL_Renderer* Renderer, SDL_Rect * Rect, bool clicks);
 int SDL_MAINS(void);
-void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, int step);
+int SDL_MAINSMODE2(void);
+void Quit(SDL_Renderer* Renderer, SDL_Renderer* Renderer2, SDL_Renderer* Renderer3, SDL_Window* Window, SDL_Window* Window2, SDL_Window* Window3, TTF_Font * Font, TTF_Font *topicFont, FILE* out[], int step);
 void TTF_DrawText(SDL_Renderer *Renderer, TTF_Font* Font, wchar_t* sentence, int x, int y);
 Uint32 get_pixel32(SDL_Surface *surface, int x, int y);
 void makebmp(const char *filename, SDL_Renderer * Renderer2);
@@ -239,45 +240,7 @@ HWND GetConsoleHwnd(void);
 
 
 
-wchar_t* UTF82UNICODE(char* UTF8, int len) {
-	wchar_t wstr[128] = L"";
-	//	int i, sum;
-	int i;
-	for (i = 0; i < len; i += 3) {
-		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
-	}
-	wcscat(wstr, L"\0");
-	return wstr;
-}
-char* UNICODE2UTF8(wchar_t* unicode, int len) {
-	char str[128] = "";
-	int i = 0, j = 0;
-	for (i = 0; j < len; j++) {
-		if (unicode[j] == 92 || unicode[j] == 39) {// 유니코드 92번(역슬래시)나 39번(작은따운표는) mysql에서 각각 \\, \'로 입력해야하므로 예외 처리를 해준다
-			str[i] = 92;
-			str[i + 1] = unicode[j];
-			i += 2;
-		}
-		else if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {// 완성형 한글일경우
-			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
-			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
-			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
-			i += 3;
-		}
-		else if (unicode[j] >= 0x3131 && unicode[j] <= 0x3163) {// 초중종성일 경우
-			str[i] = (unicode[j] - 12544) / (64 * 64) - 29;
-			str[i + 1] = (unicode[j] - 12544) % (4096) / 64 - 124;
-			str[i + 2] = (unicode[j] - 12544) % 64 - 128;
-			i += 3;
-		}
-		else {
-			str[i] = unicode[j];
-			i++;
-		}
-	}
-	strcat(str, "\0");
-	return str;
-}
+
 int main(int argc, char **argv) //main함수 SDL에서는 인수와 리턴을 꼭 해줘야함 
 {
 	//SDL_MAIN();
@@ -4832,6 +4795,1071 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	getchar();
 	return 0;// 종료
 }
+int SDL_MAINSMODE2(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메인이 아님, 따라서 매개변수도 맞춰줘야함
+
+
+	SDL_Window * Window = nullptr;//SDL 윈도우 선언
+	SDL_Renderer * Renderer = nullptr;// SDL 렌더러 선언 
+	SDL_Window * Window2 = nullptr;
+	SDL_Renderer * Renderer2 = nullptr;
+	SDL_Window * Window3 = nullptr;
+	SDL_Renderer * Renderer3 = nullptr;
+	SDL_Rect center = { 0 };
+	char query[256];
+	Mix_PauseMusic();
+	int senddata = 0;
+	Mix_VolumeMusic(120);
+	Mix_PlayMusic(music, -1);
+	// 텍스쳐와 사각형 선언
+	SDL_Texture * RgbTexture = nullptr;// 알지비 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * PenTexture = nullptr;// 펜 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * EraTexture = nullptr;// 지우개 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * NewTexture = nullptr;// 새로만들기 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * TraTexture = nullptr;// 스크롤 트랙 이미지를 담기위한 텍스쳐선언
+	SDL_Texture * BoxTexture = nullptr;// 스크롤 박스 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * ChaTexture = nullptr;// 채팅창 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * StaTexture = nullptr;// 상태창 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * InpTexture = nullptr;// 채팅 보재는 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * UseTexture = nullptr;// 유저 이미지를 담기위한 텍스쳐 선언
+	SDL_Texture * QusTexture = nullptr;// 주제 이미지를 담기위한 텍스쳐 선언
+
+	SDL_Rect RgbCode = { 0 };// RgbCode 이미지의 정보를 담기위한 사각형변수 선언
+	SDL_Rect Pencil = { 0 }; // Pencil 이미지의 정보를 담기위한 사각형 변수 선언
+	SDL_Rect Eraser = { 0 }; // Eraser 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect New = { 0 }; // New 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Track = { 0 };// Track 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Box = { 0 };//Box 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Chat = { 0 };// Chat 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Status = { 0 };//Status 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect InputT = { 0 };//InputT 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect UserT = { 0 };//UserT 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect QuesT = { 0 };//QuesT 이미지의 정보를 담기 위한 사각형 변수 선언
+	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 180 };
+	SDL_Rect Timer2 = { 0, 60, 400, 150 };
+	SDL_Rect Timer3 = { 150, 150, 100, 30 };
+	// 텍스쳐와 사각형 선언 끝
+
+	char str[256] = "";//UNICODE2UTF8의 반환값을 복사할 배열선언
+	int chaty = 0;
+	float fontsize = 17.0;
+	float fontsize2 = 35.0;
+	TTF_Font * Font;
+	TTF_Font * topicFont;
+	//	SDL_Surface *Text;
+	SDL_Rect  Word = { 0 };
+	unsigned short unicode[128] = L"";
+
+	//
+	getlevel();
+	// 추가
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {// SDL_Init함수로 SDL 초기화하고 초기화 안되면 if문 실행 SDL_Init의 인수는 다양함(ex : SDL_INIT_VIDEO)
+		SDL_ErrorLog("SDL_Init");
+		return 0;// 종료
+	};
+	//추가
+	if (TTF_Init() != 0) {
+		TTF_ErrorLog("TTF_Init");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 1);
+		return 0;
+	}
+	Font = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize);
+	if (Font == nullptr) {
+		TTF_ErrorLog("TTF_OpenFont");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 2);
+	}
+	topicFont = TTF_OpenFont(".\\font\\NanumGothic.ttf", fontsize2);
+	if (topicFont == nullptr) {
+		TTF_ErrorLog("TTF_OpenFont");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 2);
+		return 0;
+	}
+
+	// 윈도우창 3개로 나누는 기준 x좌표는 1920 - 1310/4-10이고, 1080-900/4-10은 y좌표의 기준이다.
+	Window = SDL_CreateWindow("HIT MIND WITH C", 1920 - 1310 / 4 - 10, 0, 1310 / 4 + 10, 1080, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window == nullptr) {// 윈도우 생성 실패시 if문 실행
+		SDL_ErrorLog("SDL_CreateWindow");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 3);
+		return 0;//종료
+	}
+	Renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (Renderer == nullptr) {
+		SDL_ErrorLog("SDL_CreateRenderer");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 4);
+		return 0;
+	}
+	Window2 = SDL_CreateWindow("HIT MIND WITH C 2", 0, 0, (1920 - 1310 / 4 - 10), (1080 - 900 / 4 - 10), SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window2 == nullptr) {// 윈도우 생성 실패시 if문 실행
+		SDL_ErrorLog("CreateWindow2");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 5);
+		return 0;//종료
+	}
+	Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함s수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
+	if (Renderer2 == nullptr) {// 렌더러 생성 실패시 if문 실행
+		SDL_ErrorLog("CreateRenderer2");
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 6);
+		return 0;// 종료
+	}
+	Window3 = SDL_CreateWindow("HIT MIND WITH C 3", 0, 1080 - 900 / 4 - 10, 1920 - 1310 / 4 - 10, 900 / 4 + 10, SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_BORDERLESS);// SDL_CreateWindow 함수로 SDL 윈도우 생성 함수호출시 넘겨주는 인수는 차례대로 창이름, 창의 x축위치, 창의 y축위치, 창의 너비, 창의 높이, 플래그임
+	if (Window3 == nullptr) {// 윈도우 생성 실패시 if문 실행
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 7);
+		return 0;//종료
+	}
+	Renderer3 = SDL_CreateRenderer(Window3, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// SDL_CreateRenderer 함수로 SDL Renderer 생성 함수 호출시 넘겨주는 인수는 SDL_Window *, 드라이버 설정(-1이면 알아서 맞춰줌), 플래그(지금은 하드웨어가속과 수직동기화 사용을 허용함)
+	if (Renderer3 == nullptr) {// 렌더러 생성 실패시 if문 실행
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 8);
+		return 0;// 종료
+	}
+	// 흰색으로 세팅
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+	SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer2);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+	SDL_SetRenderDrawColor(Renderer3, 255, 255, 255, 0);// 그리기 색깔 설정
+	SDL_RenderClear(Renderer3);// 렌더러 모두 지움 (그리기 색깔로 화면이 채워짐)
+							   // 끝
+	SDL_Event event;//SDL_Event 변수 선언
+//	const Uint8 * keystate;// Key 상태 배열을 받기 위한 포인터 선언
+						   // RgbCode 이미지
+	RgbTexture = LoadTextureEx(Renderer, ".\\image\\RgbCode.jpg", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (RgbTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	SDL_QueryTexture(RgbTexture, NULL, NULL, &RgbCode.w, &RgbCode.h);// RgbCode 이미지의 가로세로 읽어오기. 윈도우 창을 3개로 나누는 기준이 되므로 윈도우창 선언전에 읽어옴
+	RgbCode.w /= 4;
+	RgbCode.w *= (1);
+	RgbCode.h /= 4;
+	RgbCode.h *= (1);
+	RgbCode.x = 5 * (1);// 이미지의 x,y좌표와 너비와 높이 설정
+	RgbCode.y = 1080 * (1) - RgbCode.h - 10 * (1);
+	// 끝
+	// Track 이미지
+	TraTexture = LoadTextureEx(Renderer, ".\\image\\Track.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (TraTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	SDL_QueryTexture(TraTexture, NULL, NULL, &Track.w, &Track.h);//이미지 정보 불러오기
+	Track.w /= 4;
+	Track.w *= (1);
+	Track.h /= 8;
+	Track.h *= (1);
+	Track.x = RgbCode.x;
+	Track.y = RgbCode.y - Track.h - 25 * (1);
+	// 끝
+	// Box 이미지
+	BoxTexture = LoadTextureEx(Renderer, ".\\image\\Box.png", 255, 255, 255, 0, &center, SDL_FLIP_NONE);// 이미지 불러오기
+	if (BoxTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	SDL_QueryTexture(BoxTexture, NULL, NULL, &Box.w, &Box.h);//이미지 정보 불러오기
+	Box.w /= 2;
+	Box.w *= (1);
+	Box.h /= 2;
+	Box.h *= (1);
+	Box.x = Track.x + 50 * (1);
+	Box.y = Track.y + Track.h / 2 - Box.h / 2;
+	// 끝
+	// Pencil 이미지
+	PenTexture = LoadTexture(Renderer, ".\\image\\Pencil.jpg"); // 이미지 불러오기
+	if (PenTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	SDL_QueryTexture(PenTexture, NULL, NULL, &Pencil.w, &Pencil.h);
+	Pencil.w /= 15;
+	Pencil.h /= 15;
+	Pencil.x = Track.x + 50 + 40;
+	Pencil.y = Track.y - 30 - Pencil.h;
+	// 끝
+	// Eraser 이미지
+	EraTexture = LoadTexture(Renderer, ".\\image\\Eraser.jpg"); // 이미지 불러오기
+	if (EraTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	Eraser.w = Pencil.w;
+	Eraser.h = Pencil.h;
+	Eraser.x = Pencil.x + 50 * (1) + 30 * (1);;
+	Eraser.y = Pencil.y;
+	// 끝
+	// New 이미지
+	NewTexture = LoadTexture(Renderer, ".\\image\\New.jpg"); // 이미지 불러오기
+	if (NewTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	New.w = Eraser.w;
+	New.h = Eraser.h;
+	New.x = Eraser.x + 50 * (1) + 30 * (1);
+	New.y = Eraser.y;
+	ChaTexture = LoadTexture(Renderer, ".\\image\\CHAT_BODY.png");												// 채팅 이미지
+	if (ChaTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	Chat.w = (1310 / 4) + 20;
+	Chat.h = Eraser.y - 262;
+	Chat.x = 0;
+	Chat.y = 200;
+	InpTexture = LoadTexture(Renderer, ".\\image\\Track.png");												// 채팅 이미지
+	if (InpTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	InputT.w = (1310 / 4) + 20;
+	InputT.h = 41;
+	InputT.x = 0;
+	InputT.y = Eraser.y - 71;
+	RenderTexture(Renderer, RgbTexture, &RgbCode);
+	UseTexture = LoadTexture(Renderer3, ".\\image\\user.png");
+	if (UseTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	UserT.w = (1920 - (1310 / 4 - 10)) / 4;
+	UserT.h = (900 / 4 - 10);
+	UserT.y = 0;/*
+	for (int i = 0; i < 4; i++) {
+		UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+		RenderTexture(Renderer3, UseTexture, &UserT);
+		TTF_DrawText(Renderer3, topicFont, friendname[i], (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+	}*/
+	QusTexture = LoadTexture(Renderer, ".\\image\\question_fix.png");												// 채팅 이미지
+	if (QusTexture == nullptr) {// 에러코드 잡기
+		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
+		return 0;
+	}
+	QuesT.w = 400;
+	QuesT.h = 100;
+	QuesT.x = -40;
+	QuesT.y = 60;
+
+	// 끝
+	int drawcount = 0;
+	bool quit = false;//불 변수 선언
+	bool drag = false;// 드래그중인지 확인하는 변수 선언
+	bool happen = true;
+	bool hangeulinput = false;
+	bool enter = false;
+	bool writemode = false;
+	int alpha;// 명도와 채도를 담기위한 변수 선언
+	int x, y; // 움직이고 있지않은 마우스의 좌표를 담기위한 변수 선언
+	float r = 0, g = 0, b = 0; //rgb값을 가질 변수 선언 나누기 연산을 하므로 실수형으로 선언
+	double i = 0, j = 0, k = 0, l = 0, length = 0;// for문에서 쓸 변수선언
+
+	int pastturn = turn;
+	int newclick = 0;
+	double xpos = 0, ypos = 0;// 마우스 x좌표 y좌표를 저장하는 변수선언 
+	float strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기의 선언
+	SDL_Rect Rect = { 0 }; // 그릴 사각형의 변수를 반복문 밖에서 선언
+	SDL_Rect Fonts = { Track.x - strong / 2 + 35 ,Track.y - strong / 2 - 50,strong,strong };// 색깔, 굵기등을 보여주기 위한 사각형 변수 선언
+	SDL_Rect Edge = { 0 };// 테두리를 그리기 위한 사각형 변수 선언 
+	SDL_Rect Happen = { 0,0,1310 / 4 + 10,New.y - 10 };// Happen 이 트루일때 사용할 변수
+	bool vote = false;
+	char click_eraser, click_pencil;
+	char dragging;
+	int len = 0;
+	MYSQL_ROW sql_row;
+	int ee = 0;
+	char euckr[256];
+	char query2[50];
+	Gametopic = 0;
+	RESET(euckr);
+	int xxx, yyy;
+	float sstrong;
+	float rr, gg, bb;
+	int buff = 0;		  // 끝
+						  // while문에서 쓸 변수의 초기값 설정
+	// 렌더러에 저장하기
+												  // 변수 초기값 설정끝
+//	_beginthreadex(0, 0, (_beginthreadex_proc_type)rooprender, Renderer2, 0, 0);
+	RenderTexture(Renderer3, UseTexture, &UserT);
+	SDL_StartTextInput();
+	wchar_t inputText[128] = L"";
+	char topic[30];
+	bool hangeul = false;
+	wchar_t wstr[2] = L"";
+	long firstclock = clock();
+	int first = 0;
+	turn++;
+	/*
+	contest(Window2, Renderer2, 1);
+	contest(Window2, Renderer2, 2);
+	contest(Window2, Renderer2, 3);
+	contest(Window2, Renderer2, 4);
+	*/;
+	if (connectroom[CHOOSEROOM].mode == 2)
+	{
+		out[0] = fopen(".\\text\\user1.txt", "w");
+		out[1] = fopen(".\\text\\user2.txt", "w");
+		out[2] = fopen(".\\text\\user3.txt", "w");
+		out[3] = fopen(".\\text\\user4.txt", "w");
+	}
+	
+	
+	while (!quit) {// quit가 true가 아닐때 동안 무한반복
+		if ((clock() - firstclock) / 1000 > first)
+		{
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+			SDL_RenderFillRect(Renderer, &Timer3);// 지우개같이 흰색으로 칠함
+			first++;
+			if (first == connectroom[CHOOSEROOM].time + 1)				//1초마다 화면을 초기화하여서 올림
+			{
+				if (connectroom[CHOOSEROOM].mode == 2) {				//mode가 컨테스트이면 서로의 화면을 4등분해서 보여줌
+					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+					SDL_RenderClear(Renderer2);
+					for (i = 1; i <= 4; i++) {
+						if (status[(int)i-1] != 0)
+							contest(Window2, Renderer2, i);
+					}
+					
+				}
+				firstclock = clock();						//시간 초기화
+				first = 0;
+				if (turn == myownnumber)						//내턴일때 시간이 끝났다면
+				{
+					first = 0;
+					while (1)
+					{
+						turn++;
+						if (turn == 5)
+							turn = 1;
+						if (status[turn - 1] != 0)				//다음턴으로 넘김
+							break;
+
+					}
+					sprintf(query, "time out %d", turn);
+					send(connect_sock, query, 45, 0);
+
+				}
+
+				firstclock = clock();
+				first = 0;
+				while (!timeout);
+				//		printf("turn : %d", turn);
+				firstclock = clock();
+				first = 0;
+				timeout = false;
+				SDL_DestroyRenderer(Renderer2);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);	//랜더러 초기화
+				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+				SDL_RenderClear(Renderer2);
+				ee++;
+			}
+			sprintf(query, "%d초 남음", connectroom[CHOOSEROOM].time - first);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 150, 150);
+			happen = true;
+		}
+		if (TIMESET == true)
+		{
+			firstclock = clock();
+			first = 0;
+			TIMESET = false;
+		}
+		if (myownnumber == turn && Gametopic == 0)
+		{
+			EnterCriticalSection(&cs);
+			mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
+			sql_row = (mysql_fetch_row(mysql_store_result(cons)));
+			strcpy(topic, sql_row[0]);
+			sprintf(query, "topic   %s", sql_row[0]);
+			LeaveCriticalSection(&cs);
+			//			mysql_free_result(sql_result);
+			send(connect_sock, query, 45, 0);
+			Gametopic++;
+			drag = false;
+			clicks.pencil = false;
+			happen = true;
+		}
+		if (CurrectHappen == true)
+		{
+			CurrectHappen = false;
+
+			SDL_DestroyRenderer(Renderer2);
+			Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+			SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+			SDL_RenderClear(Renderer2);
+			if (ee != 0) {
+				firstclock = clock();
+				first = 0;
+				sprintf(query, "%s 님이 맞추었습니다! 정답은 %s 입니다", friendname[turn - 1], pasttopic);
+				han2unicode(query, unicode);
+				TTF_DrawText(Renderer2, topicFont, unicode, 0, 0);
+				SDL_RenderPresent(Renderer2);
+			}
+			ee++;
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
+
+
+
+			happen = true;
+
+
+		}
+		if (pastturn != turn)
+		{
+			firstclock = clock();
+			first = 0;
+			SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+			SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
+			if (myownnumber == turn) {
+				RenderTexture(Renderer, QusTexture, &QuesT);// 렌더러에 저장하기
+				han2unicode(topic, unicode);
+				TTF_DrawText(Renderer, topicFont, unicode, 100, 90);
+			}
+			else
+			{
+				SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+				SDL_RenderFillRect(Renderer, &Timer2);// 지우개같이 흰색으로 칠함
+			}
+			//			han2unicode(query, unicode);
+			//			TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 148);	
+			//		SDL_RenderPresent(Renderer);
+			//		SDL_Delay(3000);
+
+			sprintf(query, "%s 차례입니다", friendname[turn - 1]);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 0, 0);
+			sprintf(query, "문제 %d/%d", ee, connectroom[CHOOSEROOM].question);
+			if (ee > connectroom[CHOOSEROOM].question)
+			{
+				quit = true;
+			}
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, Font, unicode, 0, 150);
+			pastturn = turn;
+			happen = true;
+		}
+		if (ExitHappen == true)
+		{
+			ExitHappen = false;
+			SDL_RenderClear(Renderer3);
+			for (int i = 0; i < 4; i++)
+			{
+
+				if (status[i] != 0)
+				{
+
+					UserT.x = ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98);
+					RenderTexture(Renderer3, UseTexture, &UserT);
+					han2unicode(friendname[i], unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, (392.6125*i + 196.30625) - (strlen(friendname[i]) * 7), 5);
+					sprintf(query, "%d", score[i][0]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 143);
+
+					sprintf(query, "%d", score[i][1]);
+					han2unicode(query, unicode);
+					TTF_DrawText(Renderer3, topicFont, unicode, ((1920 - (1310 / 4 - 10)) / 4) * (i * 0.98) + 290, 75);
+				}
+			}
+
+		}
+
+		// contest모드
+		if (myownnumber == turn)
+		{
+			writemode = true;
+		}
+		else {
+			drag = false;
+			writemode = false;		//X
+	//	CLS;
+		}
+		if (buff < SDLCLOCK) {
+			buff++;
+			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
+			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+			cur(18, 10);
+			printf("buff : %d", buff);
+			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
+			happen = true;
+		}
+
+		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
+			switch (event.type) {//이벤트 타입에 따라 케이스문 실행
+			case SDL_TEXTINPUT:
+				if (hangeul == true && (event.text.text[0] == -29 || event.text.text[0] + 256 >= 234 && event.text.text[0] + 256 <= 237))// 한영키가 한글로 되어있고 한글이라면 event.text.text[0]의 값으로 한글판단가능함
+				{
+					wstr[2] = L"";
+					int sum = (event.text.text[0] + 22) * 64 * 64 + (event.text.text[1] + 128) * 64 + event.text.text[2] + 41088;
+					wstr[0] = sum;
+					wcscat(inputText, wstr);
+				}
+				else if (!((event.text.text[0] == 'c' || event.text.text[0] == 'C') && (event.text.text[0] == 'v' || event.text.text[0] == 'V') && SDL_GetModState() & KMOD_CTRL)) {// 한글아니고 c나 v를 눌렀을때 컨트롤모드가 아니라면 한글을 제외한 어떤 문자를 입력했다는 것임
+					wstr[2] = L"";
+					swprintf(wstr, sizeof(wstr) / sizeof(wchar_t), L"%hs", event.text.text);// event.text.text 문자열 그냥 연결시켜버림
+					wcscat(inputText, wstr);// 문자열 연결
+					hangeulinput = false;
+				}
+				happen = true;
+				break;
+			case SDL_KEYDOWN:
+				if (event.key.keysym.sym == SDLK_RETURN) {
+					if (hangeulinput == true && enter == false)
+						enter = true;
+					else {
+						strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
+						UTF8toEUCKR(euckr, 256, str, 256);
+						euckr[strlen(euckr)] = '\0';
+						han2unicode(euckr, unicode);
+						if (unicodehan(unicode, wcslen(unicode)) != unicodehan(inputText, wcslen(inputText))) {
+							strcpy(euckr, "[Error] invalid conversion");
+						}
+						if (strcmp(euckr, topics[turn - 1]) == 0)
+						{
+							if (myownnumber != turn)
+								send(connect_sock, "right   answer", 35, 0);
+						}
+						else if (strcmp(euckr, "/clear") == 0)
+						{
+							EnterCriticalSection(&cs);
+							sprintf(query, "delete from catchmind.chating where room = '%s'", connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[명령]', '채팅을 초기화 합니다.', '%s')", connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
+						}
+						else if (strcmp(euckr, "/myturn") == 0)
+						{
+							send(connect_sock, "right   answer", 35, 0);
+							Gametopic = 0;
+						}
+						else if (strcmp(euckr, "/help") == 0)
+						{
+							
+							RESET(chatquery);
+					//		EnterCriticalSection(&cs);
+							strcpy(chatquery[10], "[1] /help : 도움말을 표시합니다.");
+
+							strcpy(chatquery[11], "[2] /clear : 채팅창을 초기화합니다.");
+
+							strcpy(chatquery[12], "[3] /capture [파일명] : 현재 그림을 캡쳐.");
+
+							strcpy(chatquery[13], "[4] /stopmusic : 현재 음악을 멈춥니다.");
+
+							strcpy(chatquery[14], "[5] /startmusic : 현재 음악을 재실행합니다.");
+					//		LeaveCriticalSection(&cs);
+							CHATHAPPEN = true;
+							
+						}
+						else if (strcmp(euckr, "/?") == 0)
+						{
+							
+							RESET(chatquery);
+					//		EnterCriticalSection(&cs);
+							strcpy(chatquery[10], "[1] /help : 도움말을 표시합니다.");
+
+							strcpy(chatquery[11], "[2] /clear : 채팅창을 초기화합니다.");
+
+							strcpy(chatquery[12], "[3] /capture [파일명] : 현재 그림을 캡쳐.");
+
+							strcpy(chatquery[13], "[4] /stopmusic : 현재 음악을 멈춥니다.");
+
+							strcpy(chatquery[14], "[5] /startmusic : 현재 음악을 재실행합니다.");
+					//		LeaveCriticalSection(&cs);
+							CHATHAPPEN = true;
+							
+						}
+						else if (strcmp(euckr, "/timeclear") == 0)
+						{
+							send(connect_sock, "timeclear", 35, 0);
+							EnterCriticalSection(&cs);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[명령]', '시간을 초기화합니다.', '%s')", connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
+						}
+						else if (strncmp(euckr, "/vote ", 6) == 0)
+						{
+							if (vote == false)
+							{
+								RESET(chatquery);
+								strcpy(chatquery[14], "[알림] 아직 투표시간이 아닙니다.");
+								
+							}
+							else
+							{
+								sscanf(euckr, "/vote %d", &len);
+								RESET(chatquery);
+								if (len == myownnumber)
+								{
+									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '[알림] 자기자신에게는 투표가 불가합니다', '%s')", username, connectroom[CHOOSEROOM].ip);
+									mysql_query(cons, query);
+								}
+								else if (status[len] != 0)
+									strcpy(chatquery[14], "[알림] 투표 성공");
+								else
+								{
+									strcpy(chatquery[14], "[알림] 투표 실패");
+								}
+							}
+							CHATHAPPEN = true;
+						}
+						else if (strncmp(euckr, "/capture ", 9) == 0)
+						{
+							RESET(chatquery);
+
+							printf("%s", chatquery[12]);
+							sscanf(euckr, "/capture %s", query);
+
+							sprintf(query2, "screenshot//%s.png", query);
+							makebmp(query2, Renderer2);
+							sprintf(chatquery[13], "%s\\screenshot", _getcwd(NULL, 0));
+							sprintf(chatquery[14], "폴더 안에 %s.png가 저장이 되었습니다", query);
+							RESET(chatquery[12]);
+							RESET(euckr);
+							CHATHAPPEN = true;
+
+						}
+						else if (strcmp(euckr, "/stopmusic") == 0)
+						{
+							Mix_PauseMusic();
+						}
+						else if (strcmp(euckr, "/startmusic") == 0)
+						{
+							Mix_ResumeMusic();
+						}
+						else {
+							EnterCriticalSection(&cs);
+							sprintf(query, "insert into catchmind.chating (name, mean, room) values ('%s', '%s', '%s')", username, euckr, connectroom[CHOOSEROOM].ip);
+							mysql_query(cons, query);
+							LeaveCriticalSection(&cs);
+						}
+						ZeroMemory(unicode, sizeof(unicode));
+						ZeroMemory(str, sizeof(str));
+						ZeroMemory(euckr, sizeof(euckr));
+						ZeroMemory(inputText, sizeof(inputText));
+						enter = false;
+						happen = true;
+					}
+
+				}
+				else if (event.key.keysym.sym == SDLK_RALT)
+					hangeul = !(hangeul);
+				else if (event.key.keysym.sym == SDLK_BACKSPACE && wcslen(inputText) > 0)// 키보드 백스페이스고 배열의 길이가 1이상일때
+				{
+					inputText[wcslen(inputText) - 1] = '\0';// 마지막문자를 널문자로 바꿈
+					happen = true;
+				}
+				else if (event.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL) {// 컨트롤 모드이고 c를 눌렀다면
+					strcpy(str, UNICODE2UTF8(inputText, wcslen(inputText)));
+					SDL_SetClipboardText(str);// 클립보드에 넣음
+				}
+				else if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL)// 컨트롤 모드이고 v를 눌렀다면
+					wcscpy(inputText, UTF82UNICODE(SDL_GetClipboardText(), strlen(SDL_GetClipboardText())));// 클립보드에서 가져옴
+				else
+					hangeulinput = true;
+				happen = true;
+				break;
+			case SDL_WINDOWEVENT://SDL종료 타입일 경우
+
+				switch (event.window.event) {
+
+				case SDL_WINDOWEVENT_CLOSE:// 다수 창에서의 닫기이벤트가 발생할경우
+					send(connect_sock, "exit", 35, 0);
+					quit = true;// quit를 true로 변경
+					Sleep(100);
+					break;// 브레이크
+				case SDL_WINDOWEVENT_ENTER:// 윈도우
+					SDL_RaiseWindow(SDL_GetWindowFromID(event.window.windowID));//포커스 이동시킴
+					break;
+				case SDL_WINDOWEVENT_LEAVE:
+					drag = false;//마우스가 창에서 나갔으므로 드래그 기능을 중지시킴
+					break;
+				case SDL_WINDOWEVENT_FOCUS_GAINED:
+					break;
+				}
+			case SDL_MOUSEMOTION: // 마우스가 움직인 타입일 경우
+
+				if (event.motion.state == 1 && drag == true) {// 마우스가 움직였을때 마우스 왼쪽 버튼이 눌려져있다면 즉, 드래그 했다면
+					if (event.motion.windowID == SDL_GetWindowID(Window)) {// 마우스가 움직인 곳이 첫번째 윈도우 창일경우
+						if ((event.motion.x + Box.w / 2 >= Track.x&&event.motion.x + Box.w / 2 <= Track.x + Track.w) && (event.motion.y >= Box.y&&event.motion.y <= Box.y + Box.h)) {// 드래그한 점의 중심 x좌표가 트랙안에 잇고 드래그한 점의 중심 y좌표가 박스의 y좌표 범위 안에 있으면 if문 실행
+							SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+							SDL_RenderFillRect(Renderer, &Box);// 지우개같이 흰색으로 칠함
+							Box.x = event.motion.x;// 박스의 x좌표를 클릭한곳의 x좌표로 바꿈 == 이동시킴
+							strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌			
+							happen = true;
+							break;// 이 구문을 탈출함
+						}
+					}
+					else if (event.motion.windowID == SDL_GetWindowID(Window2)) {// 마우스가 움직인 곳이 두번째 윈도우 창일 경우
+						length = sqrt(pow(Rect.x + strong / 2 - event.motion.x, 2) + pow(Rect.y + strong / 2 - event.motion.y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+						if (length == 0) break;
+						if (clicks.pencil == true) {// 펜슬일 경우
+						
+							i = (event.motion.x - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+							j = (event.motion.y - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+							k = 0;// while문안에 쓸 변수 초기화.
+								  //xpos = Rect.x + Rect.w / 2 - strong / 2;// 전에찍은점 x좌표를 따로 저장
+								  //	ypos = Rect.y + Rect.h / 2 - strong / 2;// 전에찍은점 y좌표를 따로 저장
+							xpos = Rect.x;
+							ypos = Rect.y;
+							Rect.w = Rect.h = strong;// 굵기설정
+							SDL_SetRenderDrawColor(Renderer, r, g, b, 0);
+							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+								Rect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
+								Rect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+								SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
+							}
+							// 여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+							if (connect_sock != 0) {
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 35, 0);
+								ccount++;
+
+							}
+						}
+						else if (clicks.eraser == true) {// 지우개 경우
+							strong *= 80 / (float)50.0;
+							
+							SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로									
+							i = (event.motion.x - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+							j = (event.motion.y - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+							k = 0;// while문안에 쓸 변수 초기화.
+							xpos = Rect.x;// 전에찍은점 x좌표를 따로 저장
+							ypos = Rect.y;// 전에찍은점 y좌표를 따로 저장
+							Rect.w = Rect.h = strong;// 굵기설정
+							for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+								Rect.x = xpos + k*i;// 찍을 점의 중심 점 x좌표를 설정 
+								Rect.y = ypos + k*j;// 찍을 점의 중심 점 y좌표를 설정
+								int x1, y1, x2, y2;
+								for (l = 0; l < 180; l++) {
+									x1 = sin(3.14 / 180 * l)*strong / 2;
+									y1 = cos(3.14 / 180 * l)*strong / 2;
+									x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+									y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+								}
+							}
+							strong *= 50 / 80.0;
+							if (connect_sock != 0) {
+								if (connectroom[CHOOSEROOM].mode == 2)
+								{
+									sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								}
+								else
+									sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+								send(connect_sock, query, 35, 0);
+							
+								ccount++;
+
+							}
+						}
+						happen = true;
+						//		send(connect_sock, "", 45, 0);
+								//여기~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+					}
+				}
+				break;
+			case SDL_MOUSEBUTTONDOWN:
+				if (writemode == true) {
+					if (event.button.button == 1) {
+						if (event.button.windowID == SDL_GetWindowID(Window)) {
+							if ((event.button.x >= RgbCode.x&&event.button.x <= RgbCode.x + RgbCode.w) && (event.button.y >= RgbCode.y&&event.button.y <= RgbCode.y + RgbCode.h)) {// RgbCode 이미지 안이면 if문 실행
+								alpha = (event.button.y - RgbCode.y) / (RgbCode.h / 9);// RgbCode 안에서의 y축 계산 == 명도채도계산
+								switch ((event.button.x - RgbCode.x) / (RgbCode.w / 13)) {// RgbCode안에서의 x축 계산
+								case 0:// 색 설정 코드
+									r = 255; g = 0; b = 0;
+									break;
+								case 1:
+									r = 255; g = 128; b = 0;
+									break;
+								case 2:
+									r = 255; g = 255; b = 0;
+									break;
+								case 3:
+									r = 128; g = 255; b = 0;
+									break;
+								case 4:
+									r = 0; g = 255; b = 0;
+									break;
+								case 5:
+									r = 0; g = 255; b = 128;
+									break;
+								case 6:
+									r = 0; g = 255; b = 255;
+									break;
+								case 7:
+									r = 0; g = 128; b = 255;
+									break;
+								case 8:
+									r = 0; g = 0; b = 255;
+									break;
+								case 9:
+									r = 127; g = 0; b = 255;
+									break;
+								case 10:
+									r = 255; g = 0; b = 255;
+									break;
+								case 11:
+									r = 255; g = 0; b = 127;
+									break;
+								case 12:// case 12는 회색계열이라서 특수한 알고리즘임 그래서 따로 코드를 써줌
+									r = 128 + (255 / 8.0)*(alpha - 4); g = 128 + (255 / 8.0) * (alpha - 4); b = 128 + (255 / 8.0) * (alpha - 4);
+									alpha = 4;
+									break;
+								}
+								// 수식으로 rgb값 설정
+								if (alpha <= 4) {
+									r = r + r / 5 * (alpha - 4);
+									g = g + g / 5 * (alpha - 4);
+									b = b + b / 5 * (alpha - 4);
+									happen = true;
+									break;
+								}
+								else {
+									r = r + (255 - r) / 5 * (alpha - 4);
+									g = g + (255 - g) / 5 * (alpha - 4);
+									b = b + (255 - b) / 5 * (alpha - 4);
+									happen = true;
+									break;
+
+								}
+							}
+							else if ((event.button.x >= Track.x&&event.button.x <= Track.x + Track.w) && (event.button.y >= Box.y&&event.button.y <= Box.y + Box.h)) {//스크롤 트랙을 클릭 했을 경우
+								SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 흰색으로 설정(지우개 역할)
+								SDL_RenderFillRect(Renderer, &Box);// 렌더러에 사각형을 그려줌. 근데 흰색이므로 지워주는 역할을 함
+								Box.x = event.button.x;//스크롤 박스를 이동시킴
+								drag = true; //드래그로 조정이 가능하게 설정
+								strong = 49 * (float)(Box.x + Box.w / 2 - Track.x) / Track.w + 1;// 굵기를 트랙과 스크롤 박스의 위치를 계산해서 정해줌
+								happen = true;
+								break;
+							}
+							else if ((event.button.x >= Eraser.x - 10 && event.button.x <= Eraser.x + Eraser.w + 10) && (event.button.y - 10 >= Eraser.y&&event.button.y <= Eraser.y + Eraser.h + 10)) {
+								SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = true;
+
+								clicks.pencil = false;
+								happen = true;
+							}
+							else if ((event.button.x >= New.x - 10 && event.button.x <= New.x + New.w + 10) && (event.button.y >= New.y - 10 && event.button.y <= New.y + New.h + 10)) {		//New 이미지를 클릭했을때
+
+							//	sprintf(query, "screenshot\\%d.png", time(NULL));
+						//		makebmp(query, Renderer2);
+
+
+								SDL_DestroyRenderer(Renderer2);
+								Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								SDL_RenderClear(Renderer2);
+								happen = true;
+								sndPlaySoundA("music\\erase.wav", SND_ASYNC);
+								//여기~~~~~~~~~~~~~~~~~~
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										send(connect_sock, "Con   SDLCLEAR", 35, 0);
+									}
+									else
+										send(connect_sock, "SDLCLEAR", 35, 0);
+
+								}
+								//	SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = false;
+								clicks.pencil = true;
+
+								happen = true;
+							}
+
+							else if ((event.button.x >= Pencil.x - 10 && event.button.x <= Pencil.x + Pencil.w + 10) && (event.button.y >= Pencil.y - 10 && event.button.y <= Pencil.y + Pencil.h + 10)) {
+								Fonts.w += 2;// 완벽한 원이 아니라서 쪼끔 삐져나옴
+								Fonts.h += 2;
+								SDL_RenderFillRect(Renderer, &Fonts);// 폰트를 출력함. 근데 흰색이므로 지워주는 역할을 하게됨
+								clicks.eraser = false;
+								clicks.pencil = true;
+								sndPlaySoundA("music\\pencil.wav", SND_ASYNC);
+								happen = true;
+							}
+						}
+						else if (event.button.windowID == SDL_GetWindowID(Window2)) {
+							if (clicks.pencil == true) {
+
+								Rect.x = event.button.x - strong / 2;
+								Rect.y = event.button.y - strong / 2;// 굵기만큼의 사각형을 만듬
+								Rect.w = Rect.h = strong;// 굵기 설정
+								SDL_RenderFillRect(Renderer2, &Rect);// 렌더러에 그림
+																	 // 여기~~~~~~~~~
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									send(connect_sock, query, 35, 0);
+									ccount++;
+
+								}
+								drag = true; //드래그로 그릴수 있게 설정
+								happen = true;
+
+
+								break;
+							}
+							else if (clicks.eraser == true) {
+								strong *= 80 / (float)50.0;
+								SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+								int x1, y1, x2, y2;
+								Rect.x = event.button.x;// 원이라서 꼭짓점의 좌표가아닌 중심좌표를 찍어줘야함
+								Rect.y = event.button.y;
+								for (l = 0; l < 180; l++) {
+									x1 = sin(3.14 / 180 * l)*strong / 2;
+									y1 = cos(3.14 / 180 * l)*strong / 2;
+									x2 = sin(3.14 / 180 * (360 - l))*strong / 2;
+									y2 = cos(3.14 / 180 * (360 - l))*strong / 2;
+									SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+								}
+								// 여기~~~~~~~~~~~~~~
+								if (connect_sock != 0) {
+									if (connectroom[CHOOSEROOM].mode == 2)
+									{
+										sprintf(query, "cont   %d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									
+									}
+									else
+										sprintf(query, "%d %d %d %d %d %.1f %.0f %.0f %.0f", clicks.eraser, clicks.pencil, drag, event.motion.x, event.motion.y, strong, r, g, b);
+									send(connect_sock, query, 35, 0);
+									ccount++;
+
+								}
+								strong *= 50.0 / 80;
+								drag = true;
+								happen = true;
+								break;
+							}
+						}
+					}
+				}
+			case SDL_MOUSEBUTTONUP: // 마우스 버튼이 떼졌을때
+				if (event.button.button == SDL_BUTTON_LEFT) // 떼진 버튼이 왼쪽버튼이라면
+					drag = false;// 드래그로 하는 모든 것을 불가능하게 만듦
+			}
+		}
+
+		SDL_GetMouseState(&x, &y);
+		if ((x >= Eraser.x - 10 && x <= Eraser.x + Eraser.w + 10) && (y >= Eraser.y - 10 && y <= Eraser.y + Eraser.h + 10)) {// eraser안에 마우스가 있을때
+			if (on.eraser == false && clicks.eraser == false) // 그전까지는 마우스가 올려져있지않고 지우개가 활성화되지않았을때
+				happen = true;// happen이 발생
+			if (clicks.eraser == false)//지우개가 클릭된 상태가 아니었다면
+				on.eraser = true;// 마우스가 올려진것으로 간주함
+		}
+		else if (on.eraser == true) {//그전까지는 마우스가 올려져있었고 지금은 eraser안에 마우스가 없으면
+			happen = true;//happen이 발생
+			on.eraser = false;// 마우스가 안 올려진것으로 간주함
+		}
+		if ((x >= Pencil.x - 10 && x <= Pencil.x + Pencil.w + 10) && (y >= Pencil.y - 10 && y <= Pencil.y + Pencil.h + 10)) {// eraser 안에 마우스가 있을때
+			if (on.pencil == false && clicks.pencil == false)// 그전까지는 마우스가 올려져있지않고 펜슬이 활성화되지 않았을때
+				happen = true;// happen이 발생
+			if (clicks.pencil == false)//지우개가 클릭된 상태가 아니었다면
+				on.pencil = true;// 마우스가 올려진 것으로 간주함
+		}
+		else if (on.pencil == true) {
+			happen = true;
+			on.pencil = false;
+		}
+		if ((x >= New.x - 10 && x <= New.x + New.w + 10) && (y >= New.y - 10 && y <= New.y + New.h + 10)) {
+			if (on.new == false)
+				happen = true;
+			on.new = true;
+		}
+		else if (on.new == true) {
+			happen = true;
+			on.new = false;
+		}
+
+		if (CHATHAPPEN == true) {
+			RenderTexture(Renderer, ChaTexture, &Chat);// 렌더러에 저장하기
+			for (l = 0; l < 15; l++) {
+				if (chatquery[(int)l][0] != 0) {
+					han2unicode(chatquery[(int)l], unicode);
+					TTF_DrawText(Renderer, Font, unicode, 10, 250 + 25 * l);		//최근 15개의 채팅을 불러옴
+					ZeroMemory(unicode, sizeof(unicode));// 추가
+				}
+			}
+			CHATHAPPEN = false;
+			happen = true;
+		}
+
+		//	han2unicode(query, unicode);
+		//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
+
+		if (happen == true) {
+			//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
+			//		SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
+		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
+			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, Font, inputText, &strong, r, g, b);
+			happen = false;
+	//		cur(30, 30);
+	//		printf("send :%d", ccount);
+
+		}
+
+	}
+
+	SDL_DestroyTexture(InpTexture);
+	SDL_DestroyTexture(UseTexture);
+	SDL_DestroyTexture(RgbTexture);// 텍스쳐 파괴하기
+	SDL_DestroyTexture(ChaTexture);
+	SDL_DestroyTexture(BoxTexture);
+	SDL_DestroyTexture(TraTexture);
+	SDL_DestroyTexture(EraTexture);
+	SDL_DestroyTexture(PenTexture);
+	SDL_DestroyTexture(NewTexture);
+	SDL_DestroyTexture(QusTexture);
+	Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 10);
+
+	int good;
+	int max = 0;
+	for (int j = 0; j < 4; j++)
+	{
+		if (score[j][1] > max)
+		{
+			max = score[j][1];
+			good = j;
+		}
+	}
+	if (myownnumber == j)
+	{
+		sprintf(query, "update catchmind.login set level = level + 1 where name = '%s'", username);
+		mysql_query(cons, query);
+	}
+	CLS;
+	printf("승자는 %s입니다. 맞춘갯수 %d개\n", friendname[good], score[good][1]);
+	for (int k = 0; k < 4; k++)
+	{
+		printf("%s : %d개\n", friendname[k], score[k][1]);
+	}
+	printf("\n엔터..");
+	getchar();
+	return 0;// 종료
+}
 HWND GetConsoleHwnd(void)
 {
 
@@ -4889,6 +5917,45 @@ char* getDesktopFolderName()     //c:\Users\UserName\Desktop\ 반환
 
 
 
+}
+wchar_t* UTF82UNICODE(char* UTF8, int len) {
+	wchar_t wstr[128] = L"";
+	//	int i, sum;
+	int i;
+	for (i = 0; i < len; i += 3) {
+		wstr[i / 3] = (UTF8[i] + 22) * 64 * 64 + (UTF8[i + 1] + 128) * 64 + UTF8[i + 2] + 41088;
+	}
+	wcscat(wstr, L"\0");
+	return wstr;
+}
+char* UNICODE2UTF8(wchar_t* unicode, int len) {
+	char str[128] = "";
+	int i = 0, j = 0;
+	for (i = 0; j < len; j++) {
+		if (unicode[j] == 92 || unicode[j] == 39) {// 유니코드 92번(역슬래시)나 39번(작은따운표는) mysql에서 각각 \\, \'로 입력해야하므로 예외 처리를 해준다
+			str[i] = 92;
+			str[i + 1] = unicode[j];
+			i += 2;
+		}
+		else if (unicode[j] >= 0xac00 && unicode[j] <= 0xD7A0) {// 완성형 한글일경우
+			str[i] = (unicode[j] - 40960) / (64 * 64) - 22;
+			str[i + 1] = (unicode[j] - 40960) % (4096) / 64 - 128;
+			str[i + 2] = (unicode[j] - 40960) % 64 - 128;
+			i += 3;
+		}
+		else if (unicode[j] >= 0x3131 && unicode[j] <= 0x3163) {// 초중종성일 경우
+			str[i] = (unicode[j] - 12544) / (64 * 64) - 29;
+			str[i + 1] = (unicode[j] - 12544) % (4096) / 64 - 124;
+			str[i + 2] = (unicode[j] - 12544) % 64 - 128;
+			i += 3;
+		}
+		else {
+			str[i] = unicode[j];
+			i++;
+		}
+	}
+	strcat(str, "\0");
+	return str;
 }
 void strintrude(char *s, char *t, int i)
 
