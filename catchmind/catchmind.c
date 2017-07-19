@@ -3685,7 +3685,7 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 				}
 			}
 			strong *= 50 / 80.0;
-			//	SDL_RenderPresent(Renderer4);
+			SDL_RenderPresent(Renderer4);
 			return;
 		}
 	}
