@@ -4819,14 +4819,21 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 							//돋보기버튼
 							else if ((event.button.x >= Magnifying.x - 10 && event.button.x <= Magnifying.x + Magnifying.w + 10) && (event.button.y >= Magnifying.y - 10 && event.button.y <= Magnifying.y + Magnifying.h + 10)) {
 								if (turn != myownnumber) {
+									EnterCriticalSection(&cs);
+									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[알림]', '[%s]님이 돋보기를 사용했습니다.','%s')", username, connectroom[CHOOSEROOM].ip);
+									mysql_query(cons, query);
+									LeaveCriticalSection(&cs);
 									sprintf(query, "%d글자", strlen(topic) / 2);
 									TTF_DrawText(Renderer, topicFont, query, 20, 25);
+									happen = true;
 								}
 							} 
 							//change버튼
 							else if ((event.button.x >= Recycle.x - 10 && event.button.x <= Recycle.x + Recycle.w + 10) && (event.button.y >= Recycle.y - 10 && event.button.y <= Recycle.y + Recycle.h + 10)) {
 								if (turn == myownnumber) {
 									EnterCriticalSection(&cs);
+									sprintf(query, "insert into catchmind.chating (name, mean, room) values ('[알림]', '[%s]님이 주제를 바꾸었습니다.','%s')", username, connectroom[CHOOSEROOM].ip);
+									mysql_query(cons, query);
 									mysql_query(cons, "select top from catchmind.topic order by rand() limit 1");
 									sql_row = (mysql_fetch_row(mysql_store_result(cons)));
 									strcpy(topic, sql_row[0]);
