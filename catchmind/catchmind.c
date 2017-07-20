@@ -3250,7 +3250,7 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				sendall(message, 5);
+				sendall(message, v);
 				continue;
 			}
 			else if (strncmp(message, "cont   ", 7) == 0)
@@ -4317,6 +4317,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			send(connect_sock, query, 45, 0);
 			Gametopic++;
 			drag = false;
+			RECEIVEHAPPEN = false;
 			clicks.pencil = false;
 			happen = true;
 		}
@@ -4436,7 +4437,6 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 
 		if (RECEIVEHAPPEN == true) {
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-		
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			SDL_RenderPresent(Renderer2);
 			RECEIVEHAPPEN = false;
