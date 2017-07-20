@@ -5595,7 +5595,7 @@ int SDL_MAINSMODE2(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰�
 				}
 				firstclock = clock();						//시간 초기화
 				first = 0;
-				ee++;
+				
 			}
 
 			sprintf(query, "%d초 남음", connectroom[CHOOSEROOM].time - first);
