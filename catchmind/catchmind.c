@@ -4359,15 +4359,6 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 			first++;
 			if (first == connectroom[CHOOSEROOM].time + 1)				//1ÃÊ¸¶´Ù È­¸éÀ» ÃÊ±âÈ­ÇÏ¿©¼­ ¿Ã¸²
 			{
-				if (connectroom[CHOOSEROOM].mode == 2) {				//mode°¡ ÄÁÅ×½ºÆ®ÀÌ¸é ¼­·ÎÀÇ È­¸éÀ» 4µîºÐÇØ¼­ º¸¿©ÁÜ
-					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
-					SDL_RenderClear(Renderer2);
-					for (i = 1; i <= 4; i++) {
-						if (status[(int)i - 1] != 0)
-							contest(Window2, Renderer2, i);
-					}
-
-				}
 				firstclock = clock();						//½Ã°£ ÃÊ±âÈ­
 				first = 0;
 				if (turn == myownnumber)						//³»ÅÏÀÏ¶§ ½Ã°£ÀÌ ³¡³µ´Ù¸é
@@ -5548,6 +5539,13 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			han2unicode(topics[turn - 1], unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 90, 25);
+			sprintf(query, "¹®Á¦ %d/%d", ee+1, connectroom[CHOOSEROOM].question);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer2, topicFont, unicode, 100, 0);
+			if (ee + 1 == connectroom[CHOOSEROOM].question)
+			{
+				quit = true;
+			}
 			topichappen = false;
 		}
 		if (CurrectHappen == true)
@@ -5585,10 +5583,6 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 				for (int k = 0; k < 4; k++)
 				{
 					fclose(out[k]);
-				}
-				for (i = 0; i < 4; i++)
-				{
-
 				}
 				//mode°¡ ÄÁÅ×½ºÆ®ÀÌ¸é ¼­·ÎÀÇ È­¸éÀ» 4µîºÐÇØ¼­ º¸¿©ÁÜ
 				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
@@ -5647,6 +5641,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 				MAKETOPIC = true;
 				firstclock = clock();
 				first = 0;
+				ee++;
 			}
 			sprintf(query, "ÅõÇ¥ %dÃÊ ³²À½", 21 - first);
 			han2unicode(query, unicode);
