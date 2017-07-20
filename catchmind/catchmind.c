@@ -2033,8 +2033,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
-				cur(10, 22);
-				printf("SDLCLOCK : %d", SDLCLOCK);
+		//		cur(10, 22);
+		//		printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
 				continue;
 			}
@@ -3603,8 +3603,6 @@ void RenderTexture(SDL_Renderer* Renderer, SDL_Texture * Texture, SDL_Rect * Rec
 	return;
 }
 void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, bool pencil, bool drag, int x, int y, float strong, float r, float g, float b) {
-	cur(10, 27);
-	printf("ReceiveRender : %d", ccount++);
 	if (SDL_Clear == true) {
 		SDL_DestroyRenderer(Renderer4);
 		Renderer4 = SDL_CreateRenderer(Window4, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -3663,7 +3661,6 @@ void ReceiveRender(SDL_Window * Window4, SDL_Renderer* Renderer4, bool eraser, b
 			return;
 		}
 		else if (eraser == true && drag == true) {
-
 			strong *= 80 / (float)50.0;
 			float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
 			float length = sqrt(pow(ReceiveRect.x + strong / 2 - x, 2) + pow(ReceiveRect.y + strong / 2 - y, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
@@ -4163,17 +4160,103 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	}
 
 	/*
+	SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, MagTexture, PasTexture, RecTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, &Magnifying, &Pass, &Recycle, Font, inputText, &strong, r, g, b);
 	while (1) {
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			cur(18, 10);
-			printf("buff : %d", buff);
-			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
-			happen = true;
+		//	cur(18, 10);
+		//	printf("buff : %d", buff);
+			if (SDL_Clear == true) {
+				SDL_DestroyRenderer(Renderer2);
+				Renderer2 = SDL_CreateRenderer(Window2, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+				SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+				SDL_RenderClear(Renderer);
+				SDL_Clear = false;
+				return;
+			}
+			else {
+				if (click_pencil == true && dragging == false) {//eraser 상태에서 클릭한 경우
+					Rect.x = xxx - sstrong / 2;
+					Rect.y = yyy - sstrong / 2;// 굵기만큼의 사각형을 만듬
+					Rect.w = Rect.h = sstrong;// 굵기 설정
+					SDL_SetRenderDrawColor(Renderer2,rr, gg, bb, 0);
+					SDL_RenderFillRect(Renderer2, &Rect);// 렌더러에 그림
+																//	SDL_RenderPresent(Renderer4);
+					return;
+				}
+				else if (click_eraser == true && dragging == false) {
+					sstrong *= 80 / (float)50.0;
+					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);
+					int x1, y1, x2, y2, l;
+					Rect.x = xxx;
+					Rect.y = yyy;// 굵기만큼의 사각형을 만듬
+					for (l = 0; l < 180; l++) {
+						x1 = sin(3.14 / 180 * l)*sstrong / 2;
+						y1 = cos(3.14 / 180 * l)*sstrong / 2;
+						x2 = sin(3.14 / 180 * (360 - l))*sstrong / 2;
+						y2 = cos(3.14 / 180 * (360 - l))*sstrong / 2;
+						SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+					}
+					sstrong *= 50.0 / 80;
+					//	SDL_RenderPresent(Renderer4);
+					return;
+				}
+				else if (click_pencil == true && dragging == true) {
+					float i = 0, j = 0, k = 0, xpos = 0, ypos = 0;
+					float length = sqrt(pow(Rect.x + sstrong / 2 - xxx, 2) + pow(Rect.y + sstrong / 2 - yyy, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+					if (length == 0) return;
+					i = (xxx - (Rect.x + Rect.w / 2)) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+					j = (yyy - (Rect.y + Rect.h / 2)) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+					k = 0;// while문안에 쓸 변수 초기화.
+						  //xpos = Rect.x + Rect.w / 2 - sstrong / 2;// 전에찍은점 x좌표를 따로 저장
+						  //	ypos = Rect.y + Rect.h / 2 - sstrong / 2;// 전에찍은점 y좌표를 따로 저장
+					xpos = Rect.x;
+					ypos = Rect.y;
+					Rect.w = Rect.h = sstrong;// 굵기설정
+					SDL_SetRenderDrawColor(Renderer2, rr,gg,bb, 0);
+					for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+						Rect.x = xpos + k*i;// 찍을 점의 왼쪽위 꼭짓점의 x좌표를 설정 
+						Rect.y = ypos + k*j;// 찍을 점의 왼쪽위 꼭짓점의 y좌표를 설정
+
+						SDL_RenderFillRect(Renderer2, &Rect);//사각형 렌더러에 저장
+					}
+					//	SDL_RenderPresent(Renderer4);
+					return;
+				}
+				else if (click_eraser == true && dragging == true) {
+					sstrong *= 80 / (float)50.0;
+					float i = 0, j = 0, k = 0, l = 0, xpos = 0, ypos = 0;
+					float length = sqrt(pow(Rect.x + sstrong / 2 - xxx, 2) + pow(Rect.y + sstrong / 2 - yyy, 2));// 두점사이의 길이를 피타고라스의 정리로 구함. 이때 두점은 전에 찍힌 점과 드래그한 곳의 점을 말함
+					SDL_SetRenderDrawColor(Renderer2, 255, 255, 255, 0);// 지우개니깐 무조건 하얀색으로	
+					if (length == 0) return;
+					i = (xxx - Rect.x) / length;// i는 두점의 x좌표의 차이를 길이로 나눈 것임.
+					j = (yyy - Rect.y) / length;// j는 두점의 y좌표의 차이를 길이로 나눈 것임.
+					k = 0;// while문안에 쓸 변수 초기화.
+					xpos = Rect.x;// 전에찍은점 x좌표를 따로 저장
+					ypos = Rect.y;// 전에찍은점 y좌표를 따로 저장
+					Rect.w = Rect.h = sstrong;// 굵기설정
+					for (k = 0; k < length; k++) {// 두 점사이의 공백을 전부 사각형으로 채우는 반복문임
+						Rect.x = xpos + k*i;// 찍을 점의 중심 점 x좌표를 설정 
+						Rect.y = ypos + k*j;// 찍을 점의 중심 점 y좌표를 설정
+						int x1, y1, x2, y2;
+						for (l = 0; l < 180; l++) {
+							x1 = sin(3.14 / 180 * l)*sstrong / 2;
+							y1 = cos(3.14 / 180 * l)*sstrong / 2;
+							x2 = sin(3.14 / 180 * (360 - l))*sstrong / 2;
+							y2 = cos(3.14 / 180 * (360 - l))*sstrong / 2;
+							SDL_RenderDrawLine(Renderer2, x1 + Rect.x, y1 + Rect.y, x2 + Rect.x, y2 + Rect.y);
+						}
+					}
+					sstrong *= 50 / 80.0;
+					return;
+				}
+			}
+			SDL_RenderPresent(Renderer2);
 		}
-	}*/
+	}
+	*/
 	while (!quit) {// quit가 true가 아닐때 동안 무한반복
 		if (PASS == true)
 		{
@@ -4412,9 +4495,9 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		if (buff < SDLCLOCK) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-			ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-			cur(18, 10);
-			printf("buff : %d", buff);
+		//	ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
+		//	cur(18, 10);
+		//	printf("buff : %d", buff);
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			happen = true;
 		}
