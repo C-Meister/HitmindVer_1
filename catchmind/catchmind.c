@@ -4442,7 +4442,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		//	cur(18, 10);
 		//	printf("buff : %d", buff);
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
-			SDL_RenderPresent(RenderPresent(Renderer2));
+			SDL_RenderPresent(Renderer2);
 		}
 
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
