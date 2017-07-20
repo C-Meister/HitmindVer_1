@@ -4951,7 +4951,7 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 									strcpy(topic, sql_row[0]);
 									sprintf(query, "topic   %s", sql_row[0]);
 									LeaveCriticalSection(&cs);
-									canrecycle == false;
+									canrecycle = false;
 									//			mysql_free_result(sql_result);
 									send(connect_sock, query, 45, 0);
 								}
@@ -5408,7 +5408,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		return 0;
 	}
 	QuesT.w = 330;
-	QuesT.h = 80;
+	QuesT.h = 90;
 	QuesT.x = 0;
 	QuesT.y = 0;
 
@@ -5417,8 +5417,8 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		Quit(Renderer, Renderer2, Renderer3, Window, Window2, Window3, Font, topicFont, out, 9);
 		return 0;
 	}
-	Magnifying.w = Eraser.w + 10;
-	Magnifying.h = Eraser.h + 10;
+	Magnifying.w = 0;
+	Magnifying.h = 0;
 	Magnifying.x = 20;
 	Magnifying.y = 210;
 	PasTexture = LoadTexture(Renderer, ".\\image\\Pass.jpg");
@@ -6235,7 +6235,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			for (l = 0; l < 15; l++) {
 				if (chatquery[(int)l][0] != 0) {
 					han2unicode(chatquery[(int)l], unicode);
-					TTF_DrawText(Renderer, Font, unicode, 10, 250 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
+					TTF_DrawText(Renderer, Font, unicode, 10, 290 + 25 * l);		//ÃÖ±Ù 15°³ÀÇ Ã¤ÆÃÀ» ºÒ·¯¿È
 					ZeroMemory(unicode, sizeof(unicode));// Ãß°¡
 				}
 			}
