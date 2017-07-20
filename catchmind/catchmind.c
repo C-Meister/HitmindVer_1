@@ -2031,7 +2031,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				while (RECEIVEHAPPEN == true);
+				while (RECEIVEHAPPEN == true); 
 					strcpy(clientcatchmind, message);
 					SDLCLOCK++;
 					RECEIVEHAPPEN = true;
