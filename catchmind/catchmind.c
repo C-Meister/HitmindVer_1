@@ -2152,7 +2152,6 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				fprintf(out[3], "SDLCLEAR\n");
 				continue;
 			}
-
 			else if (strncmp("player 1 connect", message, 15) == 0) {
 				sscanf(message, "player 1 connect %s", friendname[0]);
 				status[0] = 1;
@@ -5019,18 +5018,12 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		//	TTF_DrawText(Renderer, Font, unicode, 0, 50);
 
 		if (happen == true) {
-			//		SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 0);// 색깔을 흰색으로 설정해야함 그래야 지우개 역할을 하므로
-			//		SDL_RenderFillRect(Renderer, &Timer);// 지우개같이 흰색으로 칠함
-		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, MagTexture, PasTexture, RecTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, &Magnifying, &Pass, &Recycle, Font, inputText, &strong, r, g, b);
 			happen = false;
-			cur(10, 10);
-			printf("ccount = %d", ccount);
 			//		cur(30, 30);
 			//		printf("send :%d", ccount);
 
 		}
-
 	}
 
 	SDL_DestroyTexture(InpTexture);
@@ -6068,8 +6061,6 @@ int SDL_MAINSMODE2(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰�
 								}
 								drag = true; //드래그로 그릴수 있게 설정
 								happen = true;
-
-
 								break;
 							}
 							else if (clicks.eraser == true) {
