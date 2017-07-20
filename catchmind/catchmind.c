@@ -5208,9 +5208,9 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 	SDL_Rect InputT = { 0 };//InputT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect UserT = { 0 };//UserT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
 	SDL_Rect QuesT = { 0 };//QuesT ÀÌ¹ÌÁöÀÇ Á¤º¸¸¦ ´ã±â À§ÇÑ »ç°¢Çü º¯¼ö ¼±¾ð
-	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 180 };
-	SDL_Rect Timer2 = { 0, 100, 400, 80 };
-	SDL_Rect Timer3 = { 150, 150, 200, 30 };
+	SDL_Rect Timer = { 0, 0, 1310 / 4 + 10, 200 };
+	SDL_Rect Timer2 = { 0, 100, 400, 70 };
+	SDL_Rect Timer3 = { 150, 150, 200,30 };
 	// ÅØ½ºÃÄ¿Í »ç°¢Çü ¼±¾ð ³¡
 
 	char str[256] = "";//UNICODE2UTF8ÀÇ ¹ÝÈ¯°ªÀ» º¹»çÇÒ ¹è¿­¼±¾ð
@@ -5539,9 +5539,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 			RenderTexture(Renderer, QusTexture, &QuesT);// ·»´õ·¯¿¡ ÀúÀåÇÏ±â
 			han2unicode(topics[turn - 1], unicode);
 			TTF_DrawText(Renderer, topicFont, unicode, 90, 25);
-			sprintf(query, "¹®Á¦ %d/%d", ee+1, connectroom[CHOOSEROOM].question);
-			han2unicode(query, unicode);
-			TTF_DrawText(Renderer2, topicFont, unicode, 100, 0);
+			
 			if (ee + 1 == connectroom[CHOOSEROOM].question)
 			{
 				quit = true;
@@ -5713,12 +5711,15 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		}
 
 		// contest¸ðµå
-		if (vote == false) {
-			writemode = true;
+		if (vote == true) {
+			writemode = false;
+			drag = false;
 			//	CLS;
 		}
-		else
+		else if (MAKETOPIC == true)
 			writemode = false;
+		else
+			writemode = true;
 
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
 			switch (event.type) {//ÀÌº¥Æ® Å¸ÀÔ¿¡ µû¶ó ÄÉÀÌ½º¹® ½ÇÇà
@@ -6239,6 +6240,9 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 					ZeroMemory(unicode, sizeof(unicode));// Ãß°¡
 				}
 			}
+			sprintf(query, "¹®Á¦ %d/%d", ee + 1, connectroom[CHOOSEROOM].question);
+			han2unicode(query, unicode);
+			TTF_DrawText(Renderer, topicFont, unicode, 10, 220);
 			CHATHAPPEN = false;
 			happen = true;
 		}
