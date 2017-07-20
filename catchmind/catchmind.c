@@ -5640,6 +5640,7 @@ int SDL_MAINSMODE2(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰�
 				firstclock = clock();
 				first = 0;
 				ee++;
+				CHATHAPPEN = true;
 			}
 			sprintf(query, "투표 %d초 남음", 21 - first);
 			han2unicode(query, unicode);
