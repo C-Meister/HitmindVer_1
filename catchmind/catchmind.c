@@ -3250,7 +3250,7 @@ void Clnt_1(int v)
 		if (recv(Sconnect_sock[v], message, 45, 0) > 0) {
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-				sendall(message, v);
+				sendall(message, 5);
 				continue;
 			}
 			else if (strncmp(message, "cont   ", 7) == 0)
