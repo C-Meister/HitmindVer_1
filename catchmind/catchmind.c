@@ -149,6 +149,7 @@ bool TIMESET = false;
 bool timeout = false;
 MYSQL *cons;
 char CHOOSEROOM = 0;
+bool RECEIVEHAPPEN = false;
 bool topichappen = false;
 bool SDL_Clear = false;
 bool CurrectHappen = true;
@@ -2030,11 +2031,13 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 		if (recv(connect_sock, message, 45, 0) > 0) { //서버에서 데이터를 받아와 message변수에 저장
 			if (strncmp(message, "0 ", 2) == 0 || strncmp(message, "1 ", 2) == 0)
 			{
-
-				strcpy(clientcatchmind, message);
-				SDLCLOCK++;
-				cur(12, 12);
-				printf("SDLCLOCK = %d", SDLCLOCK);
+				if (RECEIVEHAPPEN == false) {
+					strcpy(clientcatchmind, message);
+					SDLCLOCK++;
+					RECEIVEHAPPEN = true;
+					cur(12, 12);
+					printf("SDLCLOCK = %d", SDLCLOCK);
+				}
 		//		cur(10, 22);
 		//		printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
@@ -4437,7 +4440,8 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			writemode = false;		//X
 	//	CLS;
 		}
-		if (buff < SDLCLOCK) {
+
+		if (RECEIVEHAPPEN == true) {
 			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 		//	ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
@@ -4447,6 +4451,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 			SDL_RenderPresent(Renderer2);
 			cur(11, 11);
 			printf("Render = %d", buff);
+			RECEIVEHAPPEN = false;
 		}
 
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
