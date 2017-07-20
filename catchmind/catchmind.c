@@ -1403,7 +1403,7 @@ void usermain(void) {
 #ifdef MINSUK
 #endif
 	exit(1);
-}
+} 
 void zeroprint(int xx, int yy, int lr, int m) {
 	disablecursor(1);
 	if (9 <= yy && yy <= 11) {
