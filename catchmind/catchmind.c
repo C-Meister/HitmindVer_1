@@ -2033,6 +2033,8 @@ void recieve(void) { //¼­¹ö¿¡¼­ µ¥ÀÌÅÍ ¹Þ¾Æ¿À´Â ¾²·¹µå¿ë ÇÔ¼ö
 
 				strcpy(clientcatchmind, message);
 				SDLCLOCK++;
+				cur(12, 12);
+				pritnf("SDLCLOCK = %d", SDLCLOCK);
 		//		cur(10, 22);
 		//		printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
@@ -4443,6 +4445,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		//	printf("buff : %d", buff);
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			SDL_RenderPresent(Renderer2);
+			cur(11, 11);
+			printf("Render = %d", buff);
 		}
 
 		if (SDL_PollEvent(&event)) {//ÀÌº¥Æ®°¡ ÀÖÀ¸¸é if¹® ½ÇÇà
@@ -5025,6 +5029,8 @@ int SDL_MAINS(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´Â ¸ÞÀ
 		//	fprintf(out[0], "%d %d %d %d %d %.1f %.0f %.0f %.0f\n",clicks.pencil, clicks.eraser, drag, x, y, strong, r, g, b);
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, MagTexture, PasTexture, RecTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, &Magnifying, &Pass, &Recycle, Font, inputText, &strong, r, g, b);
 			happen = false;
+			cur(10, 10);
+			printf("ccount = %d", ccount);
 			//		cur(30, 30);
 			//		printf("send :%d", ccount);
 
@@ -6013,7 +6019,7 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 								if (connect_sock != 0) {
 
 									send(connect_sock, "con   SDLCLEAR", 35, 0);
-
+									ccount++;
 								}
 								//	SDL_RenderFillRect(Renderer, &Fonts);// ÆùÆ®¸¦ Ãâ·ÂÇÔ. ±Ùµ¥ Èò»öÀÌ¹Ç·Î Áö¿öÁÖ´Â ¿ªÇÒÀ» ÇÏ°ÔµÊ
 								clicks.eraser = false;
@@ -6157,11 +6163,13 @@ int SDL_MAINSMODE2(void) {// ÀÌ ¸ÞÀÎÀº SDL.h¿¡ ¼±¾ðµÈ ¸ÞÀÎÇÔ¼ö·Î ¿ì¸®°¡ ÈçÈ÷ ¾²´
 		if (happen == true) {
 			SDL_RenderUpdate(Renderer, Renderer2, Renderer3, TraTexture, BoxTexture, EraTexture, PenTexture, NewTexture, ChaTexture, InpTexture, MagTexture, PasTexture, RecTexture, &Track, &Box, &Eraser, &Pencil, &New, &Fonts, &Chat, &InputT, &Magnifying, &Pass, &Recycle, Font, inputText, &strong, r, g, b);
 			happen = false;
+			cur(10, 10);
+		
 			//		cur(30, 30);
 			//		printf("send :%d", ccount);
 
 		}
-
+	
 	}
 
 	SDL_DestroyTexture(InpTexture);
