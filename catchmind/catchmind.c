@@ -2033,10 +2033,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				while (RECEIVEHAPPEN == true); 
 					strcpy(clientcatchmind, message);
-					SDLCLOCK++;
 					RECEIVEHAPPEN = true;
-					cur(12, 12);
-					printf("SDLCLOCK = %d", SDLCLOCK);
 		//		cur(10, 22);
 		//		printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
@@ -2296,8 +2293,9 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			}
 			else if (strcmp(message, "SDLCLEAR") == 0)
 			{
+				while (RECEIVEHAPPEN == true);
 				SDL_Clear = true;
-				SDLCLOCK++;
+				RECEIVEHAPPEN = false;
 				continue;
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
@@ -4441,16 +4439,11 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 		}
 
 		if (RECEIVEHAPPEN == true) {
-			buff++;
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
-		//	ZeroMemory(clientcatchmind, sizeof(clientcatchmind));
-		//	cur(18, 10);
-		//	printf("buff : %d", buff);
+			RECEIVEHAPPEN = false;
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
 			SDL_RenderPresent(Renderer2);
-			cur(11, 11);
-			printf("Render = %d", buff);
-			RECEIVEHAPPEN = false;
+			
 		}
 
 		if (SDL_PollEvent(&event)) {//이벤트가 있으면 if문 실행
