@@ -2034,6 +2034,7 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				while (RECEIVEHAPPEN == true); 
 					strcpy(clientcatchmind, message);
 					RECEIVEHAPPEN = true;
+
 		//		cur(10, 22);
 		//		printf("SDLCLOCK : %d", SDLCLOCK);
 				ZeroMemory(message, sizeof(message));
@@ -4438,7 +4439,7 @@ int SDL_MAINS(void) {// 이 메인은 SDL.h에 선언된 메인함수로 우리가 흔히 쓰는 메�
 	//	CLS;
 		}
 
-		if (RECEIVEHAPPEN == true) {
+		if (RECEIVEHAPPEN == true && writemode == false) {
 			sscanf(clientcatchmind, "%hhd %hhd %hhd %d %d %f %f %f %f", &click_eraser, &click_pencil, &dragging, &xxx, &yyy, &sstrong, &rr, &gg, &bb);
 		
 			ReceiveRender(Window2, Renderer2, (bool)click_eraser, (bool)click_pencil, (bool)dragging, xxx, yyy, sstrong, (float)rr, (float)gg, (float)bb);
