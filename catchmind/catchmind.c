@@ -2034,10 +2034,6 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 				while (RECEIVEHAPPEN == true); 
 					strcpy(clientcatchmind, message);
 					RECEIVEHAPPEN = true;
-
-		//		cur(10, 22);
-		//		printf("SDLCLOCK : %d", SDLCLOCK);
-				ZeroMemory(message, sizeof(message));
 				continue;
 			}
 			else if (strcmp(message, "timeclear") == 0)
