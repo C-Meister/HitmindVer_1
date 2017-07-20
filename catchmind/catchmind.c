@@ -2296,7 +2296,8 @@ void recieve(void) { //서버에서 데이터 받아오는 쓰레드용 함수
 			{
 				while (RECEIVEHAPPEN == true);
 				SDL_Clear = true;
-				RECEIVEHAPPEN = false;
+				RECEIVEHAPPEN = true;
+				
 				continue;
 			}
 			else if (strcmp(message, "right 1 answer") == 0)
