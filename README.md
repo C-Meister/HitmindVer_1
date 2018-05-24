@@ -7,7 +7,7 @@
 ## 사용 기술
 1. 소켓 프로그래밍 (WinSock)
 2. MySQL (libmysql)
-3. SDL2 Graphic (SDL2)
+3. SDL2 Graphic ([SDL2](https://www.libsdl.org/download-2.0.php))
 
 ## 소개
 <p align="center">
