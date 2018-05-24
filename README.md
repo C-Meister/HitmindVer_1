@@ -1,5 +1,5 @@
 # HitmindVer_1
-[대구소프트웨어고등학교](http://www.dgsw.hs.kr/index.do) 2017학년도 1학년 1학기 나르샤 프로젝트입니다.
+[대구소프트웨어고등학교] (http://www.dgsw.hs.kr/index.do) 2017학년도 1학년 1학기 나르샤 프로젝트입니다.
 
 ## 사용 언어
 * C
